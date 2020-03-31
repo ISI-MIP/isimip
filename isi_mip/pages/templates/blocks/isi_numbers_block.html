@@ -1,5 +1,8 @@
-<div class="col-sm-3">
-    {% include 'widgets/heading3.html' with text='ISIMIP in numbers'%}
-    {% include 'widgets/indicator.html' with number=number1 title=value.number1.title text=value.number1.text  %}
-    {% include 'widgets/indicator.html' with number=number2 title=value.number2.title text=value.number2.text  %}
+<div class="col-sm-12">
+{% include 'widgets/heading3.html' with text='ISIMIP in numbers'%}
 </div>
+{% for number in value.numbers %}
+    <div class="col-sm-3">
+        {% include 'widgets/indicator.html' with number=number.number title=number.title text=number.text  %}
+    </div>
+{% endfor %}
