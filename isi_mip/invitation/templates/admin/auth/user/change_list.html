@@ -7,5 +7,10 @@
         {% blocktrans with cl.opts.verbose_name as name %}Invite {{ name }}{% endblocktrans %}
       </a>
     </li>
+    <li>
+      <a href="{% url 'export_users' %}" class="addlink">
+        {% blocktrans with cl.opts.verbose_name_plural as name %}Export {{ name }}{% endblocktrans %}
+      </a>
+    </li>
     {{ block.super }}
 {% endblock %}

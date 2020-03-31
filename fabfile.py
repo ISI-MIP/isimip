@@ -49,7 +49,7 @@ def deploy():
     with cd(env.path):
         run("git pull %(push_remote)s %(push_branch)s" % env)
         with prefix("source %(virtualenv_path)s/bin/activate" % env):
-            run("pip install -r requirements/production.txt")
+            # run("pip install -r requirements/production.txt")
             run("./manage.py collectstatic --noinput --settings=config.settings.production")
 
     migrate()

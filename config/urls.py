@@ -12,11 +12,13 @@ from wagtail.contrib.sitemaps.views import sitemap
 
 from isi_mip.climatemodels import urls as climatemodels_urls
 from isi_mip.invitation import urls as invitations_urls
+from isi_mip.contrib.views import export_users
 
 urlpatterns = [
     url(r'^styleguide/', include("isi_mip.styleguide.urls", namespace="styleguide")),
     url(r'^sitemap\.xml$', sitemap),
 
+    url(r'^admin/export/users/$', export_users, name='export_users'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^auth/', include('django.contrib.auth.urls')),
     url(r'^blog/', include('blog.urls', namespace="blog")),
