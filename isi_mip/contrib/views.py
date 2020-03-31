@@ -1,6 +1,7 @@
 import csv
 import time
 
+from django.http import Http404
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -57,3 +58,5 @@ def export_users(request):
             writer.writerow(row)
 
         return response
+    else:
+        raise Http404  
