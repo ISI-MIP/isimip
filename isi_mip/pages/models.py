@@ -286,7 +286,7 @@ class HomePage(RoutablePageWithDefault):
         # Search
         search_query = request.GET.get('query', None)
         if search_query:
-            page_results = Page.objects.live().not_type((BlogPage, BlogIndexPage)).search(search_query).annotate_score("score")
+            page_results = Page.objects.live().not_type((BlogIndexPage)).search(search_query).annotate_score("score")
 
             # Log the query so Wagtail can suggest promoted results
             Query.get(search_query).add_hit()
