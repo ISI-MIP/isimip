@@ -459,6 +459,8 @@ class ImpactModel(models.Model):
             ('Basic information', [
                 (vname('version'), self.version),
                 ('Model output license', model_output_license),
+                (vname('model_url'), self.model_url),
+                (vname('model_license'), self.model_license),
                 (vname('simulation_round_specific_description'), self.simulation_round_specific_description),
                 (vname('main_reference_paper'),
                  self.main_reference_paper.entry_with_link() if self.main_reference_paper else None),
