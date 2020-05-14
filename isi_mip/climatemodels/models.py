@@ -329,6 +329,10 @@ class ImpactModel(models.Model):
     )
     version = models.CharField(max_length=500, null=True, blank=True, verbose_name='Model version',
                                help_text='The model version with which these simulations were run. Please indicate if the model version used for ISIMIP2b can be evaluated based on comparison of the ISIMIP2a runs with observed impacts.')
+    model_license = models.CharField(max_length=200, null=True, blank=True, verbose_name='Model license',
+                               help_text='The license the model is linked to.')
+    model_url = models.URLField(null=True, blank=True, verbose_name='Model Homepage',
+                               help_text='The homepage of the model or a link to a git tree or hash of the model version used.')
     main_reference_paper = models.ForeignKey(
         ReferencePaper, null=True, blank=True, related_name='main_ref', verbose_name='Reference paper: main reference',
         help_text="The single paper that should be cited when referring to simulation output from this model",
