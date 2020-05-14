@@ -53,7 +53,7 @@
 						<div class="widget-expandable-listitem-definitions">
 							{% for definition in listitem.definitions %}
 								<div class="widget-expandable-listitem-definition">
-									{{ definition.text|safe }}
+									{{ definition.text|safe|urlize }}
 								</div>
 							{% endfor %}
 						</div>
