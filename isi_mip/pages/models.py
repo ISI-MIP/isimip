@@ -222,6 +222,10 @@ class HomePage(RoutablePageWithDefault):
     number1_imported_number = models.CharField(max_length=255, null=True, blank=True)
     number2_link = models.URLField(null=True, blank=True)
     number2_imported_number = models.CharField(max_length=255, null=True, blank=True)
+    number3_link = models.URLField(null=True, blank=True)
+    number3_imported_number = models.CharField(max_length=255, null=True, blank=True)
+    number4_link = models.URLField(null=True, blank=True)
+    number4_imported_number = models.CharField(max_length=255, null=True, blank=True)
 
     content = StreamField([
         ('row', RowBlock([
@@ -252,6 +256,14 @@ class HomePage(RoutablePageWithDefault):
             FieldPanel('number2_link'),
             FieldPanel('number2_imported_number'),
         ], heading='Second import number', help_text='The manual number will be displayed in favor of the imported number.', classname="collapsible collapsed"),
+        MultiFieldPanel([
+            FieldPanel('number3_link'),
+            FieldPanel('number3_imported_number'),
+        ], heading='Third import number', help_text='The manual number will be displayed in favor of the imported number.', classname="collapsible collapsed"),
+        MultiFieldPanel([
+            FieldPanel('number4_link'),
+            FieldPanel('number4_imported_number'),
+        ], heading='Fourth import number', help_text='The manual number will be displayed in favor of the imported number.', classname="collapsible collapsed"),
         StreamFieldPanel('content'),
     ]
 

@@ -123,6 +123,10 @@ class IsiNumbersBlock(StructBlock):
             context['value']['numbers'][0]['number'] = page.number1_imported_number
         if page.number2_imported_number and len(context['value']['numbers']) >= 2:
             context['value']['numbers'][1]['number'] = page.number2_imported_number
+        if page.number3_imported_number and len(context['value']['numbers']) >= 3:
+            context['value']['numbers'][2]['number'] = page.number3_imported_number
+        if page.number4_imported_number and len(context['value']['numbers']) >= 4:
+            context['value']['numbers'][3]['number'] = page.number4_imported_number
         
         return context
 

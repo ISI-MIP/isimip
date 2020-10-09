@@ -30,6 +30,8 @@ class Command(BaseCommand):
         for home_page in home_pages:
             number1 = None
             number2 = None
+            number3 = None
+            number4 = None
             if home_page.number1_link:
                 number1 = self.get_number(home_page.number1_link)
                 if number1:
@@ -40,7 +42,17 @@ class Command(BaseCommand):
                 if number2:
                     print('%s: imported number %s' % (home_page.number2_link, number2))
                     home_page.number2_imported_number = number2
-            if number1 or number2:
+            if home_page.number3_link:
+                number3 = self.get_number(home_page.number3_link)
+                if number3:
+                    print('%s: imported number %s' % (home_page.number3_link, number3))
+                    home_page.number3_imported_number = number3
+            if home_page.number4_link:
+                number4 = self.get_number(home_page.number4_link)
+                if number4:
+                    print('%s: imported number %s' % (home_page.number4_link, number4))
+                    home_page.number4_imported_number = number4
+            if number1 or number2 or number3 or number4:
                 home_page.save()
             else:
                 print('nothing imported')
