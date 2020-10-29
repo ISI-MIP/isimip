@@ -175,6 +175,7 @@ class Sector(models.Model):
         ('WaterGlobal', 'Water (global)'),
         ('WaterRegional', 'Water (regional)'),
         ('Biomes', 'Biomes'),
+        ('Fire', 'Fire'),
         ('Forests', 'Forests'),
         ('MarineEcosystemsGlobal', 'Marine Ecosystems and Fisheries (global)'),
         ('MarineEcosystemsRegional', 'Marine Ecosystems and Fisheries (regional)'),
@@ -975,6 +976,89 @@ class Biomes(BiomesForests):
                 (vname('output'), self.output),
                 (vname('output_per_pft'), self.output_per_pft),
                 (vname('considerations'), self.considerations),
+            ]),
+        ] + generic
+
+
+class Fire(BiomesForests):
+    # key model processes
+    compute_soil_carbon = models.TextField(null=True, blank=True, default='', verbose_name='How do you compute soil organic carbon during land use (do you mix the previous PFT SOC into agricultural SOC)?')
+    seperate_soil_carbon = models.TextField(null=True, blank=True, default='', verbose_name='Do you separate soil organic carbon in pasture from natural grass?')
+    harvest_npp_crops = models.TextField(null=True, blank=True, default='', verbose_name='Do you harvest NPP of crops? Do you including grazing? How does harvested NPP decay?')
+    treat_biofuel_npp = models.TextField(null=True, blank=True, default='', verbose_name='How do you to treat biofuel NPP and biofuel harvest?')
+    npp_litter_output = models.TextField(null=True, blank=True, default='', verbose_name='Does non-harvested crop NPP go to litter in your output?')
+    # model setup
+    simulate_bioenergy = models.TextField(null=True, blank=True, default='', verbose_name='How do you simulate bioenergy? I.e. What PFT do you simulate on bioenergy land?')
+    transition_cropland = models.TextField(null=True, blank=True, default='', verbose_name='How do you simulate the transition from cropland to bioenergy?')
+    simulate_pasture = models.TextField(null=True, blank=True, default='', verbose_name='How do you simulate pasture (which PFT)?')
+    # Burnt Area
+    main_components_burnt_area = models.TextField(null=True, blank=True, default='', verbose_name='What are the main components of burned area computation?')
+    # Ignition
+    sources_of_ignition = models.TextField(null=True, blank=True, default='', verbose_name='Which sources of ignition are included?')
+    fire_ignition_implemented = models.TextField(null=True, blank=True, default='', verbose_name='Is fire ignition implemented as a random process?')
+    human_ignition = models.TextField(null=True, blank=True, default='', verbose_name='Is human influence on fire ignition and/or suppression included? How?')
+    human_ignition_conditions = models.TextField(null=True, blank=True, default='', verbose_name='If human ignitions are included for which conditions are the ignitions highest/lowest?')
+    # Spread and duration
+    how_does_fire_spread = models.TextField(null=True, blank=True, default='', verbose_name='How does fire spread?')
+    fire_duration_computed = models.TextField(null=True, blank=True, default='', verbose_name='How is fire duration computed?')
+    # Fuel load and combustion
+    model_compute_fuel_load = models.TextField(null=True, blank=True, default='', verbose_name='How does the model compute fuel load?')
+    list_of_fuel_classes = models.TextField(null=True, blank=True, default='', verbose_name='List of fuel classes (full names and abbreviations)')
+    fuel_moisture_linked = models.TextField(null=True, blank=True, default='', verbose_name='Is fuel moisture linked to soil moisture/air humidity/precip?')
+    carbon_pools_combusted = models.TextField(null=True, blank=True, default='', verbose_name='Which carbon pools are combusted?')
+    combustion_completeness = models.TextField(null=True, blank=True, default='', verbose_name='Is the combustion completeness constant or depends on what (fuel type, moisture?)')
+    # Landcover
+    min_max_burned_area_grid = models.TextField(null=True, blank=True, default='', verbose_name='What is the minimum/maximum burned area fraction at grid cell level? Over which time period? ')
+    land_cover_classes_allowed = models.TextField(null=True, blank=True, default='', verbose_name='Land-cover classes allowed to burn')
+    burned_area_computed_separately = models.TextField(null=True, blank=True, default='', verbose_name='Is burned area computed separately for each PFT? If not how is burned area separated into the PFT-burned area? ')
+    peatland_fires_included = models.TextField(null=True, blank=True, default='', verbose_name='Are peatland fires included?')
+    deforestation_or_clearing_included = models.TextField(null=True, blank=True, default='', verbose_name='Are deforestation or land clearing fires included?')
+    pastures_represented = models.TextField(null=True, blank=True, default='', verbose_name='How are pastures represented?')
+    cropland_burn_differ = models.TextField(null=True, blank=True, default='', verbose_name='If croplands burn, does the fire model differ for this PFT? If yes please describe.')
+    pasture_burn_differ = models.TextField(null=True, blank=True, default='', verbose_name='If pastures burn, does the fire model differ for his PFT? If yes, please describe')
+    # Fire mortality
+    vegetation_fire_mortality = models.TextField(null=True, blank=True, default='', verbose_name='vegetation fire mortality: is it constant/constant per pft/depends on (for instance fire intensity, bark thickness, veg height)')
+
+    class Meta:
+        verbose_name_plural = 'Fires'
+        verbose_name = 'Fire'
+
+    def values_to_tuples(self):
+        vname = self._get_verbose_field_name_question
+        generic = super(BiomesForests, self).values_to_tuples()
+        return [
+            ('Burnt Area', [
+                (vname('main_components_burnt_area'), self.main_components_burnt_area),
+            ]),
+            ('Ignition', [
+                (vname('sources_of_ignition'), self.sources_of_ignition),
+                (vname('fire_ignition_implemented'), self.fire_ignition_implemented),
+                (vname('human_ignition'), self.human_ignition),
+                (vname('human_ignition_conditions'), self.human_ignition_conditions),
+            ]),
+            ('Spread and duration', [
+                (vname('how_does_fire_spread'), self.how_does_fire_spread),
+                (vname('fire_duration_computed'), self.fire_duration_computed),
+            ]),
+            ('Fuel load and combustion', [
+                (vname('model_compute_fuel_load'), self.model_compute_fuel_load),
+                (vname('list_of_fuel_classes'), self.list_of_fuel_classes),
+                (vname('fuel_moisture_linked'), self.fuel_moisture_linked),
+                (vname('carbon_pools_combusted'), self.carbon_pools_combusted),
+                (vname('combustion_completeness'), self.combustion_completeness),
+            ]),
+            ('Landcover', [
+                (vname('min_max_burned_area_grid'), self.min_max_burned_area_grid),
+                (vname('land_cover_classes_allowed'), self.land_cover_classes_allowed),
+                (vname('burned_area_computed_separately'), self.burned_area_computed_separately),
+                (vname('peatland_fires_included'), self.peatland_fires_included),
+                (vname('deforestation_or_clearing_included'), self.deforestation_or_clearing_included),
+                (vname('pastures_represented'), self.pastures_represented),
+                (vname('cropland_burn_differ'), self.cropland_burn_differ),
+                (vname('pasture_burn_differ'), self.pasture_burn_differ),
+            ]),
+            ('Fire mortality', [
+                (vname('vegetation_fire_mortality'), self.vegetation_fire_mortality),
             ]),
         ] + generic
 

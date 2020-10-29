@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import inlineformset_factory, ClearableFileInput
+from django.utils import text
 from django.utils.safestring import mark_safe
 from dateutil.parser import parse
 
@@ -392,6 +393,79 @@ class BiomesForm(BaseSectorForm):
         }
 
 
+class FireForm(BaseSectorForm):
+    template = 'edit_fire.html'
+
+    class Meta:
+        model = Fire
+        exclude = ('impact_model',)
+        widgets = {
+            'output': MyTextInput(textarea=True),
+            'output_per_pft': MyTextInput(),
+            'considerations': MyTextInput(textarea=True),
+            'dynamic_vegetation': MyTextInput(textarea=True),
+            'nitrogen_limitation': MyTextInput(textarea=True),
+            'co2_effects': MyTextInput(textarea=True),
+            'light_interception': MyTextInput(textarea=True),
+            'light_utilization': MyTextInput(textarea=True),
+            'phenology': MyTextInput(textarea=True),
+            'water_stress': MyTextInput(textarea=True),
+            'heat_stress': MyTextInput(textarea=True),
+            'evapotranspiration_approach': MyTextInput(textarea=True),
+            'rooting_depth_differences': MyTextInput(textarea=True),
+            'root_distribution': MyTextInput(textarea=True),
+            'permafrost': MyTextInput(textarea=True),
+            'closed_energy_balance': MyTextInput(textarea=True),
+            'soil_moisture_surface_temperature_coupling': MyTextInput(textarea=True),
+            'latent_heat': MyTextInput(textarea=True),
+            'sensible_heat': MyTextInput(textarea=True),
+            'mortality_age': MyTextInput(textarea=True),
+            'mortality_fire': MyTextInput(textarea=True),
+            'mortality_drought': MyTextInput(textarea=True),
+            'mortality_insects': MyTextInput(textarea=True),
+            'mortality_storm': MyTextInput(textarea=True),
+            'mortality_stochastic_random_disturbance': MyTextInput(textarea=True),
+            'mortality_other': MyTextInput(textarea=True),
+            'mortality_remarks': MyTextInput(textarea=True),
+            'nbp_fire': MyTextInput(textarea=True),
+            'nbp_landuse_change': MyTextInput(textarea=True),
+            'nbp_harvest': MyTextInput(textarea=True),
+            'nbp_other': MyTextInput(textarea=True),
+            'nbp_comments': MyTextInput(textarea=True),
+            'list_of_pfts': MyTextInput(textarea=True),
+            'pfts_comments': MyTextInput(textarea=True),
+            'compute_soil_carbon': MyTextInput(textarea=True),
+            'seperate_soil_carbon': MyTextInput(textarea=True),
+            'harvest_npp_crops': MyTextInput(textarea=True),
+            'treat_biofuel_npp': MyTextInput(textarea=True),
+            'npp_litter_output': MyTextInput(textarea=True),
+            'simulate_bioenergy': MyTextInput(textarea=True),
+            'transition_cropland': MyTextInput(textarea=True),
+            'simulate_pasture': MyTextInput(textarea=True),
+            'main_components_burnt_area': MyTextInput(textarea=True),
+            'sources_of_ignition': MyTextInput(textarea=True),
+            'fire_ignition_implemented': MyTextInput(textarea=True),
+            'human_ignition': MyTextInput(textarea=True),
+            'human_ignition_conditions': MyTextInput(textarea=True),
+            'how_does_fire_spread': MyTextInput(textarea=True),
+            'fire_duration_computed': MyTextInput(textarea=True),
+            'model_compute_fuel_load': MyTextInput(textarea=True),
+            'list_of_fuel_classes': MyTextInput(textarea=True),
+            'fuel_moisture_linked': MyTextInput(textarea=True),
+            'carbon_pools_combusted': MyTextInput(textarea=True),
+            'combustion_completeness': MyTextInput(textarea=True),
+            'min_max_burned_area_grid': MyTextInput(textarea=True),
+            'land_cover_classes_allowed': MyTextInput(textarea=True),
+            'burned_area_computed_separately': MyTextInput(textarea=True),
+            'peatland_fires_included': MyTextInput(textarea=True),
+            'deforestation_or_clearing_included': MyTextInput(textarea=True),
+            'pastures_represented': MyTextInput(textarea=True),
+            'cropland_burn_differ': MyTextInput(textarea=True),
+            'pasture_burn_differ': MyTextInput(textarea=True),
+            'vegetation_fire_mortality': MyTextInput(textarea=True),
+        }
+
+
 class BiodiversityForm(BaseSectorForm):
     template = 'edit_biodiversity.html'
 
@@ -504,6 +578,7 @@ def get_sector_form(sector):
         'agroeconomicmodelling': GenericSectorForm,
         'biodiversity': BiodiversityForm,
         'biomes': BiomesForm,
+        'fire': FireForm,
         'coastalinfrastructure': GenericSectorForm,
         'computablegeneralequilibriummodelling': GenericSectorForm,
         'energy': EnergyForm,

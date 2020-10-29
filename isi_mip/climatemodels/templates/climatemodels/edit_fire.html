@@ -1,0 +1,122 @@
+{% extends 'climatemodels/edit_sector.html' %}
+{% load template_form %}
+{% load keyvalue %}
+
+{% block form_content %}
+	{% template_form form as nf %}
+	{% include 'widgets/richtext-content.html' with content='This information is specific to each simulation round.' %}
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Model set-up specifications' %}
+		{{ nf.simulate_bioenergy }}
+		{{ nf.transition_cropland }}
+		{{ nf.simulate_pasture }}
+	</fieldset>
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Key model processes' %}
+		<p>Please provide yes/no and a short description how the process is included</p>
+		{{ nf.dynamic_vegetation }}
+		{{ nf.nitrogen_limitation }}
+		{{ nf.co2_effects }}
+		{{ nf.light_interception }}
+		{{ nf.light_utilization }}
+		{{ nf.phenology }}
+		{{ nf.water_stress }}
+		{{ nf.heat_stress }}
+		{{ nf.evapotranspiration_approach }}
+		{{ nf.rooting_depth_differences }}
+		{{ nf.root_distribution }}
+		{{ nf.closed_energy_balance }}
+		{{ nf.soil_moisture_surface_temperature_coupling }}
+		{{ nf.latent_heat }}
+		{{ nf.sensible_heat }}
+		{{ nf.compute_soil_carbon }}
+		{{ nf.seperate_soil_carbon }}
+		{{ nf.harvest_npp_crops }}
+		{{ nf.treat_biofuel_npp }}
+		{{ nf.npp_litter_output }}
+	</fieldset>
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Causes of mortality in vegetation models' %}
+		<p>Describe briefly how the process is described in this model and in which way it is climate dependent.</p>
+		{{ nf.mortality_age }}
+		{{ nf.mortality_fire }}
+		{{ nf.mortality_drought }}
+		{{ nf.mortality_insects }}
+		{{ nf.mortality_storm }}
+		{{ nf.mortality_stochastic_random_disturbance }}
+		{{ nf.mortality_other }}
+		{{ nf.mortality_remarks }}
+	</fieldset>
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='NBP components' %}
+		<p>Indicate whether the model includes the processes, and how the model accounts for the fluxes, i.e. what is the fate of the biomass? E.g. directly to atmsphere or let it go to other pool</p>
+		{{ nf.nbp_fire }}
+		{{ nf.nbp_landuse_change }}
+		{{ nf.nbp_harvest }}
+		{{ nf.nbp_other }}
+		{{ nf.nbp_comments }}
+	</fieldset>
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Species / Plant Functional Types (PFTs)' %}
+		<p></p>
+		{{ nf.list_of_pfts }}
+		{{ nf.pfts_comments }}
+	</fieldset>
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Model output specifications' %}
+		{{ nf.output }}
+		{{ nf.output_per_pft }}
+		{{ nf.considerations }}
+	</fieldset>
+	{% include 'widgets/heading2.html' with text='Fire modules' %}
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Burnt Area' %}
+		{{ nf.main_components_burnt_area }}
+	</fieldset>
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Ignition' %}
+		{{ nf.sources_of_ignition }}
+		{{ nf.fire_ignition_implemented }}
+		{{ nf.human_ignition }}
+		{{ nf.human_ignition_conditions }}
+	</fieldset>
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Spread and duration' %}
+		{{ nf.how_does_fire_spread }}
+		{{ nf.fire_duration_computed }}
+	</fieldset>
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Fuel load and combustion' %}
+		{{ nf.model_compute_fuel_load }}
+		{{ nf.list_of_fuel_classes }}
+		{{ nf.fuel_moisture_linked }}
+		{{ nf.carbon_pools_combusted }}
+		{{ nf.combustion_completeness }}
+	</fieldset>
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Landcover' %}
+		{{ nf.min_max_burned_area_grid }}
+		{{ nf.land_cover_classes_allowed }}
+		{{ nf.burned_area_computed_separately }}
+		{{ nf.peatland_fires_included }}
+		{{ nf.deforestation_or_clearing_included }}
+		{{ nf.pastures_represented }}
+		{{ nf.cropland_burn_differ }}
+		{{ nf.pasture_burn_differ }}
+	</fieldset>
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Fire mortality' %}
+		{{ nf.vegetation_fire_mortality }}
+	</fieldset>
+	{% for group in form.generic_groups %}
+		<fieldset>
+		{% include 'widgets/heading3.html' with text=group.name %}
+		{% if group.description %}
+			{% include 'widgets/richtext-content.html' with content=group.description %}
+		{% endif %}
+		{% for field in group.fields %}
+			{{ nf|keyvalue:field }}
+		{% endfor %}
+		</fieldset>
+	{% endfor %}
+{% endblock %}
