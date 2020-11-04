@@ -980,17 +980,11 @@ class Biomes(BiomesForests):
         ] + generic
 
 
-class Fire(BiomesForests):
-    # key model processes
-    compute_soil_carbon = models.TextField(null=True, blank=True, default='', verbose_name='How do you compute soil organic carbon during land use (do you mix the previous PFT SOC into agricultural SOC)?')
-    seperate_soil_carbon = models.TextField(null=True, blank=True, default='', verbose_name='Do you separate soil organic carbon in pasture from natural grass?')
-    harvest_npp_crops = models.TextField(null=True, blank=True, default='', verbose_name='Do you harvest NPP of crops? Do you including grazing? How does harvested NPP decay?')
-    treat_biofuel_npp = models.TextField(null=True, blank=True, default='', verbose_name='How do you to treat biofuel NPP and biofuel harvest?')
-    npp_litter_output = models.TextField(null=True, blank=True, default='', verbose_name='Does non-harvested crop NPP go to litter in your output?')
-    # model setup
-    simulate_bioenergy = models.TextField(null=True, blank=True, default='', verbose_name='How do you simulate bioenergy? I.e. What PFT do you simulate on bioenergy land?')
-    transition_cropland = models.TextField(null=True, blank=True, default='', verbose_name='How do you simulate the transition from cropland to bioenergy?')
-    simulate_pasture = models.TextField(null=True, blank=True, default='', verbose_name='How do you simulate pasture (which PFT)?')
+class Fire(BaseSector):
+    # Input data sets used 
+    input_datasets_used = models.TextField(null=True, blank=True, default='', verbose_name='What input datasets are used in the fire model and what are they used for?')
+    time_step_fire_model = models.TextField(null=True, blank=True, default='', verbose_name='What is the time step of the fire model?')
+    time_step_exchange = models.TextField(null=True, blank=True, default='', verbose_name='What is the time step of the exchange between fire and vegetation model? e.g. are carbon pools and cover fractions updated every day?')
     # Burnt Area
     main_components_burnt_area = models.TextField(null=True, blank=True, default='', verbose_name='What are the main components of burned area computation?')
     # Ignition
@@ -1025,8 +1019,13 @@ class Fire(BiomesForests):
 
     def values_to_tuples(self):
         vname = self._get_verbose_field_name_question
-        generic = super(BiomesForests, self).values_to_tuples()
+        generic = super(Fire, self).values_to_tuples()
         return [
+            ('Input data sets used', [
+                (vname('input_datasets_used'), self.input_datasets_used),
+                (vname('time_step_fire_model'), self.time_step_fire_model),
+                (vname('time_step_exchange'), self.time_step_exchange),
+            ]),
             ('Burnt Area', [
                 (vname('main_components_burnt_area'), self.main_components_burnt_area),
             ]),

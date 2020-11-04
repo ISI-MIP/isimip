@@ -6,69 +6,11 @@
 	{% template_form form as nf %}
 	{% include 'widgets/richtext-content.html' with content='This information is specific to each simulation round.' %}
 	<fieldset>
-		{% include 'widgets/heading3.html' with text='Model set-up specifications' %}
-		{{ nf.simulate_bioenergy }}
-		{{ nf.transition_cropland }}
-		{{ nf.simulate_pasture }}
+		{% include 'widgets/heading3.html' with text='Input data sets used' %}
+		{{ nf.input_datasets_used }}
+		{{ nf.time_step_fire_model }}
+		{{ nf.time_step_exchange }}
 	</fieldset>
-	<fieldset>
-		{% include 'widgets/heading3.html' with text='Key model processes' %}
-		<p>Please provide yes/no and a short description how the process is included</p>
-		{{ nf.dynamic_vegetation }}
-		{{ nf.nitrogen_limitation }}
-		{{ nf.co2_effects }}
-		{{ nf.light_interception }}
-		{{ nf.light_utilization }}
-		{{ nf.phenology }}
-		{{ nf.water_stress }}
-		{{ nf.heat_stress }}
-		{{ nf.evapotranspiration_approach }}
-		{{ nf.rooting_depth_differences }}
-		{{ nf.root_distribution }}
-		{{ nf.closed_energy_balance }}
-		{{ nf.soil_moisture_surface_temperature_coupling }}
-		{{ nf.latent_heat }}
-		{{ nf.sensible_heat }}
-		{{ nf.compute_soil_carbon }}
-		{{ nf.seperate_soil_carbon }}
-		{{ nf.harvest_npp_crops }}
-		{{ nf.treat_biofuel_npp }}
-		{{ nf.npp_litter_output }}
-	</fieldset>
-	<fieldset>
-		{% include 'widgets/heading3.html' with text='Causes of mortality in vegetation models' %}
-		<p>Describe briefly how the process is described in this model and in which way it is climate dependent.</p>
-		{{ nf.mortality_age }}
-		{{ nf.mortality_fire }}
-		{{ nf.mortality_drought }}
-		{{ nf.mortality_insects }}
-		{{ nf.mortality_storm }}
-		{{ nf.mortality_stochastic_random_disturbance }}
-		{{ nf.mortality_other }}
-		{{ nf.mortality_remarks }}
-	</fieldset>
-	<fieldset>
-		{% include 'widgets/heading3.html' with text='NBP components' %}
-		<p>Indicate whether the model includes the processes, and how the model accounts for the fluxes, i.e. what is the fate of the biomass? E.g. directly to atmsphere or let it go to other pool</p>
-		{{ nf.nbp_fire }}
-		{{ nf.nbp_landuse_change }}
-		{{ nf.nbp_harvest }}
-		{{ nf.nbp_other }}
-		{{ nf.nbp_comments }}
-	</fieldset>
-	<fieldset>
-		{% include 'widgets/heading3.html' with text='Species / Plant Functional Types (PFTs)' %}
-		<p></p>
-		{{ nf.list_of_pfts }}
-		{{ nf.pfts_comments }}
-	</fieldset>
-	<fieldset>
-		{% include 'widgets/heading3.html' with text='Model output specifications' %}
-		{{ nf.output }}
-		{{ nf.output_per_pft }}
-		{{ nf.considerations }}
-	</fieldset>
-	{% include 'widgets/heading2.html' with text='Fire modules' %}
 	<fieldset>
 		{% include 'widgets/heading3.html' with text='Burnt Area' %}
 		{{ nf.main_components_burnt_area }}
