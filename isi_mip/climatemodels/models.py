@@ -1021,7 +1021,7 @@ class Fire(BaseSector):
         vname = self._get_verbose_field_name_question
         generic = super(Fire, self).values_to_tuples()
         return [
-            ('Input data sets used', [
+            ('Fire-specific input data sets', [
                 (vname('input_datasets_used'), self.input_datasets_used),
                 (vname('time_step_fire_model'), self.time_step_fire_model),
                 (vname('time_step_exchange'), self.time_step_exchange),
