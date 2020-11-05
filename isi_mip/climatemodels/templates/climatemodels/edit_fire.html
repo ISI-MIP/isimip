@@ -6,7 +6,7 @@
 	{% template_form form as nf %}
 	{% include 'widgets/richtext-content.html' with content='This information is specific to each simulation round.' %}
 	<fieldset>
-		{% include 'widgets/heading3.html' with text='Input data sets used' %}
+		{% include 'widgets/heading3.html' with text='Fire-specific input data sets' %}
 		{{ nf.input_datasets_used }}
 		{{ nf.time_step_fire_model }}
 		{{ nf.time_step_exchange }}
