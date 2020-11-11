@@ -990,8 +990,10 @@ class Fire(BaseSector):
     # Ignition
     sources_of_ignition = models.TextField(null=True, blank=True, default='', verbose_name='Which sources of ignition are included?')
     fire_ignition_implemented = models.TextField(null=True, blank=True, default='', verbose_name='Is fire ignition implemented as a random process?')
+    natural_ignition_implemented = models.TextField(null=True, blank=True, default='', verbose_name='How are natural ignitions implemented? Which data is used and how is it scaled?')
     human_ignition = models.TextField(null=True, blank=True, default='', verbose_name='Is human influence on fire ignition and/or suppression included? How?')
     human_ignition_conditions = models.TextField(null=True, blank=True, default='', verbose_name='If human ignitions are included for which conditions are the ignitions highest/lowest?')
+
     # Spread and duration
     how_does_fire_spread = models.TextField(null=True, blank=True, default='', verbose_name='How does fire spread?')
     fire_duration_computed = models.TextField(null=True, blank=True, default='', verbose_name='How is fire duration computed?')
@@ -1032,6 +1034,7 @@ class Fire(BaseSector):
             ('Ignition', [
                 (vname('sources_of_ignition'), self.sources_of_ignition),
                 (vname('fire_ignition_implemented'), self.fire_ignition_implemented),
+                (vname('natural_ignition_implemented'), self.natural_ignition_implemented),
                 (vname('human_ignition'), self.human_ignition),
                 (vname('human_ignition_conditions'), self.human_ignition_conditions),
             ]),

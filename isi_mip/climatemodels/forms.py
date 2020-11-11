@@ -445,6 +445,7 @@ class FireForm(BaseSectorForm):
             'main_components_burnt_area': MyTextInput(textarea=True),
             'sources_of_ignition': MyTextInput(textarea=True),
             'fire_ignition_implemented': MyTextInput(textarea=True),
+            'natural_ignition_implemented': MyTextInput(textarea=True),
             'human_ignition': MyTextInput(textarea=True),
             'human_ignition_conditions': MyTextInput(textarea=True),
             'how_does_fire_spread': MyTextInput(textarea=True),
