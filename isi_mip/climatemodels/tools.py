@@ -28,6 +28,7 @@ SKIP_FIELDS = [
     'agriculture',
     'biomes',
     'forests',
+    'fire',
     'energy',
     'marineecosystemsglobal',
     'marineecosystemsregional',
