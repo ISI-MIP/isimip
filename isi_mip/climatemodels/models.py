@@ -335,6 +335,7 @@ class ImpactModel(models.Model):
                                help_text=mark_safe('Please note, if you want to update the model license please <a href="mailto:info@isimip.org">write to us</a>.'))
     model_url = models.URLField(null=True, blank=True, verbose_name='Model Homepage',
                                help_text='The homepage of the model or a link to a git tree or hash of the model version used.')
+    dataset_history = models.URLField(null=True, blank=True, verbose_name='Dataset history')
     main_reference_paper = models.ForeignKey(
         ReferencePaper, null=True, blank=True, related_name='main_ref', verbose_name='Reference paper: main reference',
         help_text="The single paper that should be cited when referring to simulation output from this model",
@@ -398,6 +399,7 @@ class ImpactModel(models.Model):
             responsible_person=self.responsible_person,
             simulation_round_specific_description=self.simulation_round_specific_description,
             public=True,
+            dataset_history=self.dataset_history,
 
         )
         duplicate.save(is_duplication=True)
@@ -462,6 +464,7 @@ class ImpactModel(models.Model):
                 (vname('version'), self.version),
                 ('Model output license', model_output_license),
                 (vname('model_url'), self.model_url),
+                (vname('dataset_history'), self.dataset_history),
                 (vname('model_license'), self.model_license),
                 (vname('simulation_round_specific_description'), self.simulation_round_specific_description),
                 (vname('main_reference_paper'),
