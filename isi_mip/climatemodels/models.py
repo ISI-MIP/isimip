@@ -1314,8 +1314,8 @@ class Water(BaseSector):
                                               verbose_name='How many catchments were callibrated?')
     vegetation = models.NullBooleanField(verbose_name='Is CO2 fertilisation accounted for?', default=None)
     vegetation_representation = models.TextField(null=True, blank=True, default='', verbose_name='How is vegetation represented?')
-    methods_evapotranspiration = models.TextField(null=True, blank=True, default='', verbose_name='Potential evapotranspiration')
-    methods_snowmelt = models.TextField(null=True, blank=True, default='', verbose_name='Snow melt')
+    methods_evapotranspiration = models.TextField(null=True, blank=True, default='', verbose_name='Potential evapotranspiration', help_text='Is it implemented? How is it resolved?')
+    methods_snowmelt = models.TextField(null=True, blank=True, default='', verbose_name='Snow melt', help_text='Is it implemented? How is it resolved?')
 
     def values_to_tuples(self):
         vname = self._get_verbose_field_name
@@ -1368,9 +1368,44 @@ class WaterGlobal(Water):
 
 
 class WaterRegional(Water):
+    VEGETATION_CHOICES = (
+        ('prescriped', 'Prescriped'),
+        ('simulated', 'Simulated'),
+    )
+    vegetation_representation = models.CharField(null=True, blank=True, choices=VEGETATION_CHOICES, verbose_name='How is vegetation represented?', max_length=255)
+    vegetation_approach_used = models.TextField(null=True, blank=True, default='', verbose_name='Approach used to simulate vegetation dynamics')
+    calibration_model_evaluated = models.NullBooleanField(verbose_name='Was the model validated/evaluated?', default=None)
+    calibration_periods = models.TextField(null=True, blank=True, default='', verbose_name='Calibration and validation periods')
+    calibration_methods = models.TextField(null=True, blank=True, default='', verbose_name='Calibration and validation method', help_text='e.g.: Calibration for discharge at the basin outlet, Enhanced calibration for discharge at multiple gauges, etc.')
+
     class Meta:
         verbose_name = 'Water (regional)'
         verbose_name_plural = 'Water (regional)'
+
+    def values_to_tuples(self):
+        vname = self._get_verbose_field_name
+        generic = super(Water, self).values_to_tuples()
+        return [
+            ('Methods', [
+                (vname('methods_evapotranspiration'), self.methods_evapotranspiration),
+                (vname('methods_snowmelt'), self.methods_snowmelt),
+            ]),
+            ('Vegetation', [
+                (vname('vegetation_representation'), self.vegetation_representation),
+                (vname('vegetation_approach_used'), self.vegetation_approach_used),
+                (vname('vegetation'), self.vegetation),
+            ]),
+            ('Routing', [
+                (vname('routing'), self.routing),
+                (vname('routing_data'), self.routing_data),
+            ]),
+            ('Calibration', [
+                (vname('calibration'), self.calibration),
+                (vname('calibration_model_evaluated'), self.calibration_model_evaluated),
+                (vname('calibration_periods'), self.calibration_periods),
+                (vname('calibration_methods'), self.calibration_methods),
+            ]),
+        ] + generic
 
 
 class Biodiversity(BaseSector):

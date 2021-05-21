@@ -1,0 +1,44 @@
+{% extends 'climatemodels/edit_sector.html' %}
+{% load template_form %}
+{% load keyvalue %}
+
+{% block form_content %}
+	{% include 'widgets/richtext-content.html' with content='This information is specific to each simulation round and specifies the main methods implemented in the model.' %}
+	{% template_form form as nf %}
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Methods' %}
+		{{ nf.methods_evapotranspiration }}
+		{{ nf.methods_snowmelt }}
+	</fieldset>
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Vegetation' %}
+		{{ nf.vegetation_representation }}
+		{{ nf.vegetation_approach_used }}
+		{{ nf.vegetation }}
+	</fieldset>
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Routing' %}
+		{{ nf.routing }}
+		{{ nf.routing_data }}
+	</fieldset>
+	<fieldset>
+		{% include 'widgets/heading3.html' with text='Calibration' %}
+		{{ nf.calibration }}
+		{{ nf.calibration_model_evaluated }}
+		{{ nf.calibration_periods }}
+		{{ nf.calibration_methods }}
+	</fieldset>
+
+
+	{% for group in form.generic_groups %}
+		<fieldset>
+		{% include 'widgets/heading3.html' with text=group.name %}
+		{% if group.description %}
+			{% include 'widgets/richtext-content.html' with content=group.description %}
+		{% endif %}
+		{% for field in group.fields %}
+			{{ nf|keyvalue:field }}
+		{% endfor %}
+		</fieldset>
+	{% endfor %}
+{% endblock %}

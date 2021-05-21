@@ -565,6 +565,27 @@ class WaterForm(BaseSectorForm):
         }
 
 
+class WaterRegionalForm(BaseSectorForm):
+    template = 'edit_water_regional.html'
+
+    class Meta:
+        model = WaterRegional
+        exclude = ('impact_model',)
+        widgets = {
+            "methods_evapotranspiration": MyTextInput(textarea=True),
+            'methods_snowmelt': MyTextInput(textarea=True),
+            'vegetation': MyBooleanSelect(nullable=True),
+            'vegetation_approach_used': MyTextInput(textarea=True),
+            'vegetation_representation': MyMultiSelect(allowcustom=False),
+            'routing': MyTextInput(textarea=True),
+            'routing_data': MyTextInput(textarea=True),
+            'calibration': MyBooleanSelect(nullable=True),
+            'calibration_model_evaluated': MyBooleanSelect(nullable=True),
+            'calibration_periods': MyTextInput(textarea=True),
+            'calibration_methods': MyTextInput(textarea=True),
+        }
+
+
 class GenericSectorForm(BaseSectorForm):
     template = 'edit_generic_sector.html'
 
@@ -589,7 +610,7 @@ def get_sector_form(sector):
         'marineecosystemsregional': MarineEcosystemsForm,
         'permafrost': GenericSectorForm,
         'waterglobal': WaterForm,
-        'waterregional': WaterForm,
+        'waterregional': WaterRegionalForm,
         'genericsector': GenericSectorForm,
     }
     return mapping[sector.class_name.lower()]
