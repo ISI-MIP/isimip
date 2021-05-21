@@ -824,6 +824,7 @@ $(window).load(function() {
 	filters['tags'] = [];
 	filters['sectors'] = [];
 	filters['simulation_round'] = [];
+	filters['category'] = [];
     // console.log(filters);
 	// init Isotope
     var $grid = $('.papers-grid').isotope({
@@ -833,16 +834,25 @@ $(window).load(function() {
 	$grid.isotope('layout');
 
 	$(".filter select.simulation-round").select2({
-		placeholder: "Select a simulation round"
+		placeholder: "Select a simulation round",
+		width: '20%',
 	});
 	$(".filter select.sector").select2({
-		placeholder: "Select a sector"
+		placeholder: "Select a sector",
+		width: '20%',
 	});
 	$(".filter select.tag").select2({
-		placeholder: "Select further categories"
+		placeholder: "Select further categories",
+		width: '20%',
+	});
+	$(".filter select.category").select2({
+		placeholder: "Select a type",
+		width: '20%',
+		allowClear: true,
+		minimumResultsForSearch: -1
 	});
 	
-	$(".filter select.tag, .filter select.sector, .filter select.simulation-round").on('change', function(e){
+	$(".filter select.tag, .filter select.sector, .filter select.simulation-round, .filter select.category").on('change', function(e){
 		if (this.value == 'all') {
 			$(this).removeClass('is-selected');
 		} else {
@@ -865,6 +875,8 @@ $(window).load(function() {
 			} else if ($(this).hasClass('tag')) {
 				// console.log('tags');
 				filters['tags'] = value;
+			} else if ($(this).hasClass('category')) {
+				filters['category'] = [value];
 			}
 			filter_papers($grid, filters);
 		// }
@@ -874,10 +886,12 @@ $(window).load(function() {
 		$('.filter select.simulation-round').val('').change();
 		$('.filter select.sector').val('').change();
 		$('.filter select.tag').val('').change();
+		$('.filter select.category').val('').change();
 		filters = {};
 		filters['tags'] = [];
 		filters['sectors'] = [];
 		filters['simulation_round'] = [];
+		filters['category'] = [];
         $grid.isotope({ filter: '*' });
     });
     $('.filter .hide-all').on('click', function( event ) {

@@ -37,6 +37,11 @@
 							<option value=".{{ tag.name|slugify }}">{{ tag.name }}</option>
 						{% endfor %}
 					</select>
+					<select class="category form-control" name="category[]">
+						<option value="">All publications</option>
+						<option value=".peer-reviewed">Peer reviewed</option>
+						<option value=".gray-literature">Gray literature</option>
+					</select>
 					<ul class="list-unstyled list-inline button-group">
 						<li class="show-all"><a href="javascript:void(0)" class="badge badge-secondary">{% trans "Reset filters" %}</a></li>
 					</ul>
@@ -48,7 +53,7 @@
 			</div>
 			<div class="papers-grid row">
 				{% for paper in papers %}
-				<div class="col-sm-12 paper {% for tag in paper.tags.all %} {{ tag.name|slugify }}{% endfor %}{% for sr in paper.simulation_rounds.all %} {{ sr.name|slugify }}{% endfor %}{% for sector in paper.sectors.all %} {{ sector.name|slugify }}{% endfor %}">
+				<div class="col-sm-12 paper{% for tag in paper.tags.all %} {{ tag.name|slugify }}{% endfor %}{% for sr in paper.simulation_rounds.all %} {{ sr.name|slugify }}{% endfor %}{% for sector in paper.sectors.all %} {{ sector.name|slugify }}{% endfor %}{% if paper.is_peer_reviewed %} peer-reviewed{% else %} gray-literature{% endif %}">
 					{% include "widgets/page-teaser.html" with author=paper.author title=paper.title description=paper.get_journal_with_year href=paper.link open_new_tab=True magicgrow=False border=False %}
 				</div>
 				{% endfor %}
