@@ -1426,6 +1426,7 @@ class Biodiversity(BaseSector):
     additional_information_response_variable = models.TextField(null=True, blank=True, default='', verbose_name='Additional information about response variable')
     DISTRIBUTION_RESPONSE_CHOICES = (
         ('Binomial', 'Binomial'),
+        ('Bernoulli', 'Bernoulli'),
         ('Poisson', 'Poisson'),
     )
     distribution_response_variable = models.CharField(null=True, blank=True, choices=DISTRIBUTION_RESPONSE_CHOICES, verbose_name='Distribution of response variable', max_length=255)
@@ -1450,8 +1451,9 @@ class Biodiversity(BaseSector):
         ('probability of occurrence', 'probability of occurrence'),
         ('relative probability of occurrence', 'relative probability of occurrence'),
         ('summed probability of occurrence', 'summed probability of occurrence'),
+        ('species richness of taxon', 'species richness of taxon'),
     )
-    model_output = models.CharField(null=True, blank=True, choices=MODEL_OUTPUT_CHOICES, verbose_name='Model output', max_length=255)
+    model_output = ChoiceOrOtherField(max_length=500, choices=MODEL_OUTPUT_CHOICES, blank=True, null=True, verbose_name='Model output')
     additional_info_model_output = models.TextField(null=True, blank=True, default='', verbose_name='Additional Information about Model output')
 
     class Meta:
@@ -1473,7 +1475,7 @@ class Biodiversity(BaseSector):
                 (vname('software_function'), self.software_function),
                 (vname('software_package'), self.software_package),
                 (vname('software_program'), self.software_program),
-                (vname('model_output'), self.model_output),
+                (vname('model_output'), ', '.join(list(eval(self.model_output)))),
                 (vname('additional_info_model_output'), self.additional_info_model_output),
             ]),
         ] + generic

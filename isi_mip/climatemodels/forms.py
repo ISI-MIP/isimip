@@ -485,7 +485,7 @@ class BiodiversityForm(BaseSectorForm):
             'software_function':  MyMultiSelect(allowcustom=False),
             'software_package': MyMultiSelect(allowcustom=False),
             'software_program':  MyTextInput(textarea=True),
-            'model_output':  MyMultiSelect(allowcustom=False),
+            'model_output':  MyMultiSelect(allowcustom=True, multiselect=True),
             'additional_info_model_output': MyTextInput(textarea=True),
         }
 
