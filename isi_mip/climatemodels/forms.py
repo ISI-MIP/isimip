@@ -47,6 +47,7 @@ class ImpactModelForm(forms.ModelForm):
             'main_reference_paper': RefPaperWidget(),
             'other_references': RefPaperWidget(),
             'responsible_person': MyTextInput(),
+            'model_license': forms.TextInput(attrs={'readonly': 'readonly'})
         }
 
     @staticmethod
