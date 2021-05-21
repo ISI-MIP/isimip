@@ -1475,7 +1475,7 @@ class Biodiversity(BaseSector):
                 (vname('software_function'), self.software_function),
                 (vname('software_package'), self.software_package),
                 (vname('software_program'), self.software_program),
-                (vname('model_output'), ', '.join(list(eval(self.model_output)))),
+                (vname('model_output'), self.model_output and ', '.join(list(eval(self.model_output)))),
                 (vname('additional_info_model_output'), self.additional_info_model_output),
             ]),
         ] + generic
