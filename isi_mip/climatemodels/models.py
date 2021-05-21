@@ -464,7 +464,7 @@ class ImpactModel(models.Model):
                 (vname('version'), self.version),
                 ('Model output license', model_output_license),
                 (vname('model_url'), self.model_url),
-                (vname('dataset_history'), self.dataset_history),
+                (vname('dataset_history'), "<a href='{0}'>{0}</a>".format(self.dataset_history)),
                 (vname('model_license'), self.model_license),
                 (vname('simulation_round_specific_description'), self.simulation_round_specific_description),
                 (vname('main_reference_paper'),
