@@ -178,7 +178,7 @@ class PaperPage(Page):
     tags = ParentalManyToManyField('PaperPageTag', blank=True, related_name='paper_page')
     simulation_rounds = ParentalManyToManyField(SimulationRound, blank=True)
     sectors = ParentalManyToManyField(Sector, blank=True)
-    is_peer_reviewed = models.BooleanField(default=True)
+    is_not_peer_reviewed = models.BooleanField(default=False)
 
     parent_page_types = ['pages.PaperOverviewPage']
 
@@ -188,7 +188,7 @@ class PaperPage(Page):
         FieldPanel('year'),
         FieldPanel('link'),
         MultiFieldPanel([
-            FieldPanel('is_peer_reviewed'),
+            FieldPanel('is_not_peer_reviewed'),
             FieldPanel('simulation_rounds', widget=forms.CheckboxSelectMultiple),
             FieldPanel('sectors', widget=forms.CheckboxSelectMultiple),
             FieldPanel('tags', widget=forms.CheckboxSelectMultiple),
