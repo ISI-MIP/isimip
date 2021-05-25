@@ -484,6 +484,7 @@ def impact_model_sector_edit(page, request, context, impact_model, target_url):
         form = formular(request.POST, instance=impact_model.fk_sector)
         if form.is_valid():
             form.save()
+            form.save_m2m()
             messages.success(request, "Thank you! All changes to your model have been saved successfully.")
             return HttpResponseRedirect(target_url)
         else:
