@@ -335,7 +335,7 @@ class ImpactModel(models.Model):
                                help_text=mark_safe('Please note, if you want to update the model license please <a href="mailto:info@isimip.org">write to us</a>.'))
     model_url = models.URLField(null=True, blank=True, verbose_name='Model Homepage',
                                help_text='The homepage of the model or a link to a git tree or hash of the model version used.')
-    dataset_history = models.URLField(null=True, blank=True, verbose_name='Dataset history')
+    dataset_history = models.URLField(null=True, blank=True, verbose_name='Dataset history', help_text="Information about data replacements, caveats and DOIs is contained within the page of every data set listed after this link.")
     main_reference_paper = models.ForeignKey(
         ReferencePaper, null=True, blank=True, related_name='main_ref', verbose_name='Reference paper: main reference',
         help_text="The single paper that should be cited when referring to simulation output from this model",
