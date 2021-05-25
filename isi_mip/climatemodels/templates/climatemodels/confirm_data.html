@@ -15,19 +15,21 @@
                 <p>The data cover the following experiments:</p>
 
                 <p>{{ custom_text|linebreaksbr|urlize }}</p>
-
-                <p>The data are now ready to be transferred to the <a href="https://esg.pik-potsdam.de/projects/isimip/" target="_blank">ISIMIP ESG server</a>, where they will be accessible to users beyond the community of ISIMIP modelling groups. Only data that has passed the our formal format check will be published. The conditions by which the data can be used are described in the ISIMIP <a href="/protocol/terms-of-use/" target="_blank">terms of use</a>.</p>
-
+                <p>Your data are now ready to be transferred to the <a href="https://data.isimip.org/" target="_blank">ISIMIP repository</a>, where they will be accessible to users beyond the community of ISIMIP modelling groups. Only data that has passed our format checks will be published. The conditions by which the data can be used are described in the <a href="https://www.isimip.org/gettingstarted/terms-of-use/" target="_blank">ISIMIP terms of use</a>.</p>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="terms" required> The uploaded simulation data for {{ simulation_round }} for {{ impact_model_name }}, and any further simulation data for the same model and simulation round can be published on the ISIMIP ESGF server.
+                        <input type="checkbox" name="terms" required> The uploaded simulation data for {{ simulation_round }} for {{ impact_model_name }}, and any further simulation data for the same model and simulation round can be published in the ISIMIP repository.
                     </label>
                 </div>
-
-                <p>Please select the appropriate licence. The same licence will be used for all data from your model in {{ simulation_round }}.</p>
+                <p>Please select the appropriate license from the list, or specify another one if needed. The same license will be used for all data from your model in {{ simulation_round }}. Please read about our license recommendations and other important technical and legal issues concerning licenses in <a href="https://www.isimip.org/gettingstarted/terms-of-use/licenses-publicly-available-isimip-data/" target="_blank">here</a>.</p>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="license" value="CC BY 4.0" required> CC BY 4.0 (strongly recommended)
+                        <input type="radio" name="license" value="CC0" required> CC0 (strongly recommended)
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="license" value="CC BY 4.0" required> CC BY 4.0
                     </label>
                 </div>
                 <div class="radio">

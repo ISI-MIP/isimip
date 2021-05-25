@@ -645,6 +645,6 @@ class AttachmentModelForm(forms.ModelForm):
 
 class DataConfirmationForm(forms.Form):
     terms = forms.BooleanField(required=True)
-    license = forms.ChoiceField(required=True, choices=(('CC BY 4.0', 'CC BY 4.0'), ('other', 'other')))
+    license = forms.ChoiceField(required=True, choices=(('CC BY 4.0', 'CC BY 4.0'), ('CC0', 'CC0'), ('other', 'other')))
     other_license_name = forms.CharField(required=False)
     correct = forms.BooleanField(required=True)
