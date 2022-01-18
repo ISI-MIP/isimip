@@ -1,5 +1,5 @@
 from django.urls import path, re_path
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 
 from isi_mip.invitation.views import InvitationView, RegistrationView
@@ -13,6 +13,7 @@ def superuser_required(view):
 
     return f
 
+app_name = 'invitation'
 
 urlpatterns = [
     path('invite/', superuser_required(InvitationView.as_view()), name='invite'),

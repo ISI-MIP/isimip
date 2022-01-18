@@ -7,7 +7,7 @@ env = environ.Env()
 env.read_env(ROOT_DIR('.env'))
 
 
-DJANGO_APPS = (
+DJANGO_APPS = [
     'isi_mip.core',  # override contrib.auth templates
     'django.contrib.admin',
     'django.contrib.auth',
@@ -17,9 +17,9 @@ DJANGO_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
-)
+]
 
-CMS_APPS = (
+CMS_APPS = [
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
     'wagtail.embeds',
@@ -45,9 +45,9 @@ CMS_APPS = (
     'static_precompiler',
     'file_resubmit',
     'easy_pdf',
-)
+]
 # Apps specific for this project go here.
-LOCAL_APPS = (
+LOCAL_APPS = [
     'isi_mip',
     'isi_mip.contrib',
     'isi_mip.styleguide',
@@ -62,22 +62,21 @@ LOCAL_APPS = (
 
     'isi_mip.twitter',
 
-)
+]
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + CMS_APPS
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Wagtail
-    'wagtail.core.middleware.SiteMiddleware',
+    'wagtail.contrib.legacy.sitemiddleware.SiteMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
-)
+]
 
 # MIGRATIONS CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -147,6 +146,8 @@ USE_L10N = True
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
 USE_TZ = True
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#templates
@@ -183,6 +184,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 # STATIC FILE CONFIGURATION
 # ------------------------------------------------------------------------------

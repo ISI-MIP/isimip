@@ -7,13 +7,12 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.core import urlresolvers
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.mail import EmailMessage
 from django.db.models import Q
 from django.http.response import HttpResponse, HttpResponseRedirect, \
     JsonResponse
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render
 from django.template import Context, RequestContext, Template
 from django.template.loader import render_to_string
 from django.utils.html import urlize, linebreaks
@@ -62,11 +61,11 @@ def impact_model_details(page, request, id):
     subpage = {'title': title, 'url': ''}
     context = {'page': page, 'subpage': subpage, 'headline': ''}
     can_edit_model = False
-    if request.user.is_authenticated() and (base_model in request.user.userprofile.owner.all() or request.user.is_superuser):
+    if request.user.is_authenticated and (base_model in request.user.userprofile.owner.all() or request.user.is_superuser):
         can_edit_model = True
 
     # context['editlink'] += ' | <a href="{}">admin edit</a>'.format(
-    #     urlresolvers.reverse('admin:climatemodels_impactmodel_change', args=(impactmodel.id,)))
+    #     reverse('admin:climatemodels_impactmodel_change', args=(impactmodel.id,)))
 
     model_simulation_rounds = []
     for im in base_model.impact_model.filter(public=True):
@@ -123,7 +122,7 @@ def impact_model_details(page, request, id):
 
 
 def confirm_data(page, request, id):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         messages.info(request, 'You need to be logged in to perform this action.')
         return HttpResponseRedirect('/dashboard/login/' + "?next={}".format(request.path))
     try:
@@ -274,7 +273,7 @@ def input_data_details(page, request, id):
         description = page.input_data_description or ''
     if request.user.is_superuser:
         admin_link += ' <a href="{}">admin edit</a>'.format(
-            urlresolvers.reverse('admin:climatemodels_inputdata_change', args=(data.id,)))
+            reverse('admin:climatemodels_inputdata_change', args=(data.id,)))
 
     subpage = {'title': 'Input data set: %s' % data.name, 'url': ''}
     context = {'page': page,
@@ -317,7 +316,7 @@ def crossref_proxy(request):
 
 
 def create_new_impact_model(page, request, base_model_id, simulation_round_id):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         messages.info(request, 'You need to be logged in to perform this action.')
         return HttpResponseRedirect('/dashboard/login/')
     base_impact_model = BaseImpactModel.objects.get(id=base_model_id)
@@ -342,7 +341,7 @@ def create_new_impact_model(page, request, base_model_id, simulation_round_id):
 
 
 def duplicate_impact_model(page, request, impact_model_id, simulation_round_id):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         messages.info(request, 'You need to be logged in to perform this action.')
         return HttpResponseRedirect('/dashboard/login/')
     impact_model = ImpactModel.objects.get(id=impact_model_id)
@@ -361,7 +360,7 @@ def duplicate_impact_model(page, request, impact_model_id, simulation_round_id):
 
 
 def impact_model_edit(page, request, id, current_step):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         messages.info(request, 'You need to be logged in to perform this action.')
         return HttpResponseRedirect('/dashboard/login/')
     impact_model = ImpactModel.objects.get(id=id)

@@ -3,7 +3,7 @@ import json
 from blog.models import BlogIndexPage as _BlogIndexPage
 from blog.models import BlogPage as _BlogPage
 from django.contrib import messages
-from django.contrib.auth.views import login, logout, password_change
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.db import models
 from django.http.response import HttpResponseRedirect
 from django.template.response import TemplateResponse
@@ -25,7 +25,7 @@ from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.core.fields import RichTextField, StreamField
 from wagtail.core.models import Page
 from wagtail.contrib.forms.models import AbstractFormField, AbstractEmailForm
-from wagtail.admin.utils import send_mail
+from wagtail.admin.mail import send_mail
 from wagtail.snippets.models import register_snippet
 
 from isi_mip.climatemodels.blocks import InputDataBlock, OutputDataBlock, ImpactModelsBlock
@@ -522,7 +522,7 @@ class DashboardPage(RoutablePageWithDefault):
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
         base_impact_models = request.user.userprofile.owner.all().order_by('name')
-        if request.user.is_authenticated() and request.user.is_superuser:
+        if request.user.is_authenticated and request.user.is_superuser:
             base_impact_models = BaseImpactModel.objects.all()
         impage = ImpactModelsPage.objects.get()
         impage_details = lambda imid: "<span class='action'><a href='{0}' class=''>{{0}}</a></span>".format(
@@ -577,7 +577,7 @@ class DashboardPage(RoutablePageWithDefault):
 
     @route(r'^$')
     def base(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             messages.info(request, 'This is a restricted area. To proceed you need to log in.')
             return HttpResponseRedirect(self.reverse_subpage('login'))
 
@@ -589,7 +589,7 @@ class DashboardPage(RoutablePageWithDefault):
 
     @route(r'participants/$')
     def participants(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             messages.info(request, 'This is a restricted area. To proceed you need to log in.')
             return HttpResponseRedirect(self.reverse_subpage('login'))
         subpage = {'title': 'ISIMIP participants', 'url': ''}
@@ -598,7 +598,7 @@ class DashboardPage(RoutablePageWithDefault):
 
     @route(r'download/$')
     def download(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             messages.info(request, 'This is a restricted area. To proceed you need to log in.')
             return HttpResponseRedirect(self.reverse_subpage('login'))
         return participant_download(self, request)
@@ -607,26 +607,29 @@ class DashboardPage(RoutablePageWithDefault):
     def logout(self, request):
         subpage = {'title': 'Logout', 'url': ''}
         context = {'page': self, 'subpage': subpage, 'headline': ''}
+        logout = LogoutView.as_view()
         return logout(request, extra_context=context)
 
     @route(r'login/$')
     def login(self, request):
         subpage = {'title': 'Login', 'url': ''}
         context = {'page': self, 'subpage': subpage, 'headline': ''}
+        login = LoginView.as_view()
         return login(request, extra_context=context, authentication_form=AuthenticationForm)
 
     @route(r'change-password/$')
     def change_password(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             messages.info(request, 'This is a restricted area. To proceed you need to log in.')
             return HttpResponseRedirect(self.reverse_subpage('login'))
         subpage = {'title': 'Change password', 'url': ''}
         context = {'page': self, 'subpage': subpage, 'headline': ''}
+        password_change = PasswordChangeView.as_view()
         return password_change(request, extra_context=context)
 
     @route(r'update-contact-information/$')
     def update_contact_information(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             messages.info(request, 'This is a restricted area. To proceed you need to log in.')
             return HttpResponseRedirect(self.reverse_subpage('login'))
         subpage = {'title': 'Update contact information', 'url': ''}

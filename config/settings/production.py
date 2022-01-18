@@ -32,7 +32,7 @@ RAVEN_MIDDLEWARE = (
     #'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',
     'raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware',
 )
-MIDDLEWARE_CLASSES += RAVEN_MIDDLEWARE #+ MIDDLEWARE_CLASSES
+MIDDLEWARE += RAVEN_MIDDLEWARE #+ MIDDLEWARE_CLASSES
 
 # Sentry Configuration
 SENTRY_DSN = env('DJANGO_SENTRY_DSN')

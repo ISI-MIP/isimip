@@ -34,7 +34,7 @@ class SimpleStringForm(template.Node):
     def __iter__(self):
         return self.fields.values().__iter__()
 
-@register.assignment_tag
+@register.simple_tag
 def template_form(form, **kwargs):
     assert isinstance(form, BaseForm)
     newform = SimpleStringForm()

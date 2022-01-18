@@ -2,8 +2,8 @@ import unicodecsv
 
 from django.contrib import admin
 from django.contrib import messages
-from django.core import urlresolvers
-from django.core.urlresolvers import NoReverseMatch
+from django.urls import reverse
+from django.urls import NoReverseMatch
 from django.forms import CheckboxSelectMultiple
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -118,7 +118,7 @@ class ImpactModelAdmin(admin.ModelAdmin):
     def sector_link(self, obj):
         try:
             adminurl = "admin:%s_%s_change" % (obj.fk_sector._meta.app_label, obj.fk_sector._meta.model_name)
-            link = urlresolvers.reverse(adminurl, args=[obj.fk_sector.id])
+            link = reverse(adminurl, args=[obj.fk_sector.id])
             return '<a href="%s">%s</a>' % (link, obj.fk_sector)
         except NoReverseMatch:
             return '<span style="color:#666;">{} has no specific attributes.</span>'.format(obj.fk_sector._meta.verbose_name)

@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
-from django.core import urlresolvers
 from django.forms import CheckboxSelectMultiple
 
 from isi_mip.climatemodels.models import BaseImpactModel, ImpactModel, SimulationRound
