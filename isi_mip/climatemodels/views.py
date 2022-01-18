@@ -466,7 +466,10 @@ def impact_model_base_edit(page, request, context, impact_model, current_step, n
             contact_persons.append({
                 'name': contact_person.name,
                 'email': contact_person.email,
-                'institute': contact_person.institute,
+                'institute': contact_person.institute or '-',
+                'country': contact_person.country or '-',
+                'orcid_id': contact_person.orcid_id or '-',
+                'ror_id': contact_person.ror_id or '-',
             })
         context['contact_persons'] = contact_persons
     context['form'] = form
@@ -568,6 +571,8 @@ def update_contact_information_view(request, page, extra_context):
             user.email = form.cleaned_data['email'].lower()
             user.userprofile.institute = form.cleaned_data['institute']
             user.userprofile.country = form.cleaned_data['country']
+            user.userprofile.orcid_id = form.cleaned_data['orcid_id']
+            user.userprofile.ror_id = form.cleaned_data['ror_id']
             user.save()
             user.userprofile.save()
             message = "Your contact information has been successfully updated"
@@ -582,6 +587,8 @@ def update_contact_information_view(request, page, extra_context):
             'email': user.email,
             'institute': user.userprofile.institute,
             'country': user.userprofile.country,
+            'orcid_id': user.userprofile.orcid_id,
+            'ror_id': user.userprofile.ror_id,
         }
         form = ContactInformationForm(initial=initial)
     context = {

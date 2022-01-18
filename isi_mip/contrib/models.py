@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
+from django.utils.safestring import mark_safe
 
 from isi_mip.climatemodels.models import Sector, BaseImpactModel, ImpactModel
 
@@ -28,6 +29,8 @@ class UserProfile(models.Model):
     owner = models.ManyToManyField(BaseImpactModel, blank=True, related_name='impact_model_owner')
     involved = models.ManyToManyField(ImpactModel, blank=True, related_name='impact_model_involved')
     show_in_participant_list = models.BooleanField(default=True)
+    orcid_id = models.CharField(max_length=500, null=True, blank=True, verbose_name='ORCID iD', help_text=mark_safe('<a href="https://orcid.org/" target="_blank">Open Researcher and Contributor ID</a>, optional.'))
+    ror_id = models.CharField(max_length=500, null=True, blank=True, verbose_name='Institute ROR ID', help_text=mark_safe('<a href="https://ror.org/" target="_blank">Research Organization Registry ID</a>, optional, if known'))
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -51,7 +54,10 @@ class UserProfile(models.Model):
         return "%s (%s) - %s" % (self.name, self.institute, self.email)
 
     def pretty(self):
-        return "{0.name} (<a href='mailto:{0.email}'>{0.email}</a>), {0.institute}{1}".format(self, self.country and " (%s)" % self.country.name or '')
+        pretty = "{0.name} (<a href='mailto:{0.email}'>{0.email}</a>), {0.institute}{1}".format(self, self.country and " (%s)" % self.country.name or '')
+        if self.orcid_id:
+            pretty += ", <small><a href='https://orcid.org/{orcid_id}' class='orcid-link' target='_blank'>{orcid_id}</a></small>".format(orcid_id=self.orcid_id)
+        return pretty
 
     class Meta:
         ordering = ('user__last_name',)
