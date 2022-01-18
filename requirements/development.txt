@@ -7,6 +7,6 @@ ipdb
 Fabric3==1.14.post1
 #fabric-virtualenv==0.2.1  # klappt eh nicht mit python3
 
-django-debug-toolbar==1.7
+django-debug-toolbar==3.2.4
 django-extensions
 
