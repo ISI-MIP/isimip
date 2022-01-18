@@ -234,11 +234,6 @@ AUTHENTICATION_CASE_SENSITIVE = 'both'
 
 WAGTAILSEARCH_BACKENDS = {
     'default': {
-        'BACKEND': 'wagtail.search.backends.elasticsearch2',
-        'URLS': ['http://localhost:9200'],
-        'INDEX': 'wagtail',
-        'TIMEOUT': 30,
-        'OPTIONS': {},
-        'INDEX_SETTINGS': {},
+        'BACKEND': 'wagtail.search.backends.database',
     }
 }
