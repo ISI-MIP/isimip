@@ -643,3 +643,5 @@ def show_participants(request, extra_context):
     if extra_context is not None:
         context.update(extra_context)
     return render(request, 'climatemodels/show_participants.html', context)
+
+

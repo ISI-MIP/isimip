@@ -28,6 +28,7 @@ urlpatterns = [
 
     path('models/', include(climatemodels_urls, namespace='climatemodels')),
     path('accounts/', include(invitations_urls, namespace='accounts')),
+    path('api/', include('isi_mip.api.urls', namespace='api')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
