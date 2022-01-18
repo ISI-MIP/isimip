@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class ContribConfig(AppConfig):
-    name = 'contrib'
+    name = 'isi_mip.contrib'
