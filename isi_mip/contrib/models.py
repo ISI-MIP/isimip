@@ -22,7 +22,7 @@ class Country(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     institute = models.CharField(max_length=500, null=True, blank=True)
-    country = models.ForeignKey(Country, null=True, blank=True)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE,  null=True, blank=True)
     sector = models.ManyToManyField(Sector, blank=True, related_name='user_sectors')
     comment = models.TextField(blank=True, null=True)
     owner = models.ManyToManyField(BaseImpactModel, blank=True, related_name='impact_model_owner')

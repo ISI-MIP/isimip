@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path, re_path
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
@@ -15,6 +15,6 @@ def superuser_required(view):
 
 
 urlpatterns = [
-    url(r'^invite/$', superuser_required(InvitationView.as_view()), name='invite'),
-    url(r'^register/(?P<pk>\d+)/(?P<token>[0-9a-f]{40})/$', RegistrationView.as_view(), name='register'),
+    path('invite/', superuser_required(InvitationView.as_view()), name='invite'),
+    re_path(r'^register/(?P<pk>\d+)/(?P<token>[0-9a-f]{40})/$', RegistrationView.as_view(), name='register'),
 ]

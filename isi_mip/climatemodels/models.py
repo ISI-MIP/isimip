@@ -4,7 +4,7 @@ from django.core.validators import FileExtensionValidator
 from django.apps import apps
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 from django.db import models
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
@@ -125,7 +125,7 @@ class ContactPerson(models.Model):
     name = models.CharField(max_length=500, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     institute = models.CharField(max_length=500, null=True, blank=True)
-    base_impact_model = models.ForeignKey('BaseImpactModel', null=True, blank=True)
+    base_impact_model = models.ForeignKey('BaseImpactModel', on_delete=models.CASCADE,  null=True, blank=True)
 
     def __str__(self):
         return "%s%s %s" % (self.name, self.institute and " (%s)" % self.institute or "", self.email)
@@ -203,7 +203,7 @@ class Sector(models.Model):
 
 
 class SectorInformationGroup(models.Model):
-    sector = models.ForeignKey(Sector)
+    sector = models.ForeignKey(Sector, on_delete=models.CASCADE)
     name = models.CharField(max_length=500)
     identifier = models.SlugField()
     description = models.TextField(blank=True)
@@ -219,7 +219,7 @@ class SectorInformationGroup(models.Model):
 
 
 class SectorInformationField(models.Model):
-    information_group = models.ForeignKey(SectorInformationGroup, related_name='fields')
+    information_group = models.ForeignKey(SectorInformationGroup, on_delete=models.CASCADE,  related_name='fields')
     name = models.CharField(max_length=500)
     identifier = models.SlugField()
     help_text = models.CharField(max_length=500, blank=True)
@@ -257,7 +257,7 @@ class BaseImpactModel(index.Indexed, models.Model):
         ('Water (global)', 'Water (global)'),
         ('Water (regional)', 'Water (regional)'),
     )
-    sector = models.ForeignKey(Sector, help_text='The sector to which this information pertains. Some models may have further entries for other sectors.')
+    sector = models.ForeignKey(Sector, on_delete=models.CASCADE,  help_text='The sector to which this information pertains. Some models may have further entries for other sectors.')
     region = models.ManyToManyField(Region, help_text="Region for which model produces results")
     short_description = models.TextField(
         null=True, blank=True, default='', verbose_name="Short model description (all rounds)",
@@ -599,11 +599,11 @@ class OtherInformation(models.Model):
         help_text='Any settings prescribed by the ISIMIP protocol that were overruled when runing the model'
     )
     YES_NO = ((True, 'Yes'), (False, 'No'))
-    spin_up = models.NullBooleanField(
+    spin_up = models.BooleanField(
         verbose_name='Was a spin-up performed?',
         help_text="'No' indicates the simulations were run starting in the first reporting year 1971",
         choices=YES_NO
-    )
+    , null=True)
     spin_up_design = models.TextField(
         null=True, blank=True, default='', verbose_name='Spin-up design',
         help_text="Including the length of the spin up, the CO2 concentration used, and any deviations from the spin-up procedure defined in the protocol"
@@ -664,7 +664,7 @@ class OtherInformation(models.Model):
 
 
 class BaseSector(models.Model):
-    impact_model = models.OneToOneField(ImpactModel)
+    impact_model = models.OneToOneField(ImpactModel, on_delete=models.CASCADE)
     data = JSONField(blank=True, null=True, default=dict)
 
     class Meta:
@@ -1310,13 +1310,13 @@ class Water(BaseSector):
     dams_reservoirs = models.TextField(null=True, blank=True, default='', verbose_name='Dam and reservoir implementation',
                                        help_text='Describe how are dams and reservoirs are implemented')
 
-    calibration = models.NullBooleanField(verbose_name='Was the model calibrated?', default=None)
+    calibration = models.BooleanField(verbose_name='Was the model calibrated?', default=None, null=True)
     calibration_years = models.TextField(null=True, blank=True, default='', verbose_name='Which years were used for calibration?')
     calibration_dataset = models.TextField(null=True, blank=True, default='', verbose_name='Which dataset was used for calibration?',
                                            help_text='E.g. WFD, GSWP3')
     calibration_catchments = models.TextField(null=True, blank=True, default='',
                                               verbose_name='How many catchments were callibrated?')
-    vegetation = models.NullBooleanField(verbose_name='Is CO2 fertilisation accounted for?', default=None)
+    vegetation = models.BooleanField(verbose_name='Is CO2 fertilisation accounted for?', default=None, null=True)
     vegetation_representation = models.TextField(null=True, blank=True, default='', verbose_name='How is vegetation represented?')
     methods_evapotranspiration = models.TextField(null=True, blank=True, default='', verbose_name='Potential evapotranspiration', help_text='Is it implemented? How is it resolved?')
     methods_snowmelt = models.TextField(null=True, blank=True, default='', verbose_name='Snow melt', help_text='Is it implemented? How is it resolved?')
@@ -1378,7 +1378,7 @@ class WaterRegional(Water):
     )
     vegetation_representation = models.CharField(null=True, blank=True, choices=VEGETATION_CHOICES, verbose_name='How is vegetation represented?', max_length=255)
     vegetation_approach_used = models.TextField(null=True, blank=True, default='', verbose_name='Approach used to simulate vegetation dynamics')
-    calibration_model_evaluated = models.NullBooleanField(verbose_name='Was the model validated/evaluated?', default=None)
+    calibration_model_evaluated = models.BooleanField(verbose_name='Was the model validated/evaluated?', default=None, null=True)
     calibration_periods = models.TextField(null=True, blank=True, default='', verbose_name='Calibration and validation periods')
     calibration_methods = models.TextField(null=True, blank=True, default='', verbose_name='Calibration and validation method', help_text='e.g.: Calibration for discharge at the basin outlet, Enhanced calibration for discharge at multiple gauges, etc.')
 
@@ -1545,7 +1545,7 @@ def impact_model_path(instance, filename):
 
 
 class Attachment(models.Model):
-    impact_model = models.OneToOneField(ImpactModel)
+    impact_model = models.OneToOneField(ImpactModel, on_delete=models.CASCADE)
     attachment1 = models.FileField(null=True, blank=True, verbose_name="Attachment", upload_to=impact_model_path, validators=[FileExtensionValidator(allowed_extensions=['pdf', 'txt', 'csv'])])
     attachment1_description = models.TextField(null=True, blank=True, verbose_name="Description")
     attachment2 = models.FileField(null=True, blank=True, verbose_name="Attachment", upload_to=impact_model_path, validators=[FileExtensionValidator(allowed_extensions=['pdf', 'txt', 'csv'])])
@@ -1587,7 +1587,7 @@ class DataPublicationConfirmation(models.Model):
 
     is_confirmed = models.BooleanField(default=False)
     confirmed_date = models.DateTimeField(null=True, blank=True)
-    confirmed_by = models.ForeignKey(User, null=True, blank=True)
+    confirmed_by = models.ForeignKey(User, on_delete=models.CASCADE,  null=True, blank=True)
     confirmed_license = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
