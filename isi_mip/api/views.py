@@ -32,4 +32,4 @@ def impact_model_datacite_api(request, impactmodel_id):
     response['creators'] = creators
     related_identifiers = {}
     response['relatedIdentifiers'] = related_identifiers
-    return JsonResponse(response)
+    return JsonResponse(response, json_dumps_params={'indent': 2})
