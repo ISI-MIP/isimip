@@ -1,15 +1,14 @@
 import os
 
-from django.core.validators import FileExtensionValidator
 from django.apps import apps
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import JSONField
+from django.core.validators import FileExtensionValidator
 from django.db import models
+from django.db.models import JSONField
+from django.template.defaultfilters import filesizeformat
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
-from django.template.defaultfilters import filesizeformat
-
 from wagtail.search import index
 
 from isi_mip.choiceorotherfield.models import ChoiceOrOtherField
@@ -167,17 +166,10 @@ class InputData(models.Model):
         ordering = ('-created', 'name',)
     
     def pretty(self):
-        pretty = self.name
-        if self.doi_link or self.data_link:
-            pretty += " <small>("
-        if self.doi_link:
-            pretty += "<a href='{doi_link}' class='doi-link' target='_blank'>{doi_link}</a>".format(doi_link=self.doi_link)
-        if self.data_link:
-            if self.doi_link:
-                pretty += ", "
-            pretty += "<a href='{data_link}' class='data-link' target='_blank'>{data_link}</a>".format(data_link=self.data_link)
-        if self.doi_link or self.data_link:
-            pretty += ")</small>"
+        from isi_mip.pages.models import GettingStartedPage
+        page = GettingStartedPage.objects.get(is_input_data_parent_page=True)
+        url = page.url + page.reverse_subpage('details', kwargs={'id': self.pk})
+        pretty = "<a href='{url}'>{name}</a>".format(name=self.name, url=url)
         return pretty
 
 

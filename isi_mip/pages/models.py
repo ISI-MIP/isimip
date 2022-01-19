@@ -4,40 +4,50 @@ from blog.models import BlogIndexPage as _BlogIndexPage
 from blog.models import BlogPage as _BlogPage
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.db.models import F
+from django.forms.widgets import EmailInput
 from django.http.response import HttpResponseRedirect
+from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.utils.text import slugify
-from django.shortcuts import render
-from django.core.serializers.json import DjangoJSONEncoder
-from django.forms.widgets import EmailInput
-from django.db.models import F
-from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from modelcluster.contrib.taggit import ClusterTaggableManager
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
+from rest_framework.fields import BooleanField
 from taggit.models import TaggedItemBase
-
-from wagtail.search.backends import get_search_backend
-from wagtail.search.models import Query
-from wagtail.search import index
-from wagtail.contrib.routable_page.models import route, RoutablePageMixin
 from wagtail.admin.edit_handlers import *
-from wagtail.images.edit_handlers import ImageChooserPanel
+from wagtail.admin.mail import send_mail
+from wagtail.contrib.forms.models import AbstractEmailForm, AbstractFormField
+from wagtail.contrib.routable_page.models import RoutablePageMixin, route
 from wagtail.core.fields import RichTextField, StreamField
 from wagtail.core.models import Page
-from wagtail.contrib.forms.models import AbstractFormField, AbstractEmailForm
-from wagtail.admin.mail import send_mail
+from wagtail.images.edit_handlers import ImageChooserPanel
+from wagtail.search import index
+from wagtail.search.backends import get_search_backend
+from wagtail.search.models import Query
 from wagtail.snippets.models import register_snippet
 
-from isi_mip.climatemodels.blocks import InputDataBlock, OutputDataBlock, ImpactModelsBlock
-from isi_mip.climatemodels.models import BaseImpactModel, SimulationRound, Sector
-from isi_mip.climatemodels.views import (
-    impact_model_details, impact_model_edit, input_data_details,
-    impact_model_download, participant_download, show_participants, STEP_BASE, STEP_DETAIL, STEP_TECHNICAL_INFORMATION,
-    STEP_INPUT_DATA, STEP_OTHER, STEP_SECTOR, STEP_ATTACHMENT, 
-    duplicate_impact_model, create_new_impact_model, update_contact_information_view, confirm_data, impact_model_pdf)
+from isi_mip.climatemodels.blocks import (ImpactModelsBlock, InputDataBlock,
+                                          OutputDataBlock)
+from isi_mip.climatemodels.models import (BaseImpactModel, Sector,
+                                          SimulationRound)
+from isi_mip.climatemodels.views import (STEP_ATTACHMENT, STEP_BASE,
+                                         STEP_DETAIL, STEP_INPUT_DATA,
+                                         STEP_OTHER, STEP_SECTOR,
+                                         STEP_TECHNICAL_INFORMATION,
+                                         confirm_data, create_new_impact_model,
+                                         duplicate_impact_model,
+                                         impact_model_details,
+                                         impact_model_download,
+                                         impact_model_edit, impact_model_pdf,
+                                         input_data_details,
+                                         participant_download,
+                                         show_participants,
+                                         update_contact_information_view)
 from isi_mip.contrib.blocks import BlogBlock, smart_truncate
-from isi_mip.pages.blocks import *
 from isi_mip.contrib.forms import AuthenticationForm
+from isi_mip.pages.blocks import *
 
 
 class BlogPage(_BlogPage):
@@ -355,12 +365,13 @@ class GettingStartedPage(RoutablePageWithDefault):
 
     ])
     input_data_description = RichTextField(null=True, blank=True, verbose_name='Input Data Details Description')
-
+    is_input_data_parent_page = models.BooleanField(blank=True, default=False)
     content_panels = Page.content_panels + [
         StreamFieldPanel('content'),
     ]
     details_content_panels = [
         RichTextFieldPanel('input_data_description'),
+        FieldPanel('is_input_data_parent_page'),
     ]
     edit_handler = TabbedInterface([
         ObjectList(content_panels, heading='Content'),
