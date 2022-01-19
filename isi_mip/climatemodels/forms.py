@@ -618,12 +618,12 @@ def get_sector_form(sector):
 
 
 class ContactInformationForm(forms.Form):
-    name = forms.CharField(label='Your name', max_length=60, required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}), help_text='If you want to change the contact person or add a new contact person, please contact info@isimip.org')
+    name = forms.CharField(label='Your name', max_length=60, required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}), help_text='If you want to change the contact person or add a new contact person, please contact info@isimip.org.')
     email = forms.EmailField(label='Your email adress', required=True)
     institute = forms.CharField(max_length=500, required=False)
     country = forms.ModelChoiceField(queryset=Country.objects.all(), required=False, empty_label='-------')
     orcid_id = forms.CharField(max_length=50, required=False, label='ORCID iD', help_text=mark_safe('<a href="https://orcid.org/" target="_blank">Open Researcher and Contributor ID</a>, optional.'))
-    ror_id = forms.CharField(max_length=50, required=False, label='Institute ROR ID', help_text=mark_safe('<a href="https://ror.org/" target="_blank">Research Organization Registry ID</a>, optional, if known'))
+    ror_id = forms.CharField(max_length=50, required=False, label='Institute ROR ID', help_text=mark_safe('<a href="https://ror.org/" target="_blank">Research Organization Registry ID</a>, optional, if known.'))
 
 
 class AttachmentModelForm(forms.ModelForm):

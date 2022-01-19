@@ -470,10 +470,10 @@ def impact_model_base_edit(page, request, context, impact_model, current_step, n
             contact_persons.append({
                 'name': contact_person.name,
                 'email': contact_person.email,
-                'institute': contact_person.institute or '-',
-                'country': contact_person.country or '-',
                 'orcid_id': contact_person.orcid_id or '-',
+                'institute': contact_person.institute or '-',
                 'ror_id': contact_person.ror_id or '-',
+                'country': contact_person.country or '-',
             })
         context['contact_persons'] = contact_persons
     context['form'] = form
