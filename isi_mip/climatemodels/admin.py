@@ -200,7 +200,7 @@ class InputDataAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'protocol_relation', 'data_type', 'variables', 'scenario', 'simulation_round', 'description', 'specification', 'data_source', 'caveats', 'download_instructions'),
+            'fields': ('name', 'protocol_relation', 'data_type', 'variables', 'scenario', 'simulation_round', 'description', 'specification', 'data_source', 'caveats', 'download_instructions', 'data_link', 'doi_link'),
             'description': "The variables are filtered based on the data type. To see variables of a different data type, please change and save data type first."
         }),
     )

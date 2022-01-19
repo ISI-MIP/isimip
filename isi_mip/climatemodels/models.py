@@ -155,6 +155,8 @@ class InputData(models.Model):
     data_source = models.TextField(null=True, blank=True, default='')
     caveats = models.TextField(null=True, blank=True)
     download_instructions = models.TextField(null=True, blank=True, default='')
+    data_link = models.URLField(null=True, blank=True, help_text="Link to the https://data.isimip.org/ repository.")
+    doi_link = models.URLField(null=True, blank=True, help_text="Link to the https://doi.org system.")
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -163,6 +165,20 @@ class InputData(models.Model):
     class Meta:
         verbose_name_plural = 'Input data'
         ordering = ('-created', 'name',)
+    
+    def pretty(self):
+        pretty = self.name
+        if self.doi_link or self.data_link:
+            pretty += " <small>("
+        if self.doi_link:
+            pretty += "<a href='{doi_link}' class='doi-link' target='_blank'>{doi_link}</a>".format(doi_link=self.doi_link)
+        if self.data_link:
+            if self.doi_link:
+                pretty += ", "
+            pretty += "<a href='{data_link}' class='data-link' target='_blank'>{data_link}</a>".format(data_link=self.data_link)
+        if self.doi_link or self.data_link:
+            pretty += ")</small>"
+        return pretty
 
 
 class Sector(models.Model):
@@ -573,15 +589,15 @@ class InputDataInformation(models.Model):
     def values_to_tuples(self):
         vname = self._get_verbose_field_name
         return ('Input data sets used', [
-                (vname('simulated_atmospheric_climate_data_sets'), ', '.join([x.name for x in self.simulated_atmospheric_climate_data_sets.all()])),
-                (vname('observed_atmospheric_climate_data_sets'), ', '.join([x.name for x in self.observed_atmospheric_climate_data_sets.all()])),
-                (vname('simulated_ocean_climate_data_sets'), ', '.join([x.name for x in self.simulated_ocean_climate_data_sets.all()])),
-                (vname('observed_ocean_climate_data_sets'), ', '.join([x.name for x in self.observed_ocean_climate_data_sets.all()])),
-                (vname('emissions_data_sets'), ', '.join([x.name for x in self.emissions_data_sets.all()])),
-                (vname('socio_economic_data_sets'), ', '.join([x.name for x in self.socio_economic_data_sets.all()])),
-                (vname('land_use_data_sets'), ', '.join([x.name for x in self.land_use_data_sets.all()])),
-                (vname('other_human_influences_data_sets'), ', '.join([x.name for x in self.other_human_influences_data_sets.all()])),
-                (vname('other_data_sets'), ', '.join([x.name for x in self.other_data_sets.all()])),
+                (vname('simulated_atmospheric_climate_data_sets'), ', '.join([x.pretty() for x in self.simulated_atmospheric_climate_data_sets.all()])),
+                (vname('observed_atmospheric_climate_data_sets'), ', '.join([x.pretty() for x in self.observed_atmospheric_climate_data_sets.all()])),
+                (vname('simulated_ocean_climate_data_sets'), ', '.join([x.pretty() for x in self.simulated_ocean_climate_data_sets.all()])),
+                (vname('observed_ocean_climate_data_sets'), ', '.join([x.pretty() for x in self.observed_ocean_climate_data_sets.all()])),
+                (vname('emissions_data_sets'), ', '.join([x.pretty() for x in self.emissions_data_sets.all()])),
+                (vname('socio_economic_data_sets'), ', '.join([x.pretty() for x in self.socio_economic_data_sets.all()])),
+                (vname('land_use_data_sets'), ', '.join([x.pretty() for x in self.land_use_data_sets.all()])),
+                (vname('other_human_influences_data_sets'), ', '.join([x.pretty() for x in self.other_human_influences_data_sets.all()])),
+                (vname('other_data_sets'), ', '.join([x.pretty() for x in self.other_data_sets.all()])),
                 (vname('climate_variables'), ', '.join([x.as_span() for x in self.climate_variables.all()])),
                 (vname('climate_variables_info'), self.climate_variables_info),
                 (vname('additional_input_data_sets'), self.additional_input_data_sets),

@@ -30,4 +30,6 @@ def impact_model_datacite_api(request, impactmodel_id):
             creator_json['nameIdentifierScheme'] = 'ORCID'
         creators.append(creator_json)
     response['creators'] = creators
+    related_identifiers = {}
+    response['relatedIdentifiers'] = related_identifiers
     return JsonResponse(response)
