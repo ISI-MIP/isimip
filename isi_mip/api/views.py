@@ -1,4 +1,3 @@
-from turtle import title
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
