@@ -298,7 +298,7 @@ def input_data_details(page, request, id):
                    {'notoggle': True, 'opened': True, 'term': 'Download Instructions',
                     'definitions': data.download_instructions and [{'text': urlize(linebreaks(data.download_instructions))}]},
                    {'notoggle': True, 'opened': True, 'term': 'Data link',
-                    'definitions': data.data_link and [{'text': urlize(data.data_link)}]},
+                    'definitions': data.data_link and [{'text': 'The data can be downloaded from the ISIMIP Repository: {}'.format(urlize(data.data_link))}]},
                    {'notoggle': True, 'opened': True, 'term': 'DOI',
                     'definitions': data.doi_link and [{'text': 'For more information and how to cite this dataset, please follow the DOI: {}'.format(urlize(data.doi_link))}]},
                ]
