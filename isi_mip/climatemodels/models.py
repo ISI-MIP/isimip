@@ -58,6 +58,13 @@ class ReferencePaper(Paper):
         journal = "{0.journal_name},{0.journal_volume},{0.journal_pages},".format(self) if self.journal_name else ''
         year = self.first_published.year if self.first_published else ''
         return "{}{}{}{}".format(author, title, journal, year)
+    
+    def entry(self):
+        author = "{} et al. ".format(self.lead_author) if self.lead_author else ''
+        title = "{0.title}. ".format(self) if self.doi else self.title
+        journal = "{0.journal_name},{0.journal_volume},{0.journal_pages},".format(self) if self.journal_name else ''
+        year = self.first_published.year if self.first_published else ''
+        return "{}{}{}{}".format(author, title, journal, year)
 
 
 class DataType(models.Model):
