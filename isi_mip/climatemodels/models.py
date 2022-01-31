@@ -484,7 +484,7 @@ class ImpactModel(models.Model):
                 ('Model Output License', model_output_license),
                 (vname('model_url'), self.model_url),
                 (vname('data_download'), self.data_download and "<a href='{0}' target='_blank'>{0}</a>".format(self.data_download)),
-                (vname('doi'), self.data_download and "<a href='{0}' target='_blank'>{0}</a>".format(self.doi)),
+                (vname('doi'), self.doi and "<a href='{0}' target='_blank'>{0}</a>".format(self.doi)),
                 (vname('model_license'), self.model_license),
                 (vname('simulation_round_specific_description'), self.simulation_round_specific_description),
                 (vname('main_reference_paper'),
