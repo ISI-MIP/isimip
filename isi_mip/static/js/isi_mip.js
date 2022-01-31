@@ -772,7 +772,7 @@ function concatValues( obj ) {
 	return values.join(',');
   }
 
-function getComboFilter( filters ) {
+function getComboFilter() {
 	var i = 0;
 	var comboFilters = [];
 	var message = [];
@@ -807,27 +807,59 @@ function getComboFilter( filters ) {
 	var comboFilter = comboFilters.join(', ');
 	return comboFilter;
 }
+var qsRegex;
+var $grid;
+var filters;
 
-function filter_papers($grid, filters) {
+function filter_papers() {
 	console.log('tags:', filters);
 	// combine filters
-	var filterValue = getComboFilter( filters );
+	var filterValue = getComboFilter();
 	// set filter for Isotope
-	console.log(filterValue);
-	$grid.isotope({ filter: filterValue });
+	console.log('filterValue', filterValue);
+	console.log('qsRegex', qsRegex);
+	$grid.isotope({
+		filter() {
+			const $this = $(this);
+			const searchResult = qsRegex ? $this.text().match(qsRegex) : true;
+			const selectResult = filterValue ? $this.is(filterValue) : true;
+			return searchResult  && selectResult;
+		}
+	})
+}
+
+// use value of search field to filter
+var $quicksearch = $('#search-box').keyup( debounce( function() {
+	qsRegex = new RegExp( $quicksearch.val(), 'gi' );
+	filter_papers();
+  }, 200 ) );
+  
+// debounce so filtering doesn't happen every millisecond
+function debounce( fn, threshold ) {
+	var timeout;
+	threshold = threshold || 100;
+	return function debounced() {
+		clearTimeout( timeout );
+		var args = arguments;
+		var _this = this;
+		function delayed() {
+		fn.apply( _this, args );
+		}
+		timeout = setTimeout( delayed, threshold );
+	};
 }
 
 $(window).load(function() {
 
 	// store filter for each group
-	var filters = {};
+	filters = {};
 	filters['tags'] = [];
 	filters['sectors'] = [];
 	filters['simulation_round'] = [];
 	filters['category'] = [];
     // console.log(filters);
 	// init Isotope
-    var $grid = $('.papers-grid').isotope({
+    $grid = $('.papers-grid').isotope({
 		// options
 		itemSelector: '.paper',
 	});
@@ -835,19 +867,19 @@ $(window).load(function() {
 
 	$(".filter select.simulation-round").select2({
 		placeholder: "Select a simulation round",
-		width: '20%',
+		width: '16.5%',
 	});
 	$(".filter select.sector").select2({
 		placeholder: "Select a sector",
-		width: '20%',
+		width: '16.5%',
 	});
 	$(".filter select.tag").select2({
 		placeholder: "Select further categories",
-		width: '20%',
+		width: '16.5%',
 	});
 	$(".filter select.category").select2({
 		placeholder: "Select a type",
-		width: '20%',
+		width: '16.5%',
 		allowClear: true,
 		minimumResultsForSearch: -1
 	});
@@ -878,7 +910,7 @@ $(window).load(function() {
 			} else if ($(this).hasClass('category')) {
 				filters['category'] = [value];
 			}
-			filter_papers($grid, filters);
+			filter_papers();
 		// }
 	});
     $('.filter .show-all').on('click', function( event ) {

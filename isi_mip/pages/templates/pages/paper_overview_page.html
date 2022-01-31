@@ -42,6 +42,7 @@
 						<option value=".peer-reviewed">Peer-reviewed</option>
 						<option value=".not-peer-reviewed">Not peer-reviewed</option>
 					</select>
+					<input class="form-control" type="text" name="search" id="search-box" placeholder="Search">
 					<ul class="list-unstyled list-inline button-group">
 						<li class="show-all"><a href="javascript:void(0)" class="badge badge-secondary">{% trans "Reset filters" %}</a></li>
 					</ul>
@@ -53,7 +54,7 @@
 			</div>
 			<div class="papers-grid row">
 				{% for paper in papers %}
-				<div class="col-sm-12 paper{% for tag in paper.tags.all %} {{ tag.name|slugify }}{% endfor %}{% for sr in paper.simulation_rounds.all %} {{ sr.name|slugify }}{% endfor %}{% for sector in paper.sectors.all %} {{ sector.name|slugify }}{% endfor %}{% if paper.is_not_peer_reviewed %} not-peer-reviewed{% else %} peer-reviewed{% endif %}">
+				<div class="col-sm-12 paper {{ paper.generate_filter_classes }}">
 					{% include "widgets/page-teaser.html" with author=paper.author title=paper.title description=paper.get_journal_with_year href=paper.link open_new_tab=True magicgrow=False border=False %}
 				</div>
 				{% endfor %}

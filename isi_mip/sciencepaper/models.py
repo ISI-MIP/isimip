@@ -1,8 +1,8 @@
 from datetime import date
 
 import requests
-
 from django.db import models
+from django.utils.text import slugify
 
 CROSSREF_URL = 'http://api.crossref.org/works?rows={rows}&query={query}'
 

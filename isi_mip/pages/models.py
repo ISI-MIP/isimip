@@ -205,6 +205,23 @@ class PaperPage(Page):
         ], heading="Tags")
     ]
 
+    @property
+    def generate_filter_classes(self):
+        classes = []
+        for tag in self.tags.all():
+            classes.append(slugify(tag.name))
+        for sr in self.simulation_rounds.all():
+            classes.append(slugify(sr.name))
+        for sector in self.sectors.all():
+            classes.append(slugify(sector.name))
+        if self.is_not_peer_reviewed:
+            classes.append('not-peer-reviewed')
+        else:
+            classes.append('peer-reviewed')
+        if self.year:
+            classes.append(self.year)
+        return " ".join(classes)
+
     def get_journal_with_year(self):
         if self.year and not self.year == '-':
             return "%s (%s)" % (self.journal, self.year)
