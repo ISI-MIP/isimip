@@ -350,7 +350,8 @@ class ImpactModel(models.Model):
                                help_text=mark_safe('Please note, if you want to update the model license please <a href="mailto:info@isimip.org">write to us</a>.'))
     model_url = models.URLField(null=True, blank=True, verbose_name='Model Homepage',
                                help_text='The homepage of the model or a link to a git tree or hash of the model version used.')
-    dataset_history = models.URLField(null=True, blank=True, verbose_name='Dataset history', help_text="Information about data replacements, caveats and DOIs is contained within the page of every data set listed after this link.")
+    data_download = models.URLField(null=True, blank=True, verbose_name='Data download', help_text="Follow this link to access the datasets in the ISIMIP Repository.")
+    doi = models.URLField(null=True, blank=True, verbose_name='DOI', help_text="For more information and how to cite this dataset, please follow the DOI.")
     main_reference_paper = models.ForeignKey(
         ReferencePaper, null=True, blank=True, related_name='main_ref', verbose_name='Reference paper: main reference',
         help_text="The single paper that should be cited when referring to simulation output from this model",
@@ -414,7 +415,8 @@ class ImpactModel(models.Model):
             responsible_person=self.responsible_person,
             simulation_round_specific_description=self.simulation_round_specific_description,
             public=True,
-            dataset_history=self.dataset_history,
+            data_download=self.data_download,
+            doi=self.doi,
 
         )
         duplicate.save(is_duplication=True)
@@ -459,7 +461,9 @@ class ImpactModel(models.Model):
 
     def _get_verbose_field_name(self, field):
         fieldmeta = self._meta.get_field(field)
-        ret = fieldmeta.verbose_name.title()
+        ret = fieldmeta.verbose_name
+        if not ret.isupper():
+            ret = ret.title()
         if fieldmeta.help_text:
             ret = generate_helptext(fieldmeta.help_text, ret)
         return ret
@@ -477,9 +481,10 @@ class ImpactModel(models.Model):
         return [
             ('Basic information', [
                 (vname('version'), self.version),
-                ('Model output license', model_output_license),
+                ('Model Output License', model_output_license),
                 (vname('model_url'), self.model_url),
-                (vname('dataset_history'), self.dataset_history and "<a href='{0}' target='_blank'>{0}</a>".format(self.dataset_history)),
+                (vname('data_download'), self.data_download and "<a href='{0}' target='_blank'>{0}</a>".format(self.data_download)),
+                (vname('doi'), self.data_download and "<a href='{0}' target='_blank'>{0}</a>".format(self.doi)),
                 (vname('model_license'), self.model_license),
                 (vname('simulation_round_specific_description'), self.simulation_round_specific_description),
                 (vname('main_reference_paper'),

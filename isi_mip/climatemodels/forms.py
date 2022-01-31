@@ -41,7 +41,7 @@ class ImpactModelForm(forms.ModelForm):
 
     class Meta:
         model = ImpactModel
-        exclude = ('base_model', 'public', 'simulation_round', 'dataset_history')
+        exclude = ('base_model', 'public', 'simulation_round', 'data_download', 'doi')
         widgets = {
             'version': MyTextInput(),
             'main_reference_paper': RefPaperWidget(),
