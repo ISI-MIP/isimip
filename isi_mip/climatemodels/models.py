@@ -345,7 +345,7 @@ class ImpactModel(models.Model):
         help_text="The ISIMIP simulation round for which these model details are relevant"
     )
     version = models.CharField(max_length=500, null=True, blank=True, verbose_name='Model version',
-                               help_text='The model version with which these simulations were run. Please indicate if the model version used for ISIMIP2b can be evaluated based on comparison of the ISIMIP2a runs with observed impacts.')
+                               help_text=mark_safe('Indicate this by a version number or year of application. If the model code would change or a new model application is performed, the new model version should be documented, and this change should be reflected in the simulation files. More information on model versioning at <a href="/protocol/preparing-simulation-files/" target="_blank">https://www.isimip.org/protocol/preparing-simulation-files</a>'))
     model_license = models.CharField(max_length=200, null=True, blank=True, verbose_name='Model license',
                                help_text=mark_safe('Please note, if you want to update the model license please <a href="mailto:info@isimip.org">write to us</a>.'))
     model_url = models.URLField(null=True, blank=True, verbose_name='Model Homepage',
@@ -512,7 +512,7 @@ class TechnicalInformation(models.Model):
         help_text="The spatial resolution at which the ISIMIP simulations were run, if on a regular grid. Data was provided on a 0.5°x0.5° grid")
     spatial_resolution_info = models.TextField(blank=True, verbose_name='Additional spatial aggregation & resolution information',
                                                help_text='Anything else necessary to understand the spatial aggregation and resolution at which the model operates')
-    TEMPORAL_RESOLUTION_CLIMATE_CHOICES = (('daily', 'daily'), ('monthly', 'monthly'), ('annual', 'annual'),)
+    TEMPORAL_RESOLUTION_CLIMATE_CHOICES = (('daily', 'daily'), ('monthly', 'monthly'), ('annual', 'annual'),("5'x5'", "5'x5'"), ("0.5'x0.5'", "0.5'x0.5'"))
     temporal_resolution_climate = ChoiceOrOtherField(
         max_length=500, choices=TEMPORAL_RESOLUTION_CLIMATE_CHOICES, blank=True, null=True, verbose_name='Temporal resolution of input data: climate variables',
         help_text="ISIMIP data was provided in daily time steps")
@@ -638,13 +638,16 @@ class OtherInformation(models.Model):
     natural_vegetation_cover_dataset = models.TextField(
         null=True, blank=True, default='', help_text='Dataset used if natural vegetation cover is prescribed'
     )
+    soil_layers = models.TextField(
+        null=True, blank=True, default='', help_text=''
+    )
     management = models.TextField(
         null=True, blank=True, default='',
-        help_text='Specific management and autonomous adaptation measures applied. E.g. varying sowing dates in crop models, dbh-related harvesting in forest models.'
+        help_text='Please specify management in the general setup. Any sector specific management information is detailed in section 6. Sector-specific information.'
     )
     extreme_events = models.TextField(
         null=True, blank=True, default='', verbose_name='Key challenges',
-        help_text='Key challenges for this model in reproducing impacts of extreme events'
+        help_text='Key challenges for this model in reproducing impacts of extreme events such as pests, fire, water logging, frost damage.'
     )
     anything_else = models.TextField(
         verbose_name='Additional comments',
@@ -672,6 +675,7 @@ class OtherInformation(models.Model):
                 (vname('natural_vegetation_partition'), self.natural_vegetation_partition),
                 (vname('natural_vegetation_dynamics'), self.natural_vegetation_dynamics),
                 (vname('natural_vegetation_cover_dataset'), self.natural_vegetation_cover_dataset),
+                (vname('soil_layers'), self.soil_layers),
             ]),
             ('Management & Adaptation Measures', [
                 (vname('management'), self.management),

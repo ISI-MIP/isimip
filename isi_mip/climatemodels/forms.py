@@ -177,6 +177,7 @@ class OtherInformationModelForm(forms.ModelForm):
             'natural_vegetation_partition': MyTextInput(textarea=True),
             'natural_vegetation_dynamics': MyTextInput(textarea=True),
             'natural_vegetation_cover_dataset': MyTextInput(),
+            'soil_layers': MyTextInput(textarea=True),
             'management': MyTextInput(textarea=True),
             'extreme_events': MyTextInput(textarea=True),
             'anything_else': MyTextInput(textarea=True),
