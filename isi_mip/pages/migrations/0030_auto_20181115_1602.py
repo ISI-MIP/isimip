@@ -9,7 +9,7 @@ import modelcluster.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pages', '0029_auto_20181114_1549'),
+        ('pages', '0029_auto_20181119_1452'),
     ]
 
     operations = [

@@ -132,8 +132,6 @@ class TechnicalInformationModelForm(forms.ModelForm):
 class InputDataInformationModelForm(forms.ModelForm):
     simulated_atmospheric_climate_data_sets = MyModelMultipleChoiceField(allowcustom=False, queryset=InputData.objects)
     observed_atmospheric_climate_data_sets = MyModelMultipleChoiceField(allowcustom=False, queryset=InputData.objects)
-    simulated_ocean_climate_data_sets = MyModelMultipleChoiceField(allowcustom=False, queryset=InputData.objects)
-    observed_ocean_climate_data_sets = MyModelMultipleChoiceField(allowcustom=False, queryset=InputData.objects)
     emissions_data_sets = MyModelMultipleChoiceField(allowcustom=False, queryset=InputData.objects)
     socio_economic_data_sets = MyModelMultipleChoiceField(allowcustom=False, queryset=InputData.objects)
     land_use_data_sets = MyModelMultipleChoiceField(allowcustom=False, queryset=InputData.objects)
@@ -157,11 +155,9 @@ class InputDataInformationModelForm(forms.ModelForm):
         self.fields['emissions_data_sets'].queryset = InputData.objects.filter(data_type__name='Emissions', simulation_round=simulation_round).distinct()
         self.fields['land_use_data_sets'].queryset = InputData.objects.filter(data_type__name='Land use', simulation_round=simulation_round).distinct()
         self.fields['observed_atmospheric_climate_data_sets'].queryset = InputData.objects.filter(data_type__name='Observed atmospheric climate', simulation_round=simulation_round).distinct()
-        self.fields['observed_ocean_climate_data_sets'].queryset = InputData.objects.filter(data_type__name='Observed ocean climate', simulation_round=simulation_round).distinct()
         self.fields['other_data_sets'].queryset = InputData.objects.filter(data_type__name='Other', simulation_round=simulation_round).distinct()
         self.fields['other_human_influences_data_sets'].queryset = InputData.objects.filter(data_type__name='Other human influences', simulation_round=simulation_round).distinct()
         self.fields['simulated_atmospheric_climate_data_sets'].queryset = InputData.objects.filter(data_type__name='Simulated atmospheric climate', simulation_round=simulation_round).distinct()
-        self.fields['simulated_ocean_climate_data_sets'].queryset = InputData.objects.filter(data_type__name='Simulated ocean climate', simulation_round=simulation_round).distinct()
         self.fields['socio_economic_data_sets'].queryset = InputData.objects.filter(data_type__name='Socio-economic', simulation_round=simulation_round).distinct()
 
 
@@ -524,7 +520,9 @@ class EnergyForm(BaseSectorForm):
 
 class MarineEcosystemsForm(BaseSectorForm):
     template = 'edit_marine.html'
-
+    simulated_ocean_climate_data_sets = MyModelMultipleChoiceField(allowcustom=False, queryset=InputData.objects)
+    observed_ocean_climate_data_sets = MyModelMultipleChoiceField(allowcustom=False, queryset=InputData.objects)
+        
     class Meta:
         model = MarineEcosystems
         exclude = ('impact_model',)
@@ -539,6 +537,14 @@ class MarineEcosystemsForm(BaseSectorForm):
             'spatial_dispersal_included': MyTextInput(),
             'fishbase_used_for_mass_length_conversion': MyTextInput(),
         }
+    
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+        simulation_round = instance.impact_model.simulation_round
+        super(MarineEcosystemsForm, self).__init__(*args, **kwargs)
+        self.fields['observed_ocean_climate_data_sets'].queryset = InputData.objects.filter(data_type__name='Observed ocean climate', simulation_round=simulation_round).distinct()
+        self.fields['simulated_ocean_climate_data_sets'].queryset = InputData.objects.filter(data_type__name='Simulated ocean climate', simulation_round=simulation_round).distinct()
+
 
 
 class WaterForm(BaseSectorForm):

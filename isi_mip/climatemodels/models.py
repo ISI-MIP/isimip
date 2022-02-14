@@ -429,8 +429,6 @@ class ImpactModel(models.Model):
         old_climate_variables = old_input_data.climate_variables.filter(inputdata__simulation_round=simulation_round)
         old_simulated_atmospheric_climate_data_sets = old_input_data.simulated_atmospheric_climate_data_sets.filter(simulation_round=simulation_round)
         old_observed_atmospheric_climate_data_sets = old_input_data.observed_atmospheric_climate_data_sets.filter(simulation_round=simulation_round)
-        old_simulated_ocean_climate_data_sets = old_input_data.simulated_ocean_climate_data_sets.filter(simulation_round=simulation_round)
-        old_observed_ocean_climate_data_sets = old_input_data.observed_ocean_climate_data_sets.filter(simulation_round=simulation_round)
         old_emissions_data_sets = old_input_data.emissions_data_sets.filter(simulation_round=simulation_round)
         old_socio_economic_data_sets = old_input_data.socio_economic_data_sets.filter(simulation_round=simulation_round)
         old_land_use_data_sets = old_input_data.land_use_data_sets.filter(simulation_round=simulation_round)
@@ -442,8 +440,6 @@ class ImpactModel(models.Model):
         old_input_data.climate_variables.set(old_climate_variables)
         old_input_data.simulated_atmospheric_climate_data_sets.set(old_simulated_atmospheric_climate_data_sets)
         old_input_data.observed_atmospheric_climate_data_sets.set(old_observed_atmospheric_climate_data_sets)
-        old_input_data.simulated_ocean_climate_data_sets.set(old_simulated_ocean_climate_data_sets)
-        old_input_data.observed_ocean_climate_data_sets.set(old_observed_ocean_climate_data_sets)
         old_input_data.emissions_data_sets.set(old_emissions_data_sets)
         old_input_data.socio_economic_data_sets.set(old_socio_economic_data_sets)
         old_input_data.land_use_data_sets.set(old_land_use_data_sets)
@@ -508,11 +504,11 @@ class TechnicalInformation(models.Model):
     )
     spatial_aggregation = models.ForeignKey(SpatialAggregation, null=True, blank=True, on_delete=models.SET_NULL)
     spatial_resolution = ChoiceOrOtherField(
-        max_length=500, choices=(('0.5°x0.5°', '0.5°x0.5°'),), blank=True, null=True, verbose_name='Spatial Resolution',
+        max_length=500, choices=(('0.5’ x 0.5’', '0.5’ x 0.5’'), ('1.5’ x 1.5’', '1.5’ x 1.5’'), ('6.0’ x 6.0’', '6.0’ x 6.0’'),('0.5°x0.5°', '0.5°x0.5°'),), blank=True, null=True, verbose_name='Spatial Resolution',
         help_text="The spatial resolution at which the ISIMIP simulations were run, if on a regular grid. Data was provided on a 0.5°x0.5° grid")
     spatial_resolution_info = models.TextField(blank=True, verbose_name='Additional spatial aggregation & resolution information',
                                                help_text='Anything else necessary to understand the spatial aggregation and resolution at which the model operates')
-    TEMPORAL_RESOLUTION_CLIMATE_CHOICES = (('daily', 'daily'), ('monthly', 'monthly'), ('annual', 'annual'),("5'x5'", "5'x5'"), ("0.5'x0.5'", "0.5'x0.5'"))
+    TEMPORAL_RESOLUTION_CLIMATE_CHOICES = (('annual', 'annual'), ('monthly', 'monthly'), ('daily', 'daily'), ('constant', 'constant'))
     temporal_resolution_climate = ChoiceOrOtherField(
         max_length=500, choices=TEMPORAL_RESOLUTION_CLIMATE_CHOICES, blank=True, null=True, verbose_name='Temporal resolution of input data: climate variables',
         help_text="ISIMIP data was provided in daily time steps")
@@ -559,10 +555,6 @@ class InputDataInformation(models.Model):
                                                                      help_text="The simulated atmospheric climate data sets used in this simulation round", related_name="simulated_atmospheric_climate_data_sets")
     observed_atmospheric_climate_data_sets = models.ManyToManyField(InputData, blank=True, verbose_name="Observed atmospheric climate data sets used",
                                                                     help_text="The observed atmospheric climate data sets used in this simulation round", related_name="observed_atmospheric_climate_data_sets")
-    simulated_ocean_climate_data_sets = models.ManyToManyField(InputData, blank=True, verbose_name="Simulated ocean climate data sets used",
-                                                               help_text="The observed ocean climate data sets used in this simulation round", related_name="simulated_ocean_climate_data_sets")
-    observed_ocean_climate_data_sets = models.ManyToManyField(InputData, blank=True, verbose_name="Observed ocean climate data sets used",
-                                                              help_text="The observed ocean climate data sets used in this simulation round", related_name="observed_ocean_climate_data_sets")
     emissions_data_sets = models.ManyToManyField(InputData, blank=True, verbose_name="Emissions data sets used",
                                                  help_text="The emissions data sets used in this simulation round", related_name="emissions_data_sets")
     socio_economic_data_sets = models.ManyToManyField(InputData, blank=True, verbose_name="Socio-economic data sets used",
@@ -595,8 +587,6 @@ class InputDataInformation(models.Model):
         return ('Input data sets used', [
                 (vname('simulated_atmospheric_climate_data_sets'), ', '.join([x.pretty() for x in self.simulated_atmospheric_climate_data_sets.all()])),
                 (vname('observed_atmospheric_climate_data_sets'), ', '.join([x.pretty() for x in self.observed_atmospheric_climate_data_sets.all()])),
-                (vname('simulated_ocean_climate_data_sets'), ', '.join([x.pretty() for x in self.simulated_ocean_climate_data_sets.all()])),
-                (vname('observed_ocean_climate_data_sets'), ', '.join([x.pretty() for x in self.observed_ocean_climate_data_sets.all()])),
                 (vname('emissions_data_sets'), ', '.join([x.pretty() for x in self.emissions_data_sets.all()])),
                 (vname('socio_economic_data_sets'), ', '.join([x.pretty() for x in self.socio_economic_data_sets.all()])),
                 (vname('land_use_data_sets'), ', '.join([x.pretty() for x in self.land_use_data_sets.all()])),
@@ -1281,6 +1271,13 @@ class MarineEcosystems(BaseSector):
     spatial_dispersal_included = models.TextField(null=True, blank=True, default='', verbose_name='Spatial dispersal included')
     fishbase_used_for_mass_length_conversion = models.TextField(
         null=True, blank=True, default='', verbose_name='Is FishBase used for mass-length conversion?')
+    simulated_ocean_climate_data_sets = models.ManyToManyField(InputData, blank=True, verbose_name="Simulated ocean climate data sets used",
+                                                               help_text="The observed ocean climate data sets used in this simulation round", related_name="%(app_label)s_%(class)s_simulated")
+    observed_ocean_climate_data_sets = models.ManyToManyField(InputData, blank=True, verbose_name="Observed ocean climate data sets used",
+                                                              help_text="The observed ocean climate data sets used in this simulation round", related_name="%(app_label)s_%(class)s_observed")
+
+    class Meta:
+        abstract = True
 
     def values_to_tuples(self):
         vname = self._get_verbose_field_name
@@ -1296,11 +1293,10 @@ class MarineEcosystems(BaseSector):
                 (vname('vertical_resolution'), self.vertical_resolution),
                 (vname('spatial_dispersal_included'), self.spatial_dispersal_included),
                 (vname('fishbase_used_for_mass_length_conversion'), self.fishbase_used_for_mass_length_conversion),
+                (vname('simulated_ocean_climate_data_sets'), ', '.join([x.pretty() for x in self.simulated_ocean_climate_data_sets.all()])),
+                (vname('observed_ocean_climate_data_sets'), ', '.join([x.pretty() for x in self.observed_ocean_climate_data_sets.all()])),
             ])
         ] + generic
-
-    class Meta:
-        abstract = True
 
 
 class MarineEcosystemsGlobal(MarineEcosystems):

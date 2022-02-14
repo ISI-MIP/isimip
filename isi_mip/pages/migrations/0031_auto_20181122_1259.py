@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('climatemodels', '0085_auto_20180215_1105'),
-        ('pages', '0030_auto_20181115_1602'),
+        ('pages', '0030_auto_20181119_1527'),
     ]
 
     operations = [
