@@ -21,6 +21,7 @@ from django.utils.safestring import mark_safe
 from django.template import Template, Context, RequestContext
 
 from easy_pdf.rendering import render_to_pdf_response, render_to_pdf, make_response
+from wagtail.core.models import Site
 
 from isi_mip.climatemodels.forms import AttachmentModelForm, ImpactModelStartForm, ContactPersonFormset, get_sector_form, \
     BaseImpactModelForm, ImpactModelForm, TechnicalInformationModelForm, InputDataInformationModelForm, \
@@ -168,7 +169,8 @@ def confirm_data(page, request, id):
             messages.error(request, 'If you choose the "Other" license you need to fill out the name!')
             return HttpResponseRedirect(request.path)
         # build and send confirm email
-        confirm_email = DataPublicationConfirmation.for_site(request.site)
+        site = Site.find_for_request(request)
+        confirm_email = DataPublicationConfirmation.for_site(site)
         license = license == 'other' and form.cleaned_data['other_license_name'] or license
         context = {
             'model_contact_person': request.user.get_full_name(),
@@ -556,7 +558,8 @@ def send_email(request, user, bimodel):
         'username': user.username,
         'valid_until': invite.valid_until,
     }
-    invitation = Invitation.for_site(request.site)
+    site = Site.find_for_request(request)
+    invitation = Invitation.for_site(site)
     template = Template(invitation.subject)
     subject = template.render(Context(context))
     # Force subject to a single line to avoid header-injection

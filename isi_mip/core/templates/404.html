@@ -2,8 +2,17 @@
 
 {% block title %}Page Not found{% endblock %}
 
-{% block content %}
-<h1>Page Not found</h1>
-
-<p>This is not the page you were looking for.</p>
-{% endblock content %}
+{% block content_container %}
+	<div class="container scrollable-container">
+		<br>
+		{% include 'widgets/heading1.html' with text='Page Not found' %}
+		<br>
+		{% block content %}
+		<div class="row">
+			<div class="col-sm-8">
+                <p>This is not the page you were looking for.</p>
+			</div>
+		</div>
+		{% endblock %}
+	</div>
+{% endblock %}

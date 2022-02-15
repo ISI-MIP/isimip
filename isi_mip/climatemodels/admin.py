@@ -11,6 +11,8 @@ from django.urls import reverse
 from django.template import Context, Template
 from django.conf import settings
 
+from wagtail.core.models import Site
+
 from isi_mip.sciencepaper.models import Author
 from .models import *
 from isi_mip.contrib.models import UserProfile
@@ -318,7 +320,8 @@ class DataPublicationConfirmationModelAdmin(admin.ModelAdmin):
                 'data_confirmation_link': link,
                 'custom_text': confirmation.email_text,
             }
-            confirm_email = DataPublicationRequest.for_site(request.site)
+            site = Site.find_for_request(request)
+            confirm_email = DataPublicationRequest.for_site(site)
             confirm_body = Template(confirm_email.body)
             confirm_body = confirm_body.render(Context(context))
             confirm_subject = confirm_email.subject

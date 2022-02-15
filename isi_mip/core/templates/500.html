@@ -2,12 +2,18 @@
 
 {% block title %}Server Error{% endblock %}
 
-{% block content %}
-<h1>Ooops!!! 500</h1>
-
-<h3>Looks like something went wrong!</h3>
-
-<p>We track these errors automatically, but if the problem persists feel free to contact us. In the meantime, try refreshing.</p>
-{% endblock content %}
-
-
+{% block content_container %}
+	<div class="container scrollable-container">
+		<br>
+		{% include 'widgets/heading1.html' with text='Ooops!!! Internal Server Error' %}
+		<br>
+		{% block content %}
+		<div class="row">
+			<div class="col-sm-8">
+				<h3>Looks like something went wrong!</h3>
+                <p>We track these errors automatically, but if the problem persists feel free to contact us. In the meantime, try refreshing.</p>
+			</div>
+		</div>
+		{% endblock %}
+	</div>
+{% endblock %}
