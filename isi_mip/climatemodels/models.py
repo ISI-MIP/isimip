@@ -612,8 +612,8 @@ class OtherInformation(models.Model):
     spin_up = models.BooleanField(
         verbose_name='Was a spin-up performed?',
         help_text="'No' indicates the simulations were run starting in the first reporting year 1971",
-        choices=YES_NO
-    , null=True)
+        choices=YES_NO,
+        null=True, blank=True)
     spin_up_design = models.TextField(
         null=True, blank=True, default='', verbose_name='Spin-up design',
         help_text="Including the length of the spin up, the CO2 concentration used, and any deviations from the spin-up procedure defined in the protocol"
