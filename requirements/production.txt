@@ -2,6 +2,6 @@
 #	production that isn't in development.
 -r base.txt
 
-sentry-sdk
-gunicorn
+sentry-sdk==1.5.*
+gunicorn==20.1.*
 django-email-obfuscator==0.1.4
