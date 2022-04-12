@@ -511,7 +511,7 @@ class TechnicalInformation(models.Model):
     TEMPORAL_RESOLUTION_CLIMATE_CHOICES = (('annual', 'annual'), ('monthly', 'monthly'), ('daily', 'daily'), ('constant', 'constant'))
     temporal_resolution_climate = ChoiceOrOtherField(
         max_length=500, choices=TEMPORAL_RESOLUTION_CLIMATE_CHOICES, blank=True, null=True, verbose_name='Temporal resolution of input data: climate variables',
-        help_text="ISIMIP data was provided in daily time steps")
+        help_text="ISIMIP data was provided in daily time steps. If more than one resolution is used, please include them in the custom field")
     temporal_resolution_co2 = ChoiceOrOtherField(
         max_length=500, choices=(('annual', 'annual'),), blank=True, null=True, verbose_name='Temporal resolution of input data: CO2',
         help_text="ISIMIP data was provided in annual time steps")
