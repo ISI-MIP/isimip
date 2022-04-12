@@ -1,6 +1,6 @@
 pip # get rid of annoying pip messages
 
-psycopg2==2.9.3
+psycopg2-binary==2.8.4
 python-dateutil==2.8.2
 
 pyexcel==0.6.7
