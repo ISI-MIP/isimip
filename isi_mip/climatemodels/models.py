@@ -504,7 +504,7 @@ class TechnicalInformation(models.Model):
     )
     spatial_aggregation = models.ForeignKey(SpatialAggregation, null=True, blank=True, on_delete=models.SET_NULL)
     spatial_resolution = ChoiceOrOtherField(
-        max_length=500, choices=(('0.5’ x 0.5’', '0.5’ x 0.5’'), ('1.5’ x 1.5’', '1.5’ x 1.5’'), ('6.0’ x 6.0’', '6.0’ x 6.0’'),('0.5°x0.5°', '0.5°x0.5°'),), blank=True, null=True, verbose_name='Spatial Resolution',
+        max_length=500, choices=(('0.5’ x 0.5’', '0.5’ x 0.5’'), ('1.5’ x 1.5’', '1.5’ x 1.5’'), ('6.0’ x 6.0’', '5.0’ x 5.0’'),('0.5°x0.5°', '0.5°x0.5°'),), blank=True, null=True, verbose_name='Spatial Resolution',
         help_text="The spatial resolution at which the ISIMIP simulations were run, if on a regular grid. Data was provided on a 0.5°x0.5° grid")
     spatial_resolution_info = models.TextField(blank=True, verbose_name='Additional spatial aggregation & resolution information',
                                                help_text='Anything else necessary to understand the spatial aggregation and resolution at which the model operates')
