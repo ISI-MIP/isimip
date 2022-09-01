@@ -76,7 +76,7 @@ class TwitterTimeline:
         if not result:
             try:
                 api = self.connect()
-                timeline = api.user_timeline(username, count=self.count)
+                timeline = api.user_timeline(screen_name=username, count=self.count)
                 result = self.extract_tweets(timeline)
                 cache.set(self.KEY, result, self.cache_timeout)
                 cache.set(self.KEY_LT, result, self.cache_long_term_timeout)
