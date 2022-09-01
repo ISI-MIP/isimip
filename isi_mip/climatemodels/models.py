@@ -345,8 +345,8 @@ class ImpactModel(models.Model):
         help_text="The ISIMIP simulation round for which these model details are relevant"
     )
     version = models.CharField(max_length=500, null=True, blank=True, verbose_name='Model version',
-                               help_text=mark_safe('Indicate this by a version number or year of application. If the model code would change or a new model application is performed, the new model version should be documented, and this change should be reflected in the simulation files. More information on model versioning at <a href="/protocol/preparing-simulation-files/" target="_blank">https://www.isimip.org/protocol/preparing-simulation-files</a>'))
-    model_license = models.CharField(max_length=200, null=True, blank=True, verbose_name='Model license',
+                               help_text=mark_safe('Indicate this by a version number or year of application. If the model code would change or a new model application is performed, the new model version should be documented, and this change should be reflected in the simulation files. More information on model versioning you can find <a href="/protocol/preparing-simulation-files/" target="_blank">here</a>.'))
+    model_license = models.CharField(max_length=200, null=True, blank=True, verbose_name='Model output license',
                                help_text=mark_safe('Please note, if you want to update the model license please <a href="mailto:info@isimip.org">write to us</a>.'))
     model_url = models.URLField(null=True, blank=True, verbose_name='Model Homepage',
                                help_text='The homepage of the model or a link to a git tree or hash of the model version used.')

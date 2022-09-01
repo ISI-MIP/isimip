@@ -446,6 +446,7 @@ $(function() {
 		initiator.popover({
 			'template': '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>',
 			'content': initiator.attr('title'),
+			'html': true,
 		});
 
 
