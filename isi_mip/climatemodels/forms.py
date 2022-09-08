@@ -38,17 +38,25 @@ class BaseImpactModelForm(forms.ModelForm):
 
 
 class ImpactModelForm(forms.ModelForm):
+    model_output_license = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}), help_text=mark_safe('Please note, if you want to update the model output license please <a href="mailto:info@isimip.org">write to us</a>.'))
 
     class Meta:
         model = ImpactModel
-        exclude = ('base_model', 'public', 'simulation_round', 'data_download', 'doi')
+        fields = ('version', 'model_license', 'model_output_license', 'model_url', 'main_reference_paper', 'other_references', 'responsible_person', 'simulation_round_specific_description')
+        # exclude = ('base_model', 'public', 'simulation_round', 'data_download', 'doi')
         widgets = {
             'version': MyTextInput(),
             'main_reference_paper': RefPaperWidget(),
             'other_references': RefPaperWidget(),
             'responsible_person': MyTextInput(),
-            'model_license': forms.TextInput(attrs={'readonly': 'readonly'})
+            'model_license': MyTextInput(),
         }
+    
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+        if instance:
+            kwargs['initial'] = {'model_output_license': instance.model_output_license, }
+        super().__init__(*args, **kwargs)
 
     @staticmethod
     def _ref_paper(args):

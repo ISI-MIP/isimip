@@ -346,8 +346,7 @@ class ImpactModel(models.Model):
     )
     version = models.CharField(max_length=500, null=True, blank=True, verbose_name='Model version',
                                help_text=mark_safe('Indicate this by a version number or year of application. If the model code would change or a new model application is performed, the new model version should be documented, and this change should be reflected in the simulation files. More information on model versioning you can find <a href="/protocol/preparing-simulation-files/" target="_blank">here</a>.'))
-    model_license = models.CharField(max_length=200, null=True, blank=True, verbose_name='Model output license',
-                               help_text=mark_safe('Please note, if you want to update the model license please <a href="mailto:info@isimip.org">write to us</a>.'))
+    model_license = models.CharField(max_length=200, null=True, blank=True, verbose_name='Model license')
     model_url = models.URLField(null=True, blank=True, verbose_name='Model Homepage',
                                help_text='The homepage of the model or a link to a git tree or hash of the model version used.')
     data_download = models.URLField(null=True, blank=True, verbose_name='Data download', help_text="Follow this link to access the datasets in the ISIMIP Repository.")
@@ -372,6 +371,13 @@ class ImpactModel(models.Model):
 
     def __str__(self):
         return "%s (%s, %s)" % (self.base_model and self.base_model.name or self.id, self.base_model and self.base_model.sector or '', self.simulation_round)
+
+    @property
+    def model_output_license(self):
+        if hasattr(self, 'confirmation'):
+            return self.confirmation.confirmed_license
+        return None
+
 
     @property
     def fk_sector_name(self):
@@ -471,13 +477,10 @@ class ImpactModel(models.Model):
             other_references = "<ul>%s</ul>" % "".join(["<li>%s</li>" % x.entry_with_link() for x in self.other_references.all()])
         else:
             other_references = None
-        model_output_license = ''
-        if hasattr(self, 'confirmation'):
-            model_output_license = self.confirmation.confirmed_license
         return [
             ('Basic information', [
                 (vname('version'), self.version),
-                ('Model Output License', model_output_license),
+                (generate_helptext(mark_safe('Please note, if you want to update the model output license please <a href="mailto:info@isimip.org">write to us</a>.'), 'Model Output License'), self.model_output_license),
                 (vname('model_url'), self.model_url),
                 (vname('data_download'), self.data_download and "<a href='{0}' target='_blank'>{0}</a>".format(self.data_download)),
                 (vname('doi'), self.doi and "<a href='{0}' target='_blank'>{0}</a>".format(self.doi)),
