@@ -1,36 +1,45 @@
+import math
 from collections import OrderedDict
 from datetime import datetime
 
-import math
 import requests
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.core.mail import EmailMessage
 from django.db.models import Q
-from django.http.response import HttpResponse, HttpResponseRedirect, \
-    JsonResponse
+from django.http.response import (HttpResponse, HttpResponseRedirect,
+                                  JsonResponse)
 from django.shortcuts import render
-from django.template import Context, RequestContext, Template
+from django.template import Context, RequestContext, Template, defaultfilters
 from django.template.loader import render_to_string
-from django.utils.html import urlize, linebreaks
-from django.utils.text import slugify
+from django.urls import reverse
+from django.utils.html import linebreaks, urlize
 from django.utils.safestring import mark_safe
-from django.template import Template, Context, RequestContext
-
-from easy_pdf.rendering import render_to_pdf_response, render_to_pdf, make_response
+from django.utils.text import slugify
+from easy_pdf.rendering import (make_response, render_to_pdf,
+                                render_to_pdf_response)
 from wagtail.core.models import Site
 
-from isi_mip.climatemodels.forms import AttachmentModelForm, ImpactModelStartForm, ContactPersonFormset, get_sector_form, \
-    BaseImpactModelForm, ImpactModelForm, TechnicalInformationModelForm, InputDataInformationModelForm, \
-    OtherInformationModelForm, ContactInformationForm, DataConfirmationForm
-from isi_mip.climatemodels.models import ImpactModel, InputData, BaseImpactModel, SimulationRound, Attachment
-from isi_mip.climatemodels.tools import ImpactModelToXLSX, ParticpantModelToXLSX
+from isi_mip.climatemodels.forms import (AttachmentModelForm,
+                                         BaseImpactModelForm,
+                                         ContactInformationForm,
+                                         ContactPersonFormset,
+                                         DataConfirmationForm, ImpactModelForm,
+                                         ImpactModelStartForm,
+                                         InputDataInformationModelForm,
+                                         OtherInformationModelForm,
+                                         TechnicalInformationModelForm,
+                                         get_sector_form)
+from isi_mip.climatemodels.models import (Attachment, BaseImpactModel,
+                                          ImpactModel, InputData,
+                                          SimulationRound)
+from isi_mip.climatemodels.tools import (ImpactModelToXLSX,
+                                         ParticpantModelToXLSX)
+from isi_mip.core.models import DataPublicationConfirmation, Invitation
 from isi_mip.invitation.views import InvitationView
-from isi_mip.core.models import Invitation, DataPublicationConfirmation
-
 
 STEP_SHOW_DETAILS = 'details'
 STEP_BASE = 'edit_base'
@@ -151,6 +160,8 @@ def confirm_data(page, request, id):
             'impact_model_name': impact_model.base_model.name,
             'custom_text': confirmation.email_text,
             'impact_model_url': '/impactmodels/edit/%s/' % impact_model.pk,
+            'publication_date_max': datetime.now() + relativedelta(years=1),
+            'publication_date_min': datetime.now(),
         }
 
         template = 'climatemodels/confirm_data.html'
@@ -168,16 +179,35 @@ def confirm_data(page, request, id):
         if license == 'other' and form.cleaned_data['other_license_name'] == '':
             messages.error(request, 'If you choose the "Other" license you need to fill out the name!')
             return HttpResponseRedirect(request.path)
+        
+        publication_date = form.cleaned_data.get('publication_date')
+        publication_date_date = form.cleaned_data.get('publication_date_date')
+        if publication_date == 'not_before_date' and not publication_date_date:
+            messages.error(request, 'If you choose not before date you need to fill out a date!')
+            return HttpResponseRedirect(request.path)
+
+        # update confirmation state
+        confirmation.is_confirmed = True
+        confirmation.confirmed_by = request.user
+        confirmation.confirmed_date = datetime.now()
+        confirmation.confirmed_license = license
+        confirmation.confirmed_publication_date = publication_date
+        confirmation.confirmed_publication_date_date = publication_date_date
+        confirmation.save()
+        
         # build and send confirm email
         site = Site.find_for_request(request)
         confirm_email = DataPublicationConfirmation.for_site(site)
         license = license == 'other' and form.cleaned_data['other_license_name'] or license
+        
         context = {
             'model_contact_person': request.user.get_full_name(),
             'simulation_round': impact_model.simulation_round,
             'impact_model_name': confirmation.impact_model.base_model.name,
             'custom_text': confirmation.email_text,
             'license': license,
+            'publication_by': confirmation.get_confirmed_publication_date_display(),
+            'publication_date': defaultfilters.date(publication_date_date, 'Y-m-d'),
         }
         confirm_body = Template(confirm_email.body)
         confirm_body = confirm_body.render(Context(context))
@@ -201,12 +231,6 @@ def confirm_data(page, request, id):
         )
         email.attach(filename, pdf, "application/pdf")
         email.send()
-        # update confirmation state
-        confirmation.is_confirmed = True
-        confirmation.confirmed_by = request.user
-        confirmation.confirmed_date = datetime.now()
-        confirmation.confirmed_license = license
-        confirmation.save()
         messages.success(request, 'The data confirmation email has been sent.')
         return HttpResponseRedirect('/dashboard/')
 
@@ -650,5 +674,3 @@ def show_participants(request, extra_context):
     if extra_context is not None:
         context.update(extra_context)
     return render(request, 'climatemodels/show_participants.html', context)
-
-

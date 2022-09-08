@@ -1600,6 +1600,14 @@ class Attachment(models.Model):
         return [('Attachments', tuples )]
 
 
+PUBLICATION_DATE_CHOICES = [
+    ('as_soon_as_possible', 'as soon as possible'), 
+    ('not_before_date', 'not before date'), 
+    ('one_year_after_dkrz', 'one year after submission to DKRZ at least'), 
+    ('notify_isimip', 'the modeling group will notify the ISIMIP data team by email of the end of the emarbo period. (not later than one year after data submission)')
+]
+
+
 class DataPublicationConfirmation(models.Model):
     impact_model = models.OneToOneField(ImpactModel, on_delete=models.PROTECT, related_name='confirmation')
     created = models.DateTimeField(auto_now_add=True)
@@ -1609,6 +1617,8 @@ class DataPublicationConfirmation(models.Model):
     confirmed_date = models.DateTimeField(null=True, blank=True)
     confirmed_by = models.ForeignKey(User, on_delete=models.CASCADE,  null=True, blank=True)
     confirmed_license = models.CharField(max_length=500, blank=True, null=True)
+    confirmed_publication_date = models.CharField(max_length=500, blank=True, null=True, verbose_name="Confirmed publication by", choices=PUBLICATION_DATE_CHOICES)
+    confirmed_publication_date_date = models.DateField(blank=True, null=True, verbose_name="Confirmed publication date")
 
     class Meta:
         verbose_name = "Data publication confirmation"
