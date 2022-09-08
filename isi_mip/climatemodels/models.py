@@ -1623,3 +1623,9 @@ class DataPublicationConfirmation(models.Model):
     class Meta:
         verbose_name = "Data publication confirmation"
         verbose_name_plural = "Data publication confirmations"
+
+    @property
+    def confirm_url(self):
+        from isi_mip.pages.models import ImpactModelsPage
+        impage = ImpactModelsPage.objects.get()
+        return impage.full_url + impage.reverse_subpage('confirm_data', kwargs={'id': self.impact_model.pk})
