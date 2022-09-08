@@ -282,10 +282,10 @@ class ClimateVariableAdmin(admin.ModelAdmin):
 
 class DataPublicationConfirmationModelAdmin(admin.ModelAdmin):
     model = DataPublicationConfirmation
-    fields = ('impact_model', 'email_text', 'is_confirmed', 'confirmed_date', 'confirmed_license', 'confirmed_by',)
+    fields = ('impact_model', 'email_text', 'is_confirmed', 'confirmed_date', 'confirmed_license', 'confirmed_by', 'confirmed_publication_date', 'confirmed_publication_date_date', 'confirm_url')
     list_display = ('impact_model', 'confirmed_date', 'confirmed_by', 'confirmed_license', 'is_confirmed')
-    readonly_fields_edit = ('is_confirmed', 'confirmed_date', 'confirmed_license', 'confirmed_by',)
-    readonly_fields = ('impact_model', 'email_text', 'is_confirmed', 'confirmed_date', 'confirmed_license', 'confirmed_by',)
+    readonly_fields_edit = ('is_confirmed', 'confirmed_date', 'confirmed_license', 'confirmed_by', 'confirmed_publication_date', 'confirmed_publication_date_date', 'confirm_url')
+    readonly_fields = ('impact_model', 'email_text', 'is_confirmed', 'confirmed_date', 'confirmed_license', 'confirmed_by', 'confirmed_publication_date', 'confirmed_publication_date_date', 'confirm_url')
     list_filter = ('is_confirmed', 'confirmed_license')
     ordering = ('impact_model',)
 

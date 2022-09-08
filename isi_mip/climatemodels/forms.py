@@ -1,13 +1,16 @@
+from dateutil.parser import parse
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms import inlineformset_factory, ClearableFileInput
+from django.forms import ClearableFileInput, inlineformset_factory
 from django.utils import text
 from django.utils.safestring import mark_safe
-from dateutil.parser import parse
 
-from isi_mip.climatemodels.fields import MyModelSingleChoiceField, MyModelMultipleChoiceField
+from isi_mip.climatemodels.fields import (MyModelMultipleChoiceField,
+                                          MyModelSingleChoiceField)
 from isi_mip.climatemodels.models import *
-from isi_mip.climatemodels.widgets import MyMultiSelect, MyTextInput, MyBooleanSelect, RefPaperWidget
+from isi_mip.climatemodels.models import PUBLICATION_DATE_CHOICES
+from isi_mip.climatemodels.widgets import (MyBooleanSelect, MyMultiSelect,
+                                           MyTextInput, RefPaperWidget)
 from isi_mip.contrib.models import Country
 
 ContactPersonFormset = inlineformset_factory(BaseImpactModel, ContactPerson,
@@ -663,5 +666,7 @@ class AttachmentModelForm(forms.ModelForm):
 class DataConfirmationForm(forms.Form):
     terms = forms.BooleanField(required=True)
     license = forms.ChoiceField(required=True, choices=(('CC BY 4.0', 'CC BY 4.0'), ('CC0', 'CC0'), ('other', 'other')))
+    publication_date = forms.ChoiceField(required=True, choices=PUBLICATION_DATE_CHOICES)
+    publication_date_date = forms.DateField(required=False)
     other_license_name = forms.CharField(required=False)
     correct = forms.BooleanField(required=True)

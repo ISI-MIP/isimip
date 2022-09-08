@@ -21,6 +21,29 @@
                         <input type="checkbox" name="terms" required> The uploaded simulation data for {{ simulation_round }} for {{ impact_model_name }}, and any further simulation data for the same model and simulation round can be published in the ISIMIP repository.
                     </label>
                 </div>
+                <p>Please select the appropriate date for data publication:
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="publication_date" value="as_soon_as_possible" required> as soon as possible
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="publication_date" value="not_before_date" required> not before date: <input name="publication_date_date" type="date" min="{{ publication_date_min|date:"Y-m-d" }}" max="{{ publication_date_max|date:"Y-m-d" }}">
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="publication_date" value="one_year_after_dkrz" required> one year after submission to DKRZ at least
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="publication_date" value="notify_isimip" required> the modeling group will notify the ISIMIP data team by email of the end of the emarbo period. (not later than one year after data submission)
+                        </label>
+                    </div>
+                </p>
+                
                 <p>Please select the appropriate license from the list, or specify another one if needed. The same license will be used for all data from your model in {{ simulation_round }}. Please read about our license recommendations and other important technical and legal issues concerning licenses in <a href="https://www.isimip.org/gettingstarted/terms-of-use/licenses-publicly-available-isimip-data/" target="_blank">here</a>.</p>
                 <div class="radio">
                     <label>

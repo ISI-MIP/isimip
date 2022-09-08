@@ -99,4 +99,4 @@ class DataPublicationRequest(BaseSetting):
 @register_setting(icon='mail')
 class DataPublicationConfirmation(BaseSetting):
     subject = models.CharField(max_length=500, help_text='Data publication confirmation subject', default="[ISIMIP] Data confirmation")
-    body = models.TextField(help_text='You can use the following tokens in the email template: {{model_contact_person}}, {{simulation_round}}, {{impact_model_name}}, {{custom_text}}, {{license}}')
+    body = models.TextField(help_text='You can use the following tokens in the email template: {{model_contact_person}}, {{simulation_round}}, {{impact_model_name}}, {{custom_text}}, {{license}}, {{publication_by}}, {{publication_date}}')
