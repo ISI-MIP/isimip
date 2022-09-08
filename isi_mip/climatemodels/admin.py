@@ -283,11 +283,16 @@ class ClimateVariableAdmin(admin.ModelAdmin):
 class DataPublicationConfirmationModelAdmin(admin.ModelAdmin):
     model = DataPublicationConfirmation
     fields = ('impact_model', 'email_text', 'is_confirmed', 'confirmed_date', 'confirmed_license', 'confirmed_by', 'confirmed_publication_date', 'confirmed_publication_date_date')
-    list_display = ('impact_model', 'confirmed_date', 'confirmed_by', 'confirmed_license', 'is_confirmed')
+    list_display = ('impact_model', 'confirm_url', 'confirmed_date', 'confirmed_by', 'confirmed_license', 'is_confirmed')
     readonly_fields_edit = ('is_confirmed', 'confirmed_date', 'confirmed_license', 'confirmed_by', 'confirmed_publication_date', 'confirmed_publication_date_date')
     readonly_fields = ('impact_model', 'email_text', 'is_confirmed', 'confirmed_date', 'confirmed_license', 'confirmed_by', 'confirmed_publication_date', 'confirmed_publication_date_date')
     list_filter = ('is_confirmed', 'confirmed_license')
     ordering = ('impact_model',)
+
+    def confirm_url(self, obj):
+        impage = ImpactModelsPage.objects.get()
+        return impage.full_url + impage.reverse_subpage('confirm_data', kwargs={'id': obj.impact_model.pk})
+    confirm_url.allow_tags = True
 
     def get_readonly_fields(self, request, obj=None):
         if not obj:
