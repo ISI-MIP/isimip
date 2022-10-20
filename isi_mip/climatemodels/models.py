@@ -1396,7 +1396,7 @@ class WaterGlobal(Water):
 
 class WaterRegional(Water):
     VEGETATION_CHOICES = (
-        ('prescriped', 'Prescriped'),
+        ('prescriped', 'Prescribed'),
         ('simulated', 'Simulated'),
     )
     vegetation_representation = models.CharField(null=True, blank=True, choices=VEGETATION_CHOICES, verbose_name='How is vegetation represented?', max_length=255)
