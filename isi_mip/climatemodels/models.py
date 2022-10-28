@@ -284,7 +284,6 @@ class BaseImpactModel(index.Indexed, models.Model):
             index.SearchField('name'),
         ]),
         index.FilterField('public'),
-        index.SearchField('get_related_contact_persons'),
         index.SearchField('short_description'),
     ]
 
@@ -304,9 +303,6 @@ class BaseImpactModel(index.Indexed, models.Model):
 
     def public(self):
         return self.impact_model.filter(public=True).exists()
-
-    def get_related_contact_persons(self):
-        return '\n'.join(['%s %s %s' % (owner.name, owner.email, owner.institute) for owner in self.impact_model_owner.all()])
 
     def can_duplicate_from(self):
         return self.impact_model.order_by('simulation_round').first()
@@ -363,12 +359,19 @@ class ImpactModel(models.Model):
 
     public = models.BooleanField(default=False)
 
+    search_fields = [
+        index.SearchField('get_related_contact_persons'),
+    ]
+
     class Meta:
         unique_together = ('base_model', 'simulation_round')
         ordering = ('base_model', 'simulation_round')
 
     def __str__(self):
         return "%s (%s, %s)" % (self.base_model and self.base_model.name or self.id, self.base_model and self.base_model.sector or '', self.simulation_round)
+
+    def get_related_contact_persons(self):
+        return '\n'.join(['%s %s %s' % (owner.name, owner.email, owner.institute) for owner in self.impact_model_responsible.all()])
 
     @property
     def model_output_license(self):
@@ -398,7 +401,7 @@ class ImpactModel(models.Model):
 
         # make all owners involved in the duplicated model
         if is_creation and self.base_model:
-            for owner in self.base_model.impact_model_owner.all():
+            for owner in self.impact_model_responsible.all():
                 owner.responsible.add(self)
         # make sure if sector changes that sector specific objects exists for the impact model
         if not is_duplication and not hasattr(self, self.fk_sector_name):

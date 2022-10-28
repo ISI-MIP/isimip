@@ -213,7 +213,7 @@ def confirm_data(page, request, id):
         confirm_body = confirm_body.render(Context(context))
         # add newlines to the end of body to split attachment from text
         confirm_body += "\n\n"
-        ccs = impact_model.base_model.impact_model_owner.exclude(pk=request.user.pk)
+        ccs = impact_model.impact_model_responsible.exclude(pk=request.user.pk)
         pdf = render_impact_model_to_pdf(impact_model)
         subject = "%s for %s" % (confirm_email.subject, confirmation.impact_model.base_model.name)
         email = EmailMessage(
@@ -492,7 +492,7 @@ def impact_model_base_edit(page, request, context, impact_model, current_step, n
     else:
         form = BaseImpactModelForm(instance=base_impact_model)
         contact_persons = []
-        for contact_person in base_impact_model.impact_model_owner.all():
+        for contact_person in impact_model.impact_model_responsible.all():
             contact_persons.append({
                 'name': contact_person.name,
                 'email': contact_person.email,

@@ -319,7 +319,7 @@ class DataPublicationConfirmationModelAdmin(admin.ModelAdmin):
     def send_request_to_confirm(self, confirmation, request):
 
         impage = ImpactModelsPage.objects.get()
-        for owner in confirmation.impact_model.base_model.impact_model_owner.all():
+        for owner in confirmation.impact_model.impact_model_responsible.all():
             link = impage.full_url + impage.reverse_subpage('confirm_data', kwargs={'id': confirmation.impact_model.pk})
             context = {
                 'model_contact_person': owner.name,

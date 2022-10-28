@@ -11,24 +11,24 @@ def impact_model_datacite_api(request, impactmodel_id):
     titles = [{
         'title': base_impact_model.name
     }]
-    creators = []
-    for creator in base_impact_model.impact_model_owner.all():
-        creator_json = {
-            'firstName': creator.user.first_name,
-            'givenName': creator.user.last_name,
-        }
-        affiliation = {}
-        if creator.institute:
-            affiliation['affiliation'] = creator.institute
-        if creator.ror_id:
-            affiliation['affiliationIdentifier'] = creator.ror_id
-            affiliation['affiliationIdentifierScheme'] = 'ROR'
-        creator_json['affiliations'] = (affiliation,)
-        if creator.orcid_id:
-            creator_json['nameIdentifier'] = creator.orcid_id
-            creator_json['nameIdentifierScheme'] = 'ORCID'
-        creators.append(creator_json)
     for impact_model in base_impact_model.impact_model.all():
+        creators = []
+        for creator in impact_model.impact_model_responsible.all():
+            creator_json = {
+                'firstName': creator.user.first_name,
+                'givenName': creator.user.last_name,
+            }
+            affiliation = {}
+            if creator.institute:
+                affiliation['affiliation'] = creator.institute
+            if creator.ror_id:
+                affiliation['affiliationIdentifier'] = creator.ror_id
+                affiliation['affiliationIdentifierScheme'] = 'ROR'
+            creator_json['affiliations'] = (affiliation,)
+            if creator.orcid_id:
+                creator_json['nameIdentifier'] = creator.orcid_id
+                creator_json['nameIdentifierScheme'] = 'ORCID'
+            creators.append(creator_json)
         related_identifiers = []
         if impact_model.model_url:
             related_identifiers.append({

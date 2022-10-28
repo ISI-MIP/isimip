@@ -14,7 +14,7 @@ class ImpactModelsBlock(StructBlock):
     def get_context(self, value, parent_context=None):
         context = super(ImpactModelsBlock, self).get_context(value, parent_context=parent_context)
 
-        bims = BaseImpactModel.objects.select_related('sector').prefetch_related('impact_model', 'impact_model_owner', 'impact_model_owner__user')
+        bims = BaseImpactModel.objects.select_related('sector').prefetch_related('impact_model')
         bims = bims.filter(impact_model__public=True).distinct().order_by('name')
 
         # Filter und Suchfelder

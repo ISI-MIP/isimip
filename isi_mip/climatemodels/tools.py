@@ -47,7 +47,7 @@ SKIP_FIELDS = [
 ]
 
 SORT_ORDER = {
-    "impact_model_owner": 1,
+    "impact_model_responsible": 1,
     "main_reference_paper": 1,
     "other_references": 2,
 }
@@ -93,8 +93,8 @@ class ImpactModelToXLSX:
                 if hasattr(field, 'verbose_name'):
                     all_field_titles.append(field.verbose_name.capitalize())
                 else:
-                    if field.name == 'impact_model_owner':
-                        all_field_titles.append('Contact person')
+                    if field.name == 'impact_model_responsible':
+                        all_field_titles.append('Person responsible')
                     else:
                         name = field.name.replace("_", " ").capitalize()
                         all_field_titles.append(name)
