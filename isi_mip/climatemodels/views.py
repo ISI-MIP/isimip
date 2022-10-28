@@ -541,25 +541,22 @@ def impact_model_assign(request, username=None):
     if request.method == 'POST':
         form = ImpactModelStartForm(request.POST, instance=base_impact_model)
         if form.is_valid():
-            bimodel = form.cleaned_data['model']
+            imodel = form.cleaned_data['model']
             send_invitation_email = form.cleaned_data.pop('send_invitation_email')
-            if bimodel:
-                user.userprofile.owner.add(bimodel)
-                impact_models = bimodel.impact_model.all().order_by('simulation_round')
-                if impact_models:
-                    user.userprofile.responsible.add(impact_models[0])
-                user.userprofile.sector.add(bimodel.sector)
-                messages.success(request, "{} has been added to the list of owners for \"{}\"".format(user, bimodel))
+            if imodel:
+                user.userprofile.responsible.add(imodel)
+                user.userprofile.sector.add(imodel.base_model.sector)
+                messages.success(request, "{} has been added to the list of owners for \"{}\"".format(user, imodel))
             else:
                 del (form.cleaned_data['model'])
-                bimodel = BaseImpactModel.objects.create(**form.cleaned_data)
-                user.userprofile.owner.add(bimodel)
-                user.userprofile.sector.add(bimodel.sector)
-                bimodel.public = False
-                bimodel.save()
-                messages.success(request, "The new model \"{}\" has been successfully created and assigned to {}".format(bimodel, user))
+                imodel = BaseImpactModel.objects.create(**form.cleaned_data)
+                user.userprofile.owner.add(imodel)
+                user.userprofile.sector.add(imodel.sector)
+                imodel.public = False
+                imodel.save()
+                messages.success(request, "The new model \"{}\" has been successfully created and assigned to {}".format(imodel, user))
             if send_invitation_email:
-                send_email(request, user, bimodel)
+                send_email(request, user, imodel)
             if 'next' in request.GET:
                 return HttpResponseRedirect(request.GET['next'])
             return HttpResponseRedirect(reverse('admin:auth_user_list'))
@@ -571,13 +568,13 @@ def impact_model_assign(request, username=None):
     return render(request, template, {'form': form, 'owner': user})
 
 
-def send_email(request, user, bimodel):
+def send_email(request, user, imodel):
     invite = user.invitation_set.last()
     register_link = reverse('accounts:register', kwargs={'pk': user.id, 'token': invite.token})
     context = {
         'url': request.build_absolute_uri(register_link),
-        'model_name': bimodel.name,
-        'sector': bimodel.sector,
+        'model_name': imodel.base_model.name,
+        'sector': imodel.base_model.sector,
         'username': user.username,
         'valid_until': invite.valid_until,
     }

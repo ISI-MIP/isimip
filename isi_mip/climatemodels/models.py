@@ -285,6 +285,7 @@ class BaseImpactModel(index.Indexed, models.Model):
         ]),
         index.FilterField('public'),
         index.SearchField('short_description'),
+        index.SearchField('get_related_contact_persons'),
     ]
 
     class Meta:
@@ -292,6 +293,9 @@ class BaseImpactModel(index.Indexed, models.Model):
 
     def __str__(self):
         return "%s (%s)" % (self.name, self.sector)
+
+    def get_related_contact_persons(self):
+        return '\n'.join(['%s %s %s' % (owner.name, owner.email, owner.institute) for owner in self.impact_model_responsible.all()])
 
     def relative_url(self, site, request):
         # hard coded url, since no better solution at the moment
@@ -359,9 +363,7 @@ class ImpactModel(models.Model):
 
     public = models.BooleanField(default=False)
 
-    search_fields = [
-        index.SearchField('get_related_contact_persons'),
-    ]
+
 
     class Meta:
         unique_together = ('base_model', 'simulation_round')
@@ -369,9 +371,6 @@ class ImpactModel(models.Model):
 
     def __str__(self):
         return "%s (%s, %s)" % (self.base_model and self.base_model.name or self.id, self.base_model and self.base_model.sector or '', self.simulation_round)
-
-    def get_related_contact_persons(self):
-        return '\n'.join(['%s %s %s' % (owner.name, owner.email, owner.institute) for owner in self.impact_model_responsible.all()])
 
     @property
     def model_output_license(self):
