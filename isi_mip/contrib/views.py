@@ -12,8 +12,8 @@ from isi_mip.contrib.admin import UserAdmin
 def export_users(request):
     # nasty copy and paste of the admin.py UserAdmin  methods
     def get_involved(obj):
-        if obj.userprofile.involved.exists():
-            return ', '.join(['%s(%s)' % (involved.base_model.name, involved.simulation_round) for involved in obj.userprofile.involved.all()])
+        if obj.userprofile.responsible.exists():
+            return ', '.join(['%s(%s)' % (responsible.base_model.name, responsible.simulation_round) for responsible in obj.userprofile.responsible.all()])
         return '-'
 
     def get_show_in_participant_list(obj):
@@ -47,7 +47,7 @@ def export_users(request):
         response['Content-Disposition'] = 'attachment; filename={}-{}.csv'.format('users', time.strftime("%Y%m%d-%H%M%S"))
         writer = csv.writer(response)
         # write a header
-        writer.writerow(['Email', 'Name', 'Country', 'Owner', 'Involved', 'Sector', 'Is active?', 'Show in participant list?'])
+        writer.writerow(['Email', 'Name', 'Country', 'Owner', 'Responsible', 'Sector', 'Is active?', 'Show in participant list?'])
         for obj in queryset:
             row = []
             for field in field_names:

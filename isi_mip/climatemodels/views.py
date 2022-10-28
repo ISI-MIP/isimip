@@ -282,7 +282,7 @@ def impact_model_download(page, request):
 
 def participant_download(page, request):
     participants = User.objects.filter(userprofile__show_in_participant_list=True).order_by('last_name')
-    participants = participants.select_related('userprofile').prefetch_related('userprofile__involved__simulation_round', 'userprofile__involved__base_model__sector', 'userprofile__sector', 'userprofile__country')
+    participants = participants.select_related('userprofile').prefetch_related('userprofile__responsible__simulation_round', 'userprofile__responsible__base_model__sector', 'userprofile__sector', 'userprofile__country')
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename="Participants {:%Y-%m-%d}.xlsx"'.format(datetime.now())
     ParticpantModelToXLSX(response, participants)
@@ -548,7 +548,7 @@ def impact_model_assign(request, username=None):
                 user.userprofile.owner.add(bimodel)
                 impact_models = bimodel.impact_model.all().order_by('simulation_round')
                 if impact_models:
-                    user.userprofile.involved.add(impact_models[0])
+                    user.userprofile.responsible.add(impact_models[0])
                 user.userprofile.sector.add(bimodel.sector)
                 messages.success(request, "{} has been added to the list of owners for \"{}\"".format(user, bimodel))
             else:
@@ -635,7 +635,7 @@ def show_participants(request, extra_context):
     if request.user.groups.filter(name='ISIMIP-Team').exists():
         # user has the right to view the participants list
         participants = User.objects.filter(userprofile__show_in_participant_list=True).order_by('last_name')
-        participants = participants.select_related('userprofile').prefetch_related('userprofile__involved__simulation_round', 'userprofile__involved__base_model__sector', 'userprofile__sector', 'userprofile__country')
+        participants = participants.select_related('userprofile').prefetch_related('userprofile__responsible__simulation_round', 'userprofile__responsible__base_model__sector', 'userprofile__sector', 'userprofile__country')
         result = {'head': {}, 'body': {}}
         result['head'] = {
             'cols': [{'text': 'Name'}, {'text': 'Email'}, {'text': 'Institute(Country)'}, {'text': 'Model'}, {'text': 'Sector'}]
@@ -651,13 +651,13 @@ def show_participants(request, extra_context):
         for i, participant in enumerate(participants):
             country = participant.userprofile.country and " (%s)" % participant.userprofile.country or ''
             institute = participant.userprofile.institute or ""
-            sectors = participant.userprofile.involved.values_list('base_model__sector__name', flat=True).distinct()
+            sectors = participant.userprofile.responsible.values_list('base_model__sector__name', flat=True).distinct()
             if not sectors:
                 sectors = participant.userprofile.sector.all().values_list('name', flat=True).distinct()
             values = [["{0.name}".format(participant.userprofile)]]
             values += [["<a href='mailto:{0.email}'>{0.email}</a>".format(participant)]]
             values += [["{0}{1}".format(institute, country)]]
-            values += [["<a href='/impactmodels/details/{0.base_model.id}/'>{0.base_model.name} ({0.simulation_round.name})</a><br>".format(model) for model in participant.userprofile.involved.all()]]
+            values += [["<a href='/impactmodels/details/{0.base_model.id}/'>{0.base_model.name} ({0.simulation_round.name})</a><br>".format(model) for model in participant.userprofile.responsible.all()]]
             values += [["{0}<br>".format(sector) for sector in sectors]]
             bodyrows.append({
                 'invisible': i >= rows_per_page,

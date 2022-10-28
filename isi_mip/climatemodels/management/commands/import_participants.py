@@ -92,7 +92,7 @@ class Command(BaseCommand):
                             try:
                                 model = model.strip()
                                 base_model = BaseImpactModel.objects.get(name__iexact=model)
-                                user.userprofile.involved.add(*list(base_model.impact_model.all()))
+                                user.userprofile.responsible.add(*list(base_model.impact_model.all()))
                             except:
                                 print('Model not found: %s' % model)
                                 model_not_found_counter = model_not_found_counter + 1
@@ -101,7 +101,7 @@ class Command(BaseCommand):
                     elif mapped_sectors and models:
                         cleaned_sectors = []
                         for sector in mapped_sectors:
-                            for im in user.userprofile.involved.all():
+                            for im in user.userprofile.responsible.all():
                                 if im.base_model.sector == sector:
                                     continue
                                 else:

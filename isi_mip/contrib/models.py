@@ -27,7 +27,7 @@ class UserProfile(models.Model):
     sector = models.ManyToManyField(Sector, blank=True, related_name='user_sectors')
     comment = models.TextField(blank=True, null=True)
     owner = models.ManyToManyField(BaseImpactModel, blank=True, related_name='impact_model_owner')
-    involved = models.ManyToManyField(ImpactModel, blank=True, related_name='impact_model_involved')
+    responsible = models.ManyToManyField(ImpactModel, blank=True, related_name='impact_model_responsible')
     show_in_participant_list = models.BooleanField(default=True)
     orcid_id = models.CharField(max_length=500, null=True, blank=True, verbose_name='ORCID iD', help_text=mark_safe('<a href="https://orcid.org/" target="_blank">Open Researcher and Contributor ID</a>, optional.'))
     ror_id = models.CharField(max_length=500, null=True, blank=True, verbose_name='Institute ROR ID', help_text=mark_safe('<a href="https://ror.org/" target="_blank">Research Organization Registry ID</a>, optional, if known'))

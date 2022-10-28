@@ -20,7 +20,7 @@ class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
     verbose_name_plural = 'user profiles'
-    filter_vertical = ('owner', 'involved')
+    filter_vertical = ('owner', 'responsible')
     filter_horizontal = ('sector', )
 
     class Media:
@@ -54,19 +54,19 @@ class UserAdmin(UserAdmin):
     # list_filter = ('userprofile__sector', SimulationRoundListFilter)
     list_display_links = ('email', 'get_name')
     list_filter = ()
-    search_fields = ('email', 'username', 'first_name', 'last_name', 'userprofile__country__name', 'userprofile__institute', 'userprofile__owner__name', 'userprofile__involved__base_model__name', 'userprofile__sector__name', 'userprofile__involved__simulation_round__name')
+    search_fields = ('email', 'username', 'first_name', 'last_name', 'userprofile__country__name', 'userprofile__institute', 'userprofile__owner__name', 'userprofile__responsible__base_model__name', 'userprofile__sector__name', 'userprofile__responsible__simulation_round__name')
     inlines = (UserProfileInline, )
     save_on_top = True
 
     def get_queryset(self, request):
-        return super(UserAdmin, self).get_queryset(request).select_related('userprofile').prefetch_related('userprofile__owner', 'userprofile__involved', 'userprofile__sector', 'userprofile__country')
+        return super(UserAdmin, self).get_queryset(request).select_related('userprofile').prefetch_related('userprofile__owner', 'userprofile__responsible', 'userprofile__sector', 'userprofile__country')
 
     def get_involved(self, obj):
-        if obj.userprofile.involved.exists():
-            return ', '.join(['%s(%s)' % (involved.base_model.name, involved.simulation_round) for involved in obj.userprofile.involved.all()])
+        if obj.userprofile.responsible.exists():
+            return ', '.join(['%s(%s)' % (responsible.base_model.name, responsible.simulation_round) for responsible in obj.userprofile.responsible.all()])
         return '-'
-    get_involved.admin_order_field = 'userprofile__involved__base_model__name'
-    get_involved.short_description = 'Involved'
+    get_involved.admin_order_field = 'userprofile__responsible__base_model__name'
+    get_involved.short_description = 'Responsible'
     get_involved.allow_tags = True
 
     def get_show_in_participant_list(self, obj):

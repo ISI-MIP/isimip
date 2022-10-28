@@ -401,7 +401,7 @@ class ImpactModel(models.Model):
         # make all owners involved in the duplicated model
         if is_creation and self.base_model:
             for owner in self.base_model.impact_model_owner.all():
-                owner.involved.add(self)
+                owner.responsible.add(self)
         # make sure if sector changes that sector specific objects exists for the impact model
         if not is_duplication and not hasattr(self, self.fk_sector_name):
             self.base_model.sector.model.objects.get_or_create(impact_model=self)

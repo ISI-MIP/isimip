@@ -20,7 +20,7 @@ SKIP_FIELDS = [
     'base_model',
     'public',
     'impact_model',
-    'impact_model_involved',
+    'impact_model_responsible',
     'technicalinformation',
     'inputdatainformation',
     'otherinformation',
@@ -166,7 +166,7 @@ class ParticpantModelToXLSX:
             general.write(i + 1, 1, participant.email)
             general.write(i + 1, 2, participant.userprofile.institute)
             general.write(i + 1, 3, participant.userprofile.country and participant.userprofile.country.name or '')
-            models = [str(model) for model in participant.userprofile.involved.all()]
+            models = [str(model) for model in participant.userprofile.responsible.all()]
             general.write(i + 1, 4, ", ".join(models))
             sectors = [sector.name for sector in participant.userprofile.sector.all()]
             general.write(i + 1, 5, ", ".join(sectors))
