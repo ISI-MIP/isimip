@@ -30,7 +30,7 @@ from wagtail.snippets.models import register_snippet
 
 from isi_mip.climatemodels.blocks import (ImpactModelsBlock, InputDataBlock,
                                           OutputDataBlock)
-from isi_mip.climatemodels.models import (BaseImpactModel, Sector,
+from isi_mip.climatemodels.models import (BaseImpactModel, ImpactModel, Sector,
                                           SimulationRound)
 from isi_mip.climatemodels.views import (STEP_ATTACHMENT, STEP_BASE,
                                          STEP_DETAIL, STEP_INPUT_DATA,
@@ -549,9 +549,9 @@ class DashboardPage(RoutablePageWithDefault):
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
-        base_impact_models = request.user.userprofile.owner.all().order_by('name')
+        impact_models = request.user.userprofile.responsible.all().order_by('base_model__name')
         if request.user.is_authenticated and request.user.is_superuser:
-            base_impact_models = BaseImpactModel.objects.all()
+            impact_models = ImpactModel.objects.all()
         impage = ImpactModelsPage.objects.get()
         impage_details = lambda imid: "<span class='action'><a href='{0}' class=''>{{0}}</a></span>".format(
             impage.url + impage.reverse_subpage('details', args=(imid, )))
@@ -566,38 +566,37 @@ class DashboardPage(RoutablePageWithDefault):
         }
 
         bodyrows = []
-        for bims in base_impact_models:
-            for imodel in bims.impact_model.all():
-                values = [
-                    [impage_details(bims.id).format(bims.name)],
-                    [bims.sector.name],
-                    [imodel.simulation_round.name],
-                    ['<i class="fa fa-{}" aria-hidden="true"></i>'.format('check' if imodel.public else 'times')],
-                    [impage_edit(imodel.id).format(imodel.simulation_round.name)],
-                ]
-                row = {
-                    'cols': [{'texts': x} for x in values],
-                }
-                bodyrows.append(row)
-            duplicate_impact_model = bims.can_duplicate_from()
-            for sr in bims.get_missing_simulation_rounds():
-                duplicate_model_text = ''
-                if duplicate_impact_model:
-                    duplicate_model_text = impage_duplicate(duplicate_impact_model.id, sr.id).format(duplicate_impact_model.simulation_round, sr.name)
-                values = [
-                    [bims.name],
-                    [bims.sector.name],
-                    [sr.name],
-                    [],
-                    [
-                        impage_create(bims.id, sr.id).format(sr.name),
-                        duplicate_model_text
-                    ],
-                ]
-                row = {
-                    'cols': [{'texts': x} for x in values],
-                }
-                bodyrows.append(row)
+        for imodel in impact_models:
+            values = [
+                [impage_details(imodel.base_model.id).format(imodel.base_model.name)],
+                [imodel.base_model.sector.name],
+                [imodel.simulation_round.name],
+                ['<i class="fa fa-{}" aria-hidden="true"></i>'.format('check' if imodel.public else 'times')],
+                [impage_edit(imodel.id).format(imodel.simulation_round.name)],
+            ]
+            row = {
+                'cols': [{'texts': x} for x in values],
+            }
+            bodyrows.append(row)
+        duplicate_impact_model = imodel.base_model.can_duplicate_from()
+        for sr in imodel.base_model.get_missing_simulation_rounds():
+            duplicate_model_text = ''
+            if duplicate_impact_model:
+                duplicate_model_text = impage_duplicate(duplicate_impact_model.id, sr.id).format(duplicate_impact_model.simulation_round, sr.name)
+            values = [
+                [imodel.base_model.name],
+                [imodel.base_model.sector.name],
+                [sr.name],
+                [],
+                [
+                    impage_create(imodel.base_model.id, sr.id).format(sr.name),
+                    duplicate_model_text
+                ],
+            ]
+            row = {
+                'cols': [{'texts': x} for x in values],
+            }
+            bodyrows.append(row)
         context['body'] = {'rows': bodyrows}
         if request.user.groups.filter(name='ISIMIP-Team').exists():
             context['show_participants_link'] = True

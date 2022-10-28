@@ -50,7 +50,7 @@ class SimulationRoundListFilter(admin.SimpleListFilter):
 
 
 class UserAdmin(UserAdmin):
-    list_display = ('email', 'get_name', 'get_country', 'get_owner', 'get_involved', 'get_sector', 'is_active', 'get_show_in_participant_list')
+    list_display = ('email', 'get_name', 'get_country', 'get_responsible', 'get_sector', 'is_active', 'get_show_in_participant_list')
     # list_filter = ('userprofile__sector', SimulationRoundListFilter)
     list_display_links = ('email', 'get_name')
     list_filter = ()
@@ -61,13 +61,13 @@ class UserAdmin(UserAdmin):
     def get_queryset(self, request):
         return super(UserAdmin, self).get_queryset(request).select_related('userprofile').prefetch_related('userprofile__owner', 'userprofile__responsible', 'userprofile__sector', 'userprofile__country')
 
-    def get_involved(self, obj):
+    def get_responsible(self, obj):
         if obj.userprofile.responsible.exists():
             return ', '.join(['%s(%s)' % (responsible.base_model.name, responsible.simulation_round) for responsible in obj.userprofile.responsible.all()])
         return '-'
-    get_involved.admin_order_field = 'userprofile__responsible__base_model__name'
-    get_involved.short_description = 'Responsible'
-    get_involved.allow_tags = True
+    get_responsible.admin_order_field = 'userprofile__responsible__base_model__name'
+    get_responsible.short_description = 'Responsible'
+    get_responsible.allow_tags = True
 
     def get_show_in_participant_list(self, obj):
         return obj.userprofile.show_in_participant_list
@@ -79,14 +79,6 @@ class UserAdmin(UserAdmin):
         return '%s %s' % (obj.first_name, obj.last_name)
     get_name.admin_order_field = 'last_name'
     get_name.short_description = 'Name'
-
-    def get_owner(self, obj):
-        if obj.userprofile.owner.exists():
-            return ', '.join([owner.name for owner in obj.userprofile.owner.all()])
-        return '-'
-    get_owner.admin_order_field = 'userprofile__owner__name'
-    get_owner.short_description = 'Owner'
-    get_owner.allow_tags = True
 
     def get_sector(self, obj):
         if obj.userprofile.sector.exists():

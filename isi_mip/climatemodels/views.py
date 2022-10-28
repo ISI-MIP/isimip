@@ -70,9 +70,6 @@ def impact_model_details(page, request, id):
     title = 'Impact model: %s' % base_model.name
     subpage = {'title': title, 'url': ''}
     context = {'page': page, 'subpage': subpage, 'headline': ''}
-    can_edit_model = False
-    if request.user.is_authenticated and (base_model in request.user.userprofile.owner.all() or request.user.is_superuser):
-        can_edit_model = True
 
     # context['editlink'] += ' | <a href="{}">admin edit</a>'.format(
     #     reverse('admin:climatemodels_impactmodel_change', args=(impactmodel.id,)))
@@ -92,7 +89,7 @@ def impact_model_details(page, request, id):
         if model_details:
             model_details[0]['opened'] = True
         edit_link = ''
-        if can_edit_model:
+        if request.user.is_authenticated and (im in request.user.userprofile.responsible.all() or request.user.is_superuser):
             edit_link = '<i class="fa fa-cog" aria-hidden="true"></i> <a href="{}">Edit model information for simulation round {}</a>'.format(page.url + page.reverse_subpage(STEP_BASE, args=(im.id,)), im.simulation_round.name)
         output_data = []
         confirm_data_link = ''
@@ -140,7 +137,7 @@ def confirm_data(page, request, id):
     except ImpactModel.DoesNotExist:
         messages.warning(request, 'Unknown model')
         return HttpResponseRedirect('/impactmodels/')
-    if not (impact_model.base_model in request.user.userprofile.owner.all() or request.user.is_superuser):
+    if not (impact_model in request.user.userprofile.responsible.all() or request.user.is_superuser):
         messages.info(request, 'You need to be logged in to perform this action.')
         nexturl = reverse('wagtailadmin_login') + "?next={}".format(request.path)
         return HttpResponseRedirect(nexturl)
@@ -351,6 +348,7 @@ def create_new_impact_model(page, request, base_model_id, simulation_round_id):
         return HttpResponseRedirect('/dashboard/login/')
     base_impact_model = BaseImpactModel.objects.get(id=base_model_id)
     simulation_round = SimulationRound.objects.get(id=simulation_round_id)
+    # FIXME make use of responsible persons
     if not (base_impact_model in request.user.userprofile.owner.all() or request.user.is_superuser):
         messages.info(request, 'You need to have the permissions to perform this action.')
         return HttpResponseRedirect('/dashboard/')
@@ -376,6 +374,7 @@ def duplicate_impact_model(page, request, impact_model_id, simulation_round_id):
         return HttpResponseRedirect('/dashboard/login/')
     impact_model = ImpactModel.objects.get(id=impact_model_id)
     simulation_round = SimulationRound.objects.get(id=simulation_round_id)
+    # FIXME make use of responsible persons
     if not (impact_model.base_model in request.user.userprofile.owner.all() or request.user.is_superuser):
         messages.info(request, 'You need to have the permissions to perform this action.')
         return HttpResponseRedirect('/dashboard/')
@@ -394,7 +393,7 @@ def impact_model_edit(page, request, id, current_step):
         messages.info(request, 'You need to be logged in to perform this action.')
         return HttpResponseRedirect('/dashboard/login/')
     impact_model = ImpactModel.objects.get(id=id)
-    if not (impact_model.base_model in request.user.userprofile.owner.all() or request.user.is_superuser):
+    if not (impact_model in request.user.userprofile.responsible.all() or request.user.is_superuser):
         messages.info(request, 'You need to have the permissions to perform this action.')
         return HttpResponseRedirect('/dashboard/')
     # raise Exception(request.POST)
@@ -529,7 +528,7 @@ def impact_model_sector_edit(page, request, context, impact_model, target_url):
     template = 'climatemodels/{}'.format(formular.template)
     return render(request, template, context)
 
-
+# FIXME should make use of responsible persons
 def impact_model_assign(request, username=None):
     if not request.user.is_superuser:
         messages.info(request, 'You need to be logged in to perform this action.')
