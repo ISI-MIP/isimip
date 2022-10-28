@@ -137,7 +137,7 @@ class ContactPerson(models.Model):
         return "%s%s %s" % (self.name, self.institute and " (%s)" % self.institute or "", self.email)
 
     def pretty(self):
-        return "{0.name} (<a href='mailto:{0.email}'>{0.email}</a>), {0.institute}".format(self)
+        return "<a href='mailto:{0.email}'>{0.email}</a>, {0.institute}".format(self)
 
     class Meta:
         ordering = ('name',)
@@ -320,12 +320,10 @@ class BaseImpactModel(index.Indexed, models.Model):
 
     def values_to_tuples(self):
         vname = self._get_verbose_field_name
-        cpers = "<ul>%s</ul>" % "".join(["<li>%s</li>" % x.pretty() for x in self.impact_model_owner.all()])
         return [
             ('Common information', [
                 (vname('sector'), self.sector),
                 (vname('region'), ', '.join([x.name for x in self.region.all()])),
-                ('Contact Person', cpers),
             ])]
 
     def save(self, *args, **kwargs):
@@ -473,11 +471,13 @@ class ImpactModel(models.Model):
     def values_to_tuples(self):
         vname = self._get_verbose_field_name
         bvname = self.base_model._get_verbose_field_name
+        cpers = [(x.name, x.pretty()) for x in self.impact_model_responsible.all()]
         if self.other_references.exists():
             other_references = "<ul>%s</ul>" % "".join(["<li>%s</li>" % x.entry_with_link() for x in self.other_references.all()])
         else:
             other_references = None
         return [
+            ('Person Responsible For Model Simulations In This Simulation Round', cpers),
             ('Basic information', [
                 (vname('version'), self.version),
                 (generate_helptext(mark_safe('Please note, if you want to update the model output license please <a href="mailto:info@isimip.org">write to us</a>.'), 'Model Output License'), self.model_output_license),
