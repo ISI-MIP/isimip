@@ -263,8 +263,19 @@ class OutputDataAdmin(admin.ModelAdmin):
     get_drivers.short_description = 'Input data'
 
 
+
+class InputDataInline(admin.TabularInline):
+    model = InputData.variables.through
+    extra = 0
+    verbose_name = 'Input Data'
+
+
 class ClimateVariableAdmin(admin.ModelAdmin):
     model = ClimateVariable
+
+    inlines = [
+        InputDataInline,
+    ]
 
     def get_type(self, obj):
         return ','.join(set(filter(None, [input_data.data_type and input_data.data_type.name for input_data in obj.inputdata_set.all().distinct()])))
