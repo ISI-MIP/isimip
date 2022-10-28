@@ -355,8 +355,8 @@ class ImpactModel(models.Model):
         on_delete=models.SET_NULL)
     other_references = models.ManyToManyField(ReferencePaper, blank=True, verbose_name='Reference paper: other references',
                                               help_text='Other papers describing aspects of this model')
-    responsible_person = models.CharField(max_length=500, null=True, blank=True, verbose_name='Person responsible for model simulations in this simulation round',
-                               help_text='Contact information for person responsible for model simulations in this simulation round, if not the model contact person')
+    additional_persons_involved = models.CharField(max_length=500, null=True, blank=True, verbose_name='Additional persons involved',
+                               help_text='List of all additional persons involved in this model.')
     simulation_round_specific_description = models.TextField(
         null=True, blank=True, default='', verbose_name="Simulation round specific description",
         help_text="")
@@ -416,7 +416,7 @@ class ImpactModel(models.Model):
             simulation_round=simulation_round,
             version=self.version,
             main_reference_paper=self.main_reference_paper,
-            responsible_person=self.responsible_person,
+            additional_persons_involved=self.additional_persons_involved,
             simulation_round_specific_description=self.simulation_round_specific_description,
             public=True,
             data_download=self.data_download,
@@ -477,7 +477,7 @@ class ImpactModel(models.Model):
         else:
             other_references = None
         return [
-            ('Person Responsible For Model Simulations In This Simulation Round', cpers),
+            ('Person responsible for model simulations in this simulation round', cpers),
             ('Basic information', [
                 (vname('version'), self.version),
                 (generate_helptext(mark_safe('Please note, if you want to update the model output license please <a href="mailto:info@isimip.org">write to us</a>.'), 'Model Output License'), self.model_output_license),
@@ -489,7 +489,7 @@ class ImpactModel(models.Model):
                 (vname('main_reference_paper'),
                  self.main_reference_paper.entry_with_link() if self.main_reference_paper else None),
                 (vname('other_references'), other_references),
-                (vname('responsible_person'), self.responsible_person),
+                (vname('additional_persons_involved'), self.additional_persons_involved),
             ]),
             self.technicalinformation.values_to_tuples(),
             self.inputdatainformation.values_to_tuples(),

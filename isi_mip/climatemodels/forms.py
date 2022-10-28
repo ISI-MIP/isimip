@@ -45,13 +45,13 @@ class ImpactModelForm(forms.ModelForm):
 
     class Meta:
         model = ImpactModel
-        fields = ('version', 'model_license', 'model_output_license', 'model_url', 'main_reference_paper', 'other_references', 'responsible_person', 'simulation_round_specific_description')
+        fields = ('version', 'model_license', 'model_output_license', 'model_url', 'main_reference_paper', 'other_references', 'additional_persons_involved', 'simulation_round_specific_description')
         # exclude = ('base_model', 'public', 'simulation_round', 'data_download', 'doi')
         widgets = {
             'version': MyTextInput(),
             'main_reference_paper': RefPaperWidget(),
             'other_references': RefPaperWidget(),
-            'responsible_person': MyTextInput(),
+            'additional_persons_involved': MyTextInput(),
             'model_license': MyTextInput(),
         }
     
