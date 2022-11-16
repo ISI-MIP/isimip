@@ -19,8 +19,10 @@ ContactPersonFormset = inlineformset_factory(BaseImpactModel, ContactPerson,
 
 
 class ImpactModelStartForm(forms.ModelForm):
-    model = forms.ModelChoiceField(queryset=ImpactModel.objects, required=False)
-    name = forms.CharField(label='New Impact Model', required=False)
+    model = forms.ModelChoiceField(queryset=BaseImpactModel.objects, required=False)
+    simulation_round_existing = forms.ModelChoiceField(queryset=SimulationRound.objects, required=False, label='Simulation Round')
+    simulation_round_new = forms.ModelChoiceField(queryset=SimulationRound.objects, required=False, label='Simulation Round')
+    name = forms.CharField(label='Impact Model Name', required=False)
     sector = forms.ModelChoiceField(queryset=Sector.objects.order_by('name'), required=False)
     send_invitation_email = forms.BooleanField(label='Send the invitation email?', required=False, initial=True)
 
@@ -51,7 +53,6 @@ class ImpactModelForm(forms.ModelForm):
             'version': MyTextInput(),
             'main_reference_paper': RefPaperWidget(),
             'other_references': RefPaperWidget(),
-            'additional_persons_involved': MyTextInput(),
             'model_license': MyTextInput(),
         }
     

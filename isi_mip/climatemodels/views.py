@@ -472,6 +472,18 @@ def impact_model_detail_edit(page, request, context, form, instance, current_ste
     else:
         form = form(instance=instance)
     context['form'] = form
+    if current_step == STEP_DETAIL:
+        contact_persons = []
+        for contact_person in instance.impact_model_responsible.all():
+            contact_persons.append({
+                'name': contact_person.name,
+                'email': contact_person.email,
+                'orcid_id': contact_person.orcid_id or '-',
+                'institute': contact_person.institute or '-',
+                'ror_id': contact_person.ror_id or '-',
+                'country': contact_person.country or '-',
+            })
+        context['contact_persons'] = contact_persons
     template = 'climatemodels/%s.html' % (current_step)
     return render(request, template, context)
 
@@ -490,17 +502,6 @@ def impact_model_base_edit(page, request, context, impact_model, current_step, n
             messages.warning(request, form.errors)
     else:
         form = BaseImpactModelForm(instance=base_impact_model)
-        contact_persons = []
-        for contact_person in impact_model.impact_model_responsible.all():
-            contact_persons.append({
-                'name': contact_person.name,
-                'email': contact_person.email,
-                'orcid_id': contact_person.orcid_id or '-',
-                'institute': contact_person.institute or '-',
-                'ror_id': contact_person.ror_id or '-',
-                'country': contact_person.country or '-',
-            })
-        context['contact_persons'] = contact_persons
     context['form'] = form
     template = 'climatemodels/%s.html' % (current_step)
     return render(request, template, context)
@@ -528,7 +529,6 @@ def impact_model_sector_edit(page, request, context, impact_model, target_url):
     template = 'climatemodels/{}'.format(formular.template)
     return render(request, template, context)
 
-# FIXME should make use of responsible persons
 def impact_model_assign(request, username=None):
     if not request.user.is_superuser:
         messages.info(request, 'You need to be logged in to perform this action.')
@@ -541,22 +541,31 @@ def impact_model_assign(request, username=None):
     if request.method == 'POST':
         form = ImpactModelStartForm(request.POST, instance=base_impact_model)
         if form.is_valid():
-            imodel = form.cleaned_data['model']
+            base_imodel = form.cleaned_data['model']
             send_invitation_email = form.cleaned_data.pop('send_invitation_email')
-            if imodel:
-                user.userprofile.responsible.add(imodel)
-                user.userprofile.sector.add(imodel.base_model.sector)
-                messages.success(request, "{} has been added to the list of owners for \"{}\"".format(user, imodel))
+            if base_imodel:
+                simulation_round = form.cleaned_data['simulation_round_existing']
+                impact_model, created = ImpactModel.objects.get_or_create(base_model=base_imodel, simulation_round=simulation_round)
+                user.userprofile.responsible.add(impact_model)
+                user.userprofile.sector.add(base_imodel.sector)
+                messages.success(request, "{} has been added to the list of owners for \"{}\"".format(user, impact_model))
             else:
                 del (form.cleaned_data['model'])
-                imodel = BaseImpactModel.objects.create(**form.cleaned_data)
-                user.userprofile.owner.add(imodel)
-                user.userprofile.sector.add(imodel.sector)
-                imodel.public = False
-                imodel.save()
-                messages.success(request, "The new model \"{}\" has been successfully created and assigned to {}".format(imodel, user))
+                del (form.cleaned_data['simulation_round_existing'])
+                simulation_round = form.cleaned_data['simulation_round_new']
+                base_imodel = BaseImpactModel.objects.create(
+                    name=form.cleaned_data['name'],
+                    sector=form.cleaned_data['sector'],
+                )
+                impact_model = ImpactModel.objects.create(
+                    base_model=base_imodel,
+                    simulation_round=simulation_round
+                )
+                user.userprofile.responsible.add(impact_model)
+                user.userprofile.sector.add(base_imodel.sector)
+                messages.success(request, "The new model \"{}\" has been successfully created and assigned to {}".format(impact_model, user))
             if send_invitation_email:
-                send_email(request, user, imodel)
+                send_email(request, user, impact_model)
             if 'next' in request.GET:
                 return HttpResponseRedirect(request.GET['next'])
             return HttpResponseRedirect(reverse('admin:auth_user_list'))

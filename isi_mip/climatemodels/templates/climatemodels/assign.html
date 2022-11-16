@@ -30,9 +30,17 @@
 	<div id="content-main">
 		<form action="{{ form_url }}" method="post" id="registration_form" novalidate>
 			{% csrf_token %}
+			<h2>Existing Model:</h2>
 			<p>{{ form.model.label }}: {{ form.model }}</p>
-
-			<div class="tohide">OR: <p>{{ form.name.label }}: {{ form.name }} &nbsp;{{ form.sector.label }}: {{ form.sector }}</p></div>
+			<p>{{ form.simulation_round_existing.label }}: {{ form.simulation_round_existing }}</p>
+			<hr>
+			<h2>New Impact Model:</h2>
+			<div class="tohide">
+				<p>{{ form.name.label }}: {{ form.name }}</p>
+				<p>{{ form.simulation_round_new.label }}: {{ form.simulation_round_new }}</p>
+				<p>{{ form.sector.label }}: {{ form.sector }}</p>
+			</div>
+			<hr>
 			<p>{{ form.send_invitation_email.label }}: {{ form.send_invitation_email }}</p>
 			<input type="submit" value="Save">
 		</form>

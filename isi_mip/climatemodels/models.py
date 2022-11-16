@@ -474,6 +474,8 @@ class ImpactModel(models.Model):
         vname = self._get_verbose_field_name
         bvname = self.base_model._get_verbose_field_name
         cpers = [(x.name, x.pretty()) for x in self.impact_model_responsible.all()]
+        if self.additional_persons_involved:
+            cpers.append(['Additional persons involved', self.additional_persons_involved])
         if self.other_references.exists():
             other_references = "<ul>%s</ul>" % "".join(["<li>%s</li>" % x.entry_with_link() for x in self.other_references.all()])
         else:
@@ -491,7 +493,6 @@ class ImpactModel(models.Model):
                 (vname('main_reference_paper'),
                  self.main_reference_paper.entry_with_link() if self.main_reference_paper else None),
                 (vname('other_references'), other_references),
-                (vname('additional_persons_involved'), self.additional_persons_involved),
             ]),
             self.technicalinformation.values_to_tuples(),
             self.inputdatainformation.values_to_tuples(),
