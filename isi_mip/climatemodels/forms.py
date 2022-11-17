@@ -31,6 +31,16 @@ class ImpactModelStartForm(forms.ModelForm):
         fields = ('model', 'name', 'sector')
 
 
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if BaseImpactModel.objects.filter(name__iexact=name).exists():
+            raise ValidationError("An impact model with this name already exists.")
+
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return name
+
+
 class BaseImpactModelForm(forms.ModelForm):
     region = MyModelMultipleChoiceField(allowcustom=True, queryset=Region.objects, required=True)
 

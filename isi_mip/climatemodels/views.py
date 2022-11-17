@@ -529,6 +529,7 @@ def impact_model_sector_edit(page, request, context, impact_model, target_url):
     template = 'climatemodels/{}'.format(formular.template)
     return render(request, template, context)
 
+
 def impact_model_assign(request, username=None):
     if not request.user.is_superuser:
         messages.info(request, 'You need to be logged in to perform this action.')
