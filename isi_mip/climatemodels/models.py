@@ -295,7 +295,11 @@ class BaseImpactModel(index.Indexed, models.Model):
         return "%s (%s)" % (self.name, self.sector)
 
     def get_related_contact_persons(self):
-        return '\n'.join(['%s %s %s' % (owner.name, owner.email, owner.institute) for owner in self.impact_model_responsible.all()])
+        contact_persons = []
+        for impact_model in self.impact_model.all():
+            for owner in impact_model.impact_model_responsible.all():
+                contact_persons.append('%s %s %s' % (owner.name, owner.email, owner.institute))
+        return '\n'.join(contact_persons)
 
     def relative_url(self, site, request):
         # hard coded url, since no better solution at the moment
