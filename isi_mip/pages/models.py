@@ -581,15 +581,18 @@ class DashboardPage(RoutablePageWithDefault):
         duplicate_impact_model = imodel.base_model.can_duplicate_from()
         for sr in imodel.base_model.get_missing_simulation_rounds():
             duplicate_model_text = ''
-            if duplicate_impact_model:
-                duplicate_model_text = impage_duplicate(duplicate_impact_model.id, sr.id).format(duplicate_impact_model.simulation_round, sr.name)
+            create_model_text = ''
+            if request.user.is_authenticated and request.user.is_superuser:
+                create_model_text = impage_create(imodel.base_model.id, sr.id).format(sr.name)
+                if duplicate_impact_model:
+                    duplicate_model_text = impage_duplicate(duplicate_impact_model.id, sr.id).format(duplicate_impact_model.simulation_round, sr.name)
             values = [
                 [imodel.base_model.name],
                 [imodel.base_model.sector.name],
                 [sr.name],
                 [],
                 [
-                    impage_create(imodel.base_model.id, sr.id).format(sr.name),
+                    create_model_text,
                     duplicate_model_text
                 ],
             ]

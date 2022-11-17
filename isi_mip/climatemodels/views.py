@@ -348,8 +348,7 @@ def create_new_impact_model(page, request, base_model_id, simulation_round_id):
         return HttpResponseRedirect('/dashboard/login/')
     base_impact_model = BaseImpactModel.objects.get(id=base_model_id)
     simulation_round = SimulationRound.objects.get(id=simulation_round_id)
-    # FIXME make use of responsible persons
-    if not (base_impact_model in request.user.userprofile.owner.all() or request.user.is_superuser):
+    if not request.user.is_superuser:
         messages.info(request, 'You need to have the permissions to perform this action.')
         return HttpResponseRedirect('/dashboard/')
 
@@ -374,8 +373,7 @@ def duplicate_impact_model(page, request, impact_model_id, simulation_round_id):
         return HttpResponseRedirect('/dashboard/login/')
     impact_model = ImpactModel.objects.get(id=impact_model_id)
     simulation_round = SimulationRound.objects.get(id=simulation_round_id)
-    # FIXME make use of responsible persons
-    if not (impact_model.base_model in request.user.userprofile.owner.all() or request.user.is_superuser):
+    if not request.user.is_superuser:
         messages.info(request, 'You need to have the permissions to perform this action.')
         return HttpResponseRedirect('/dashboard/')
     if ImpactModel.objects.filter(base_model=impact_model.base_model, simulation_round=simulation_round).exists():
