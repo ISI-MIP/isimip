@@ -637,8 +637,8 @@ class DashboardPage(RoutablePageWithDefault):
     def logout(self, request):
         subpage = {'title': 'Logout', 'url': ''}
         context = {'page': self, 'subpage': subpage, 'headline': ''}
-        logout = LogoutView.as_view()
-        return logout(request, extra_context=context)
+        logout = LogoutView.as_view(extra_context=context)
+        return logout(request)
 
     @route(r'login/$')
     def login(self, request):
@@ -654,8 +654,8 @@ class DashboardPage(RoutablePageWithDefault):
             return HttpResponseRedirect(self.reverse_subpage('login'))
         subpage = {'title': 'Change password', 'url': ''}
         context = {'page': self, 'subpage': subpage, 'headline': ''}
-        password_change = PasswordChangeView.as_view()
-        return password_change(request, extra_context=context)
+        password_change = PasswordChangeView.as_view(extra_context=context)
+        return password_change(request)
 
     @route(r'update-contact-information/$')
     def update_contact_information(self, request):
