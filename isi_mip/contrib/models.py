@@ -57,7 +57,7 @@ class UserProfile(models.Model):
         orcid = ''
         if self.orcid_id:
             orcid = ", <a href='https://orcid.org/{orcid_id}' class='orcid-link' target='_blank'>{orcid_id}</a>".format(orcid_id=self.orcid_id)
-        pretty = "{0.name} (<a href='mailto:{0.email}'>{0.email}</a>{2}), {0.institute}{1}".format(self, self.country and " (%s)" % self.country.name or '', orcid)
+        pretty = "<a href='mailto:{0.email}'>{0.email}</a>{2}, {0.institute}{1}".format(self, self.country and " (%s)" % self.country.name or '', orcid)
         return pretty
 
     class Meta:
