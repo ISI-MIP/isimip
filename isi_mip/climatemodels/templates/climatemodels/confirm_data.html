@@ -10,7 +10,7 @@
                 {% csrf_token %}
                 <p>This agreement relates to the ISIMIP model simulations for the simulation round {{simulation_round}} for the model {{ impact_model_name }}. Data that have already passed the basic format check are now visible to all ISIMIP participants, in the relevant directory on the DKRZ server:</p>
 
-                <p>/work/bb0820/ISIMIP/{{simulation_round}}/OutputData/{{ sector }}/{{ impact_model_name }}/…</p>
+                <p>/work/bb0820/ISIMIP/{{simulation_round}}/OutputData/{{ sector_drkz_folder_name|default:sector }}/{{ model_drkz_folder_name|default:impact_model_name }}/…</p>
 
                 <p>The data cover the following experiments:</p>
 

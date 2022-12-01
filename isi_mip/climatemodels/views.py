@@ -155,6 +155,8 @@ def confirm_data(page, request, id):
             'simulation_round': impact_model.simulation_round,
             'sector': impact_model.base_model.sector,
             'impact_model_name': impact_model.base_model.name,
+            'model_drkz_folder_name': impact_model.base_model.drkz_folder_name,
+            'sector_drkz_folder_name': impact_model.base_model.sector.drkz_folder_name,
             'custom_text': confirmation.email_text,
             'impact_model_url': '/impactmodels/edit/%s/' % impact_model.pk,
             'publication_date_max': datetime.now() + relativedelta(years=1),
