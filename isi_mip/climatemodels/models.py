@@ -1613,7 +1613,7 @@ class Attachment(models.Model):
 PUBLICATION_DATE_CHOICES = [
     ('as_soon_as_possible', 'as soon as possible'), 
     ('not_before_date', 'not before date'), 
-    ('one_year_after_dkrz', 'one year after submission to DKRZ at least'), 
+    ('one_year_after_dkrz', 'one year after submission to DKRZ at latest'), 
     ('notify_isimip', 'the modeling group will notify the ISIMIP data team by email of the end of the emarbo period. (not later than one year after data submission)')
 ]
 
