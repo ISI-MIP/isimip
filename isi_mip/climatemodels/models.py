@@ -1545,9 +1545,9 @@ class AgroEconomicModelling(BaseSector):
 class OutputData(models.Model):
     model = models.ForeignKey(ImpactModel, null=True, blank=True, on_delete=models.CASCADE)
     scenarios = models.ManyToManyField(Scenario, blank=True)
-    experiments = models.CharField(max_length=500, null=True, blank=True)
+    experiments = models.CharField(max_length=1024, null=True, blank=True)
     drivers = models.ManyToManyField(InputData)
-    date = models.DateField()
+    date = models.DateField(null=True, blank=True)
 
     class Meta:
         verbose_name = verbose_name_plural = 'Output data'
