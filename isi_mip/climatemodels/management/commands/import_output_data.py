@@ -62,6 +62,7 @@ class Command(BaseCommand):
                 # TODO sector is funky, first new model has last sector 
                 if line.startswith('* '):
                     sector_name_not_mapped = line.split('* ')[1]
+                    # print(sector_name_not_mapped)
                     if not last_sector_name_not_mapped:
                         last_sector_name_not_mapped = sector_name_not_mapped
                     sector_name = sector_name_not_mapped
@@ -73,7 +74,7 @@ class Command(BaseCommand):
                     if not last_sector:
                         last_sector = sector
                     if not sector:
-                        print('Sector not found: {}'.format(sector_name))
+                        print('Sector not found: {} {}'.format(sector_name, sector_name_not_mapped))
                     # else:
                         # print(sector)
                 if line.startswith(' o '):
@@ -93,6 +94,7 @@ class Command(BaseCommand):
                     input_data_list = set()
                     experiment_list = set()
                     impact_model_name = line.split(' o ')[1]
+                    # print("- " + impact_model_name)
                     impact_model = ImpactModel.objects.filter(base_model__sector=sector, base_model__name__iexact=impact_model_name, simulation_round__name__iexact=simulation_round).first()
                     if not impact_model:
                         impact_model = ImpactModel.objects.filter(base_model__sector=sector, base_model__drkz_folder_name__iexact=impact_model_name, simulation_round__name__iexact=simulation_round).first()
@@ -113,6 +115,13 @@ class Command(BaseCommand):
                         output_data_date = current_date
                     # print(experiment, output_data_date)
                     experiment_list.add(experiment)
+            else:
+                if impact_model:
+                    # print('update data: {}'.format(impact_model))
+                    api_url = "https://data.isimip.org/api/v1/datasets/?path={}/OutputData/{}/{}".format(simulation_round, last_sector_name_not_mapped.lower(), impact_model_name)
+                    is_public = int(json.loads(urllib.request.urlopen(api_url).read().decode('utf-8')).get('count')) > 0
+                    self.update_output_data(simulation_round, last_sector, impact_model, input_data_list, experiment_list, output_data_date, is_public)
+
                     
 
         except Exception as e:
