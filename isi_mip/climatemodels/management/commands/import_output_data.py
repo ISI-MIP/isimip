@@ -36,7 +36,7 @@ class Command(BaseCommand):
             experiments = "(*) "
         experiments += ", ".join(experiment_list)
         output_data.experiments =  experiments
-        output_data.drivers_list = ", ".join(input_data_list)
+        output_data.drivers_list = ", ".join(sorted(input_data_list))
         if not output_data.date:
             output_data.date = output_data_date
         output_data.save()
