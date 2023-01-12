@@ -68,6 +68,8 @@ class Command(BaseCommand):
                     if sector_name in SECTOR_NAME_MAPPING.keys():
                         sector_name = SECTOR_NAME_MAPPING.get(sector_name)
                     sector = Sector.objects.filter(name__iexact=sector_name).first()
+                    if not sector:
+                        sector = Sector.objects.filter(drkz_folder_name__iexact=sector_name).first()
                     if not last_sector:
                         last_sector = sector
                     if not sector:
