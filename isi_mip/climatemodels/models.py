@@ -1547,6 +1547,7 @@ class OutputData(models.Model):
     scenarios = models.ManyToManyField(Scenario, blank=True)
     experiments = models.CharField(max_length=1024, null=True, blank=True)
     drivers = models.ManyToManyField(InputData)
+    drivers_list = models.CharField(max_length=1024, blank=True, null=True)
     date = models.DateField(null=True, blank=True)
 
     class Meta:

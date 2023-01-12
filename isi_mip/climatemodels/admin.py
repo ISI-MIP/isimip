@@ -225,7 +225,7 @@ class InputDataAdmin(admin.ModelAdmin):
 
 class OutputDataAdmin(admin.ModelAdmin):
     model = OutputData
-    list_display = ('get_sector', 'get_model', 'get_simulation_round', 'get_drivers', 'experiments')
+    list_display = ('get_sector', 'get_model', 'get_simulation_round', 'get_drivers', 'drivers_list', 'experiments')
     list_filter = ('model__base_model__sector__name', 'model__simulation_round__name')
     formfield_overrides = {
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},

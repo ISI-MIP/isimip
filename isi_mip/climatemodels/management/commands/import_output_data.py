@@ -36,7 +36,7 @@ class Command(BaseCommand):
             experiments = "(*) "
         experiments += ", ".join(experiment_list)
         output_data.experiments =  experiments
-        output_data.drivers.set(input_data_list, clear=True)
+        output_data.drivers_list = ", ".join(input_data_list)
         if not output_data.date:
             output_data.date = output_data_date
         output_data.save()
@@ -88,7 +88,7 @@ class Command(BaseCommand):
                     # reset all variables, new impact model
                     current_date = None
                     output_data_date = None
-                    input_data_list = []
+                    input_data_list = set()
                     experiment_list = set()
                     impact_model_name = line.split(' o ')[1]
                     impact_model = ImpactModel.objects.filter(base_model__sector=sector, base_model__name__iexact=impact_model_name, simulation_round__name__iexact=simulation_round).first()
@@ -100,11 +100,7 @@ class Command(BaseCommand):
                     #     print('found {}'.format(impact_model))
                 if line.startswith('  - '):
                     input_data_name = line.split('  - ')[1]
-                    input_data = InputData.objects.filter(name__istartswith=input_data_name, simulation_round__name__iexact=simulation_round).first()
-                    if not input_data:
-                        print('InputData model not found: {}'.format(input_data_name))
-                    else:
-                        input_data_list.append(input_data)
+                    input_data_list.add(input_data_name)
                     #     print('InputData found: {}'.format(input_data))
                 if line.startswith('     '):
                     result = re.search('(.*) \( (.*) \) \[ (.*) \]', line.strip())

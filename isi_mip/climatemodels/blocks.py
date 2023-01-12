@@ -122,7 +122,10 @@ class OutputDataBlock(StructBlock):
         # This is not possible at the moment because of circular import issues.
         outputdata = OutputData.objects.order_by('-date', 'model__base_model__sector', 'model')
         for i, odat in enumerate(outputdata):
-            drivers = [x.name for x in odat.drivers.all()]
+            if odat.drivers_list:
+                drivers = [odat.drivers_list]
+            else:
+                drivers = [x.name for x in odat.drivers.all()]
             context['body']['rows'] += [{
                 'invisible': i >= value.get('rows_per_page'),
                 'cols': [
