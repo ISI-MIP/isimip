@@ -97,7 +97,7 @@ def impact_model_details(page, request, id):
             confirm_data_link = '<i class="fa fa-check-circle" aria-hidden="true"></i> <a href="{}">Confirm data for simulation round {}</a>'.format(page.url + page.reverse_subpage("confirm_data", args=(im.id,)), im.simulation_round.name)
         for od in im.outputdata_set.all():
             text = "Experiments: <i>%s</i><br/>" % od.experiments
-            text += "Climate Drivers: <i>%s</i><br/>" % ", ".join([d.name for d in od.drivers.all()])
+            text += "Climate Drivers: <i>%s</i><br/>" % od.drivers_list or ", ".join([d.name for d in od.drivers.all()])
             text += "Date: <i>%s</i>" % od.date
             output_data.append({'text': text})
         model_details.insert(1, {
