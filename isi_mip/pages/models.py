@@ -7,7 +7,7 @@ from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import F
-from django.forms.widgets import EmailInput
+from django.forms.widgets import CheckboxSelectMultiple, EmailInput
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.template.response import TemplateResponse
@@ -16,13 +16,14 @@ from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from rest_framework.fields import BooleanField
 from taggit.models import TaggedItemBase
-from wagtail.admin.edit_handlers import *
+from wagtail.admin.edit_handlers import (FieldPanel, InlinePanel,
+                                         MultiFieldPanel)
 from wagtail.admin.mail import send_mail
+from wagtail.admin.panels import ObjectList, TabbedInterface
 from wagtail.contrib.forms.models import AbstractEmailForm, AbstractFormField
 from wagtail.contrib.routable_page.models import RoutablePageMixin, route
-from wagtail.core.fields import RichTextField, StreamField
-from wagtail.core.models import Page
-from wagtail.images.edit_handlers import ImageChooserPanel
+from wagtail.fields import RichTextField, StreamField
+from wagtail.models import Page
 from wagtail.search import index
 from wagtail.search.backends import get_search_backend
 from wagtail.search.models import Query
@@ -70,7 +71,7 @@ class BlogIndexPage(_BlogIndexPage):
     flat = models.BooleanField(default=False, help_text='Whether or not the index page should display items as a flat list or as blocks.')
 
     content_panels = _BlogIndexPage.content_panels + [
-        RichTextFieldPanel('description'),
+        FieldPanel('description'),
     ]
     settings_panels = Page.settings_panels + [
         FieldPanel('flat'),
@@ -144,9 +145,9 @@ class RoutablePageWithDefault(RoutablePageMixin, TOCPage):
 
 class GenericPage(TOCPage):
     template = 'pages/default_page.html'
-    content = StreamField(BASE_BLOCKS + COLUMNS_BLOCKS)
+    content = StreamField(BASE_BLOCKS + COLUMNS_BLOCKS, use_json_field=True)
     content_panels = Page.content_panels + [
-        StreamFieldPanel('content'),
+        FieldPanel('content'),
     ]
 
     search_fields = Page.search_fields + [
@@ -155,9 +156,9 @@ class GenericPage(TOCPage):
 
 
 class PaperOverviewPage(Page):
-    content = StreamField(BASE_BLOCKS, blank=True)
+    content = StreamField(BASE_BLOCKS, blank=True, use_json_field=True)
     content_panels = Page.content_panels + [
-        StreamFieldPanel('content'),
+        FieldPanel('content'),
     ]
 
     def get_context(self, request, *args, **kwargs):
@@ -199,9 +200,9 @@ class PaperPage(Page):
         FieldPanel('link'),
         MultiFieldPanel([
             FieldPanel('is_not_peer_reviewed'),
-            FieldPanel('simulation_rounds', widget=forms.CheckboxSelectMultiple),
-            FieldPanel('sectors', widget=forms.CheckboxSelectMultiple),
-            FieldPanel('tags', widget=forms.CheckboxSelectMultiple),
+            FieldPanel('simulation_rounds', widget=CheckboxSelectMultiple),
+            FieldPanel('sectors', widget=CheckboxSelectMultiple),
+            FieldPanel('tags', widget=CheckboxSelectMultiple),
         ], heading="Tags")
     ]
 
@@ -265,15 +266,15 @@ class HomePage(RoutablePageWithDefault):
             ('twitter', TwitterBlock()),
         ])
          )
-    ])
+    ], use_json_field=True)
 
     content_panels = Page.content_panels + [
         MultiFieldPanel([
             FieldPanel('teaser_title'),
-            RichTextFieldPanel('teaser_text'),
+            FieldPanel('teaser_text'),
             MultiFieldPanel([
                 FieldPanel('teaser_link_external'),
-                PageChooserPanel('teaser_link_internal'),
+                FieldPanel('teaser_link_internal'),
 
             ]),
         ], heading='Teaser'),
@@ -293,7 +294,7 @@ class HomePage(RoutablePageWithDefault):
             FieldPanel('number4_link'),
             FieldPanel('number4_imported_number'),
         ], heading='Fourth import number', help_text='The manual number will be displayed in favor of the imported number.', classname="collapsible collapsed"),
-        StreamFieldPanel('content'),
+        FieldPanel('content'),
     ]
 
     search_fields = Page.search_fields + [
@@ -360,9 +361,9 @@ class AboutPage(TOCPage):
         ('paper', PaperBlock(template='widgets/page-teaser-wide.html')),
         ('bigteaser', BigTeaserBlock()),
         ('contact', ContactsBlock()),
-    ])
+    ], use_json_field=True)
     content_panels = Page.content_panels + [
-        StreamFieldPanel('content')
+        FieldPanel('content')
     ]
 
     search_fields = Page.search_fields + [
@@ -380,14 +381,14 @@ class GettingStartedPage(RoutablePageWithDefault):
         ('contact', ContactsBlock()),
         ('blog', BlogBlock(template='blocks/flat_blog_block.html')),
 
-    ])
+    ], use_json_field=True)
     input_data_description = RichTextField(null=True, blank=True, verbose_name='Input Data Details Description')
     is_input_data_parent_page = models.BooleanField(blank=True, default=False)
     content_panels = Page.content_panels + [
-        StreamFieldPanel('content'),
+        FieldPanel('content'),
     ]
     details_content_panels = [
-        RichTextFieldPanel('input_data_description'),
+        FieldPanel('input_data_description'),
         FieldPanel('is_input_data_parent_page'),
     ]
     edit_handler = TabbedInterface([
@@ -412,12 +413,12 @@ class ImpactModelsPage(RoutablePageWithDefault):
     content = StreamField(BASE_BLOCKS + COLUMNS_BLOCKS + [
         ('impact_models', ImpactModelsBlock()),
         ('blog', BlogBlock(template='blocks/flat_blog_block.html')),
-    ])
+    ], use_json_field=True)
     private_model_message = models.TextField()
     common_attributes_text = models.TextField()
 
     content_panels = Page.content_panels + [
-        StreamFieldPanel('content'),
+        FieldPanel('content'),
     ]
     settings_panels = RoutablePageWithDefault.settings_panels + [
         FieldPanel('private_model_message'),
@@ -487,9 +488,9 @@ class OutputDataPage(TOCPage):
     content = StreamField(BASE_BLOCKS + COLUMNS_BLOCKS + [
         ('output_data', OutputDataBlock()),
         ('blog', BlogBlock(template='blocks/flat_blog_block.html')),
-    ])
+    ], use_json_field=True)
     content_panels = Page.content_panels + [
-        StreamFieldPanel('content'),
+        FieldPanel('content'),
     ]
     search_fields = Page.search_fields + [
         index.SearchField('content'),
@@ -501,9 +502,9 @@ class OutcomesPage(TOCPage):
 
     content = StreamField(BASE_BLOCKS + COLUMNS_BLOCKS + [
         ('papers', PapersBlock()),
-    ])
+    ], use_json_field=True)
     content_panels = Page.content_panels + [
-        StreamFieldPanel('content'),
+        FieldPanel('content'),
     ]
     search_fields = Page.search_fields + [
         index.SearchField('content'),
@@ -516,9 +517,9 @@ class FAQPage(TOCPage):
 
     content = StreamField(BASE_BLOCKS + COLUMNS_BLOCKS + [
         ('faqs', FAQsBlock()),
-    ])
+    ], use_json_field=True)
     content_panels = Page.content_panels + [
-        StreamFieldPanel('content'),
+        FieldPanel('content'),
     ]
     search_fields = Page.search_fields + [
         index.SearchField('content'),
@@ -531,10 +532,10 @@ class LinkListPage(TOCPage):
     content = StreamField(BASE_BLOCKS + [
         ('links', ListBlock(LinkBlock(), template='blocks/link_list_block.html', icon='fa fa-list-ul')),
         ('supporters', SupportersBlock())
-    ])
+    ], use_json_field=True)
 
     content_panels = Page.content_panels + [
-        StreamFieldPanel('content'),
+        FieldPanel('content'),
     ]
     search_fields = Page.search_fields + [
         index.SearchField('content'),
@@ -544,7 +545,7 @@ class LinkListPage(TOCPage):
 class DashboardPage(RoutablePageWithDefault):
     impact_models_description = RichTextField(null=True, blank=True)
     content_panels = Page.content_panels + [
-        RichTextFieldPanel('impact_models_description'),
+        FieldPanel('impact_models_description'),
     ]
 
     def get_context(self, request, *args, **kwargs):
@@ -675,32 +676,32 @@ class FormPage(AbstractEmailForm):
     landing_page_template = 'pages/form_page_confirmation.html'
     subpage_types = []
 
-    top_content = StreamField(BASE_BLOCKS + COLUMNS_BLOCKS, blank=True)
+    top_content = StreamField(BASE_BLOCKS + COLUMNS_BLOCKS, blank=True, use_json_field=True)
     confirmation_text = models.TextField(default='Your registration was submitted')
     send_confirmation_email = models.BooleanField(default=False, verbose_name='Send confirmation email?')
     confirmation_email_subject = models.CharField(default='ISIMIP Form submission confirmation.', max_length=500, verbose_name='Email subject', null=True, blank=True)
     confirmation_email_text = models.TextField(default='The form was submitted successfully. We will get back to you soon.', verbose_name='Email text', null=True, blank=True)
-    bottom_content = StreamField(BASE_BLOCKS + COLUMNS_BLOCKS, blank=True)
+    bottom_content = StreamField(BASE_BLOCKS + COLUMNS_BLOCKS, blank=True, use_json_field=True)
 
     button_name = models.CharField(max_length=500, verbose_name='Button name', default='Submit')
 
     content_panels = AbstractEmailForm.content_panels + [
-        StreamFieldPanel('top_content'),
-        StreamFieldPanel('bottom_content')
+        FieldPanel('top_content'),
+        FieldPanel('bottom_content')
     ]
     form_content_panels = [
         InlinePanel('form_fields', label="Form fields"),
         FieldPanel('button_name'),
-        FieldPanel('confirmation_text', classname="full"),
+        FieldPanel('confirmation_text'),
         MultiFieldPanel([
             FieldPanel('send_confirmation_email'),
             FieldPanel('confirmation_email_subject'),
-            FieldPanel('confirmation_email_text', classname="full"),
+            FieldPanel('confirmation_email_text'),
         ], "Confirmation email"),
         MultiFieldPanel([
-            FieldPanel('to_address', classname="full"),
-            FieldPanel('from_address', classname="full"),
-            FieldPanel('subject', classname="full"),
+            FieldPanel('to_address'),
+            FieldPanel('from_address'),
+            FieldPanel('subject'),
         ], "Email"),
     ]
     search_fields = Page.search_fields + [

@@ -21,7 +21,7 @@ from django.utils.safestring import mark_safe
 from django.utils.text import slugify
 from easy_pdf.rendering import (make_response, render_to_pdf,
                                 render_to_pdf_response)
-from wagtail.core.models import Site
+from wagtail.models import Site
 
 from isi_mip.climatemodels.forms import (AttachmentModelForm,
                                          BaseImpactModelForm,

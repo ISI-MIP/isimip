@@ -1,9 +1,12 @@
 from django.conf import settings
-from django.utils.html import format_html_join, format_html
-from wagtail.core import hooks
+from django.urls import reverse
+from django.utils.html import format_html, format_html_join
+from django.utils.safestring import mark_safe
+from wagtail.admin.menu import MenuItem
+from wagtail.admin.ui.components import Component
+from wagtail import hooks
 
 from isi_mip.climatemodels.models import ImpactModel, InputData, OutputData
-from django.utils.safestring import mark_safe
 
 
 @hooks.register('insert_editor_css')
@@ -64,27 +67,31 @@ def add_wagtail_icon_items(request, items):
     items.append(LogOutLinkItem())
 
 
-class ImpactModelsPanel(object):
+class ImpactModelsPanel(Component):
     order = 50
 
-    def render(self):
+    def render_html(self, parent_context):
         impactmodels = ImpactModel.objects
         inputdata = InputData.objects
         outputdata = OutputData.objects
-        output = """<section class="panel summary nice-padding">
+        
+        output = """<section class="w-summary">
                     <h2 class="visuallyhidden">Impact Model summary</h2>
-                    <ul class="stats">
-                            <li class="icon icon-cogs">
+                    <ul class="w-summary__list">
+                    <li>
+                        <svg class="icon icon-cogs" aria-hidden="true"><use href="#icon-doc-empty"></use></svg>
                         <a href="/admin/climatemodels/impactmodel/">
                             <span>{}</span> Impact Models
                         </a>
                     </li>
-                    <li class="icon icon-order-down">
+                    <li>
+                        <svg class="icon icon-order-down" aria-hidden="true"><use href="#icon-doc-empty"></use></svg>
                         <a href="/admin/climatemodels/inputdata/">
                             <span>{}</span> Input Data sets
                         </a>
                     </li>
-                    <li class="icon icon-order-up">
+                    <li>
+                        <svg class="icon icon-order-up" aria-hidden="true"><use href="#icon-doc-empty"></use></svg>
                         <a href="/admin/climatemodels/outputdata/">
                             <span>{}</span> Output Data sets
                         </a>
@@ -100,14 +107,6 @@ class ImpactModelsPanel(object):
 def add_impact_models_panel(request, panels):
     return panels.append(ImpactModelsPanel())
 
-class DjangoAdminMenuItem:
-    order = 90000
-    def render_html(self, request):
-        output = '''<li class="menu-item">
-                        <a href="/admin/" class="icon icon-pick">Django Admin</a>
-                    </li>'''
-        return output
-
-@hooks.register('construct_main_menu')
-def main_menu_django_admin_item(request, menu_items):
-    menu_items.append(DjangoAdminMenuItem())
+@hooks.register('register_admin_menu_item')
+def register_frank_menu_item():
+  return MenuItem('Django Admin', reverse('admin:index'), icon_name='cogs', order=90000)

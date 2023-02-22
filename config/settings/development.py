@@ -69,3 +69,5 @@ WAGTAILSEARCH_BACKENDS = {
         'BACKEND': 'wagtail.search.backends.db',
     }
 }
+
+WAGTAILADMIN_BASE_URL = 'https://127.0.0.1'

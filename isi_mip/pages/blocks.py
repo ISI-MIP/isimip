@@ -1,5 +1,5 @@
 from django.utils import formats
-from wagtail.core.blocks import CharBlock, StructBlock, TextBlock, StreamBlock, PageChooserBlock, \
+from wagtail.blocks import CharBlock, StructBlock, TextBlock, StreamBlock, PageChooserBlock, \
     URLBlock, DateBlock, ListBlock, BooleanBlock
 from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.embeds.blocks import EmbedBlock
