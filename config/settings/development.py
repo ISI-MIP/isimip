@@ -66,7 +66,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 WAGTAILSEARCH_BACKENDS = {
     'default': {
-        'BACKEND': 'wagtail.search.backends.db',
+        'BACKEND': 'wagtail.search.backends.database',
     }
 }
 

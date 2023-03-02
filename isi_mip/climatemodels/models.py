@@ -1,5 +1,7 @@
 import os
+from collections import OrderedDict
 
+import django
 from django.apps import apps
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -9,9 +11,17 @@ from django.db.models import JSONField
 from django.template.defaultfilters import filesizeformat
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
+from django_filters.fields import MultipleChoiceField
+from wagtail.admin.panels import FieldPanel
+from wagtail.fields import StreamField
 from wagtail.search import index
+from wagtail.snippets.models import register_snippet
 
+from isi_mip.choiceorotherfield.fields import MyTypedChoiceField
 from isi_mip.choiceorotherfield.models import ChoiceOrOtherField
+from isi_mip.climatemodels.impact_model_blocks import \
+    IMPACT_MODEL_QUESTION_BLOCKS
+from isi_mip.climatemodels.widgets import MyBooleanSelect, MyMultiSelect
 from isi_mip.sciencepaper.models import Paper
 
 
@@ -504,6 +514,111 @@ class ImpactModel(models.Model):
 
     def can_confirm_data(self):
         return hasattr(self, 'confirmation') and not self.confirmation.is_confirmed
+
+
+class ImpactModelInformation(models.Model):
+    impact_model = models.OneToOneField(
+        ImpactModel,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        related_name='impact_model_information'
+    )
+    technical_information = JSONField(default=dict)
+    input_data_information = JSONField(default=dict)
+    other_information = JSONField(default=dict)
+    sector_specific_information = JSONField(default=dict)
+
+
+INFORMATION_TYPE_CHOICES = [
+    ('technical_information', 'Resolution'),
+    ('input_data_information', 'Input Data'),
+    ('other_information', 'Model Setup'),
+]
+
+@register_snippet
+class ImpactModelQuestion(models.Model):
+    information_type = models.CharField(choices=INFORMATION_TYPE_CHOICES, max_length=255, unique=True, blank=True, null=True)
+    sector = models.OneToOneField('Sector', blank=True, null=True, on_delete=models.PROTECT)
+    step = models.PositiveSmallIntegerField(default=0)
+    heading = models.CharField(max_length=1024)
+    subheading = models.CharField(max_length=1024, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    questions = StreamField(IMPACT_MODEL_QUESTION_BLOCKS, blank=True, null=True, use_json_field=True)
+
+    panels = [
+        FieldPanel('information_type'),
+        FieldPanel('sector'),
+        FieldPanel('step'),
+        FieldPanel('heading'),
+        FieldPanel('subheading'),
+        FieldPanel('description'),
+        FieldPanel('questions'),
+    ]
+
+    class Meta:
+        ordering = ['step']
+        verbose_name = 'Model Documentation'
+
+    def __str__(self):
+        if self.information_type:
+            return self.information_type
+        if self.sector:
+            return self.sector
+        
+    def get_form(self, *args, **kwargs):
+        from isi_mip.climatemodels.forms import ImpactModelQuestionForm
+        kwargs['impact_model_question'] = self
+        return ImpactModelQuestionForm(*args, **kwargs)
+    
+    def get_field_options(self, question):
+        field = question.value
+        options = {"label": field['question']}
+        options["help_text"] = field['help_text']
+        options["required"] = field['required']
+        # options["initial"] = field.default_value
+        return options
+    
+    
+    def create_field(self, question):
+        options = self.get_field_options(question)
+        if question.block_type == 'textarea':
+            return django.forms.CharField(widget=django.forms.Textarea, **options)
+        elif question.block_type == 'single_line':
+            return django.forms.CharField(**options)
+        elif question.block_type == 'choice':
+            choices = question.value['choices']
+            options["choices"] = [(choice['label'], choice['name']) for choice in choices]
+            return MyTypedChoiceField(widget=MyMultiSelect(allowcustom=question.value['allow_custom'], multiselect=False), **options)
+        elif question.block_type == 'multiple_choice':
+            choices = question.value['choices']
+            options["choices"] = [(choice['label'], choice['name']) for choice in choices]
+            return django.forms.MultipleChoiceField(widget=MyMultiSelect(multiselect=True), **options)
+        elif question.block_type == 'input_data_choice':
+            options["choices"] = [(choice, InputData.objects.get(pk=choice)) for choice in question.value['choices']]
+            return django.forms.MultipleChoiceField(widget=MyMultiSelect(allowcustom=False, multiselect=True), **options)
+        elif question.block_type == 'true_false':
+            return django.forms.BooleanField(widget=MyBooleanSelect(nullable=question.value['nullable']), **options)
+
+    
+    @property
+    def formfields(self):
+        formfields = OrderedDict()
+
+        for question in self.questions:
+            clean_name = question.value['name']
+            formfields[clean_name] =  self.create_field(question)
+            # options = self.get_field_options(field)
+            # create_field = self.get_create_field_function(field.field_type)
+
+            # If the field hasn't been saved to the database yet (e.g. we are previewing
+            # a FormPage with unsaved changes) it won't have a clean_name as this is
+            # set in FormField.save.
+            # clean_name = field.clean_name or field.get_field_clean_name()
+            # formfields[clean_name] = create_field(field, options)
+        # raise Exception(formfields)
+        return formfields
+    
+
 
 
 class TechnicalInformation(models.Model):

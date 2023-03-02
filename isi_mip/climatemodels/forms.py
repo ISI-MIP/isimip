@@ -681,3 +681,10 @@ class DataConfirmationForm(forms.Form):
     publication_date_date = forms.DateField(required=False)
     other_license_name = forms.CharField(required=False)
     correct = forms.BooleanField(required=True)
+
+
+class ImpactModelQuestionForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        impact_model_question = kwargs.pop('impact_model_question')
+        super().__init__(*args, **kwargs)
+        self.fields = impact_model_question.formfields

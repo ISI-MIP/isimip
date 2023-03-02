@@ -1,0 +1,17 @@
+{% extends 'climatemodels/edit_base.html' %}
+{% load template_form %}
+
+{% block form_content %}
+	<fieldset>
+		{% include 'widgets/heading3.html' with text=impact_model_step.heading %}
+		{% include 'widgets/richtext-content.html' with content=impact_model_step.subheading %}
+		<p>{{ impact_model_step.description }}</p>
+		{% template_form form as nf %}
+		{{ nf }}
+	</fieldset>
+{% endblock %}
+{% block form_action %}
+	<div class="form-actions">
+		<input type="submit" name="submit-button" value="Save and edit model setup" class="btn btn-primary">
+	</div>
+{% endblock %}

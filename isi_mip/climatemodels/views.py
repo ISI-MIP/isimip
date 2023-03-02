@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.db.models import Q
@@ -34,8 +35,8 @@ from isi_mip.climatemodels.forms import (AttachmentModelForm,
                                          TechnicalInformationModelForm,
                                          get_sector_form)
 from isi_mip.climatemodels.models import (Attachment, BaseImpactModel,
-                                          ImpactModel, InputData,
-                                          SimulationRound)
+                                          ImpactModel, ImpactModelQuestion,
+                                          InputData, SimulationRound)
 from isi_mip.climatemodels.tools import (ImpactModelToXLSX,
                                          ParticpantModelToXLSX)
 from isi_mip.core.models import DataPublicationConfirmation, Invitation
@@ -680,3 +681,43 @@ def show_participants(request, extra_context):
     if extra_context is not None:
         context.update(extra_context)
     return render(request, 'climatemodels/show_participants.html', context)
+
+
+# TODO check if user can edit model
+# if not (impact_model in request.user.userprofile.responsible.all() or request.user.is_superuser):
+#         messages.info(request, 'You need to have the permissions to perform this action.')
+#         return HttpResponseRedirect('/dashboard/')
+@login_required
+def impact_model_edit_updated(request, page, id, current_step):
+    impact_model = ImpactModel.objects.get(id=id)
+    # raise Exception(request.POST)
+    next_step = FORM_STEPS[current_step]["next"]
+    form = FORM_STEPS[current_step]["form"]
+    subpage = {
+        'title': 'Impact Model: %s (%s, %s)' % (impact_model.base_model.name, impact_model.base_model.sector.name, impact_model.simulation_round.name),
+        'url': page.url + page.reverse_subpage('details', args=(impact_model.base_model.id,)),
+        'subpage': {'title': 'Edit %s' % FORM_STEPS[current_step]['verbose_name'], 'url': ''}
+    }
+    impact_model_question = ImpactModelQuestion.objects.get(information_type='technical_information')
+    if request.method == 'POST':
+        form = impact_model_question.get_form(request.POST, request.FILES)
+        if form.is_valid():
+            impact_model.impact_model_information.technical_information = form.cleaned_data
+            impact_model.impact_model_information.save()
+        else:
+            messages.error(request, 'Your form has errors.')
+            messages.warning(request, form.errors)
+        
+    else:
+        form = impact_model_question.get_form(impact_model.impact_model_information.technical_information)
+        # form = impact_model_question.get_form()
+    
+    context = {
+        'form': form,
+        'impact_model_step': impact_model_question,
+        'subpage': subpage,
+        'page': page,
+        'user': request.user,
+    }
+    template = 'climatemodels/edit_updated.html'
+    return render(request, template, context)

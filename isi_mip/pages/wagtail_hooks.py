@@ -110,3 +110,8 @@ def add_impact_models_panel(request, panels):
 @hooks.register('register_admin_menu_item')
 def register_frank_menu_item():
   return MenuItem('Django Admin', reverse('admin:index'), icon_name='cogs', order=90000)
+
+
+@hooks.register('register_admin_menu_item')
+def register_questions_menu_item():
+  return MenuItem('Model Documentation', '/cms/snippets/climatemodels/impactmodelquestion/' , icon_name='folder-inverse', order=4000)

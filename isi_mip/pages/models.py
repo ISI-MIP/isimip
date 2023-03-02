@@ -16,7 +16,7 @@ from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from rest_framework.fields import BooleanField
 from taggit.models import TaggedItemBase
-from wagtail.admin.edit_handlers import (FieldPanel, InlinePanel,
+from wagtail.admin.panels import (FieldPanel, InlinePanel,
                                          MultiFieldPanel)
 from wagtail.admin.mail import send_mail
 from wagtail.admin.panels import ObjectList, TabbedInterface
@@ -41,8 +41,9 @@ from isi_mip.climatemodels.views import (STEP_ATTACHMENT, STEP_BASE,
                                          duplicate_impact_model,
                                          impact_model_details,
                                          impact_model_download,
-                                         impact_model_edit, impact_model_pdf,
-                                         input_data_details,
+                                         impact_model_edit,
+                                         impact_model_edit_updated,
+                                         impact_model_pdf, input_data_details,
                                          participant_download,
                                          show_participants,
                                          update_contact_information_view)
@@ -467,6 +468,10 @@ class ImpactModelsPage(RoutablePageWithDefault):
     @route(r'edit/attachment/(?P<id>[0-9]*)/$')
     def edit_attachment(self, request, id=None):
         return impact_model_edit(self, request, id, STEP_ATTACHMENT)
+    
+    @route(r'edit/updated/(?P<id>[0-9]*)/$')
+    def edit_updated(self, request, id=None):
+        return impact_model_edit_updated(request, self, id, STEP_ATTACHMENT)
 
     @route(r'duplicate/(?P<impact_model_id>[0-9]*)/(?P<simulation_round_id>[0-9]*)/$')
     def duplicate(self, request, impact_model_id=None, simulation_round_id=None):
