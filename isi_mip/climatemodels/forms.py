@@ -5,6 +5,8 @@ from django.forms import ClearableFileInput, inlineformset_factory
 from django.utils import text
 from django.utils.safestring import mark_safe
 
+
+from isi_mip.contrib.forms import FieldsetFormMixin
 from isi_mip.climatemodels.fields import (MyModelMultipleChoiceField,
                                           MyModelSingleChoiceField)
 from isi_mip.climatemodels.models import *
@@ -683,8 +685,11 @@ class DataConfirmationForm(forms.Form):
     correct = forms.BooleanField(required=True)
 
 
-class ImpactModelQuestionForm(forms.Form):
+class ImpactModelQuestionForm(FieldsetFormMixin, forms.Form):
+    fieldset = []
     def __init__(self, *args, **kwargs):
         impact_model_question = kwargs.pop('impact_model_question')
+        simulation_round = kwargs.pop('simulation_round')
+        self.fieldset = impact_model_question.fieldset
         super().__init__(*args, **kwargs)
-        self.fields = impact_model_question.formfields
+        self.fields = impact_model_question.formfields(simulation_round)

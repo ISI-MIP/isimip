@@ -11,7 +11,7 @@ from django.db.models import JSONField
 from django.template.defaultfilters import filesizeformat
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
-from django_filters.fields import MultipleChoiceField
+from django_filters.fields import ChoiceField, MultipleChoiceField
 from wagtail.admin.panels import FieldPanel
 from wagtail.fields import StreamField
 from wagtail.search import index
@@ -19,8 +19,8 @@ from wagtail.snippets.models import register_snippet
 
 from isi_mip.choiceorotherfield.fields import MyTypedChoiceField
 from isi_mip.choiceorotherfield.models import ChoiceOrOtherField
-from isi_mip.climatemodels.impact_model_blocks import \
-    IMPACT_MODEL_QUESTION_BLOCKS
+from isi_mip.climatemodels.impact_model_blocks import (
+    IMPACT_MODEL_QUESTION_BLOCKS, MODEL_FILTER_CHOICES, FieldsetBlock)
 from isi_mip.climatemodels.widgets import MyBooleanSelect, MyMultiSelect
 from isi_mip.sciencepaper.models import Paper
 
@@ -541,16 +541,14 @@ class ImpactModelQuestion(models.Model):
     sector = models.OneToOneField('Sector', blank=True, null=True, on_delete=models.PROTECT)
     step = models.PositiveSmallIntegerField(default=0)
     heading = models.CharField(max_length=1024)
-    subheading = models.CharField(max_length=1024, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    questions = StreamField(IMPACT_MODEL_QUESTION_BLOCKS, blank=True, null=True, use_json_field=True)
+    questions = StreamField([('fieldset', FieldsetBlock())], blank=True, null=True, use_json_field=True)
 
     panels = [
         FieldPanel('information_type'),
         FieldPanel('sector'),
         FieldPanel('step'),
         FieldPanel('heading'),
-        FieldPanel('subheading'),
         FieldPanel('description'),
         FieldPanel('questions'),
     ]
@@ -563,7 +561,7 @@ class ImpactModelQuestion(models.Model):
         if self.information_type:
             return self.information_type
         if self.sector:
-            return self.sector
+            return self.sector.name
         
     def get_form(self, *args, **kwargs):
         from isi_mip.climatemodels.forms import ImpactModelQuestionForm
@@ -579,8 +577,9 @@ class ImpactModelQuestion(models.Model):
         return options
     
     
-    def create_field(self, question):
+    def create_field(self, question, simulation_round, fieldset):
         options = self.get_field_options(question)
+        # options['fieldset'] = fieldset
         if question.block_type == 'textarea':
             return django.forms.CharField(widget=django.forms.Textarea, **options)
         elif question.block_type == 'single_line':
@@ -593,31 +592,58 @@ class ImpactModelQuestion(models.Model):
             choices = question.value['choices']
             options["choices"] = [(choice['label'], choice['name']) for choice in choices]
             return django.forms.MultipleChoiceField(widget=MyMultiSelect(multiselect=True), **options)
-        elif question.block_type == 'input_data_choice':
-            options["choices"] = [(choice, InputData.objects.get(pk=choice)) for choice in question.value['choices']]
-            return django.forms.MultipleChoiceField(widget=MyMultiSelect(allowcustom=False, multiselect=True), **options)
+        elif question.block_type == 'model_single_choice':
+            choices = [(spatial.name, spatial.name) for spatial in SpatialAggregation.objects.all()]
+            return django.forms.ChoiceField(
+                widget=MyMultiSelect(allowcustom=True, multiselect=False), 
+                choices=choices,
+                **options)
+        elif question.block_type == 'model_multiple_choice':
+            name = dict(MODEL_FILTER_CHOICES).get(question.value['model_choice'])
+            choices = [(input_data.pk, input_data.name) for input_data in InputData.objects.filter(data_type__name=name, simulation_round=simulation_round)]
+            return django.forms.MultipleChoiceField(
+                widget=MyMultiSelect(allowcustom=False, multiselect=True),
+                choices=choices,
+                **options)
         elif question.block_type == 'true_false':
             return django.forms.BooleanField(widget=MyBooleanSelect(nullable=question.value['nullable']), **options)
+        raise Exception(question.block_type)
 
     
-    @property
-    def formfields(self):
+    def formfields(self, simulation_round):
         formfields = OrderedDict()
 
-        for question in self.questions:
-            clean_name = question.value['name']
-            formfields[clean_name] =  self.create_field(question)
-            # options = self.get_field_options(field)
-            # create_field = self.get_create_field_function(field.field_type)
+        for fieldset in self.questions:
+            for question in fieldset.value['questions']:
+                fieldset_name = fieldset.value['heading']
+                fieldset_description = fieldset.value['description']
+                clean_name = question.value['name']
+                formfields[clean_name] =  self.create_field(question, simulation_round, fieldset_name)
+                # options = self.get_field_options(field)
+                # create_field = self.get_create_field_function(field.field_type)
 
-            # If the field hasn't been saved to the database yet (e.g. we are previewing
-            # a FormPage with unsaved changes) it won't have a clean_name as this is
-            # set in FormField.save.
-            # clean_name = field.clean_name or field.get_field_clean_name()
-            # formfields[clean_name] = create_field(field, options)
-        # raise Exception(formfields)
+                # If the field hasn't been saved to the database yet (e.g. we are previewing
+                # a FormPage with unsaved changes) it won't have a clean_name as this is
+                # set in FormField.save.
+                # clean_name = field.clean_name or field.get_field_clean_name()
+                # formfields[clean_name] = create_field(field, options)
+            # raise Exception(formfields)
         return formfields
     
+    @property
+    def fieldset(self):
+        fieldset_list = []
+        for fieldset in self.questions:
+            fields = []
+            for question in fieldset.value['questions']:
+                fields.append(question.value['name'])
+            # raise Exception(formfields)
+            fieldset_list.append((fieldset.value['heading'], {
+                'fields': fields,
+                'description': fieldset.value['description']
+            }))
+        return fieldset_list
+        
 
 
 
