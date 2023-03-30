@@ -11,6 +11,10 @@ def set_information_type(apps, schema_editor):
     ImpactModelQuestion = apps.get_model('climatemodels', 'ImpactModelQuestion')
     ImpactModelQuestion.objects.filter(information_type__isnull=True).update(information_type='sector_specific_information')
 
+
+def unset_information_type(apps, schema_editor):
+    pass
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -18,5 +22,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(set_information_type),
+        migrations.RunPython(set_information_type, unset_information_type),
     ]
