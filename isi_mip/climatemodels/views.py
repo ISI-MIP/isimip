@@ -79,7 +79,8 @@ def impact_model_details(page, request, id):
 
     model_simulation_rounds = []
     for im in base_model.impact_model.filter(public=True):
-        im_values = im.values_to_tuples() + im.fk_sector.values_to_tuples()
+        im_values = im.impact_model_information.values_to_tuples()
+        # im_values = im.values_to_tuples() + im.fk_sector.values_to_tuples()
         if hasattr(im, 'attachment'):
             im_values += im.attachment.values_to_tuples()
         model_details = []
@@ -434,9 +435,11 @@ def impact_model_edit(page, request, id, current_step):
         if current_step == STEP_DETAIL:
             instance = impact_model
             return impact_model_detail_edit(page, request, context, form, instance, current_step, next_step, target_url)
+        # if current_step == STEP_SECTOR:
+        #     instance = impact_model
+        #     return impact_model_sector_edit(page, request, context, instance, target_url)
         else:
-            return impact_model_edit_updated(request, page, context, impact_model.id, current_step, next_step, target_url)
-
+            return impact_model_edit_updated(request, page, context, impact_model.id, current_step, target_url)
 
 def impact_model_attachment_edit(page, request, context, impact_model, current_step, next_step, target_url):
     attachment, created = Attachment.objects.get_or_create(impact_model=impact_model)
@@ -484,6 +487,7 @@ def impact_model_detail_edit(page, request, context, form, instance, current_ste
                 'country': contact_person.country or '-',
             })
         context['contact_persons'] = contact_persons
+    # raise Exception('here')
     template = 'climatemodels/%s.html' % (current_step)
     return render(request, template, context)
 
@@ -687,7 +691,7 @@ def show_participants(request, extra_context):
 #         messages.info(request, 'You need to have the permissions to perform this action.')
 #         return HttpResponseRedirect('/dashboard/')
 @login_required
-def impact_model_edit_updated(request, page, context,  id, current_step, next_step, target_url):
+def impact_model_edit_updated(request, page, context,  id, current_step, target_url):
     impact_model = ImpactModel.objects.get(id=id)
     # raise Exception(request.POST)
     next_step = FORM_STEPS[current_step]["next"]

@@ -106,15 +106,6 @@ MODEL_FILTER_CHOICES = [
 ]
 
 class ModelMultipleChoiceBlock(BaseQuestionBlock):
-    # input_data = ModelMultipleChoiceBlock(
-    #     target_model="climatemodels.InputData",
-    #     queryset=get_input_data,
-    # )
-    # choices = _MultipleChoiceBlock(
-    #     required=True,
-    #     choices=get_input_data,
-    #     widget=CheckboxSelectMultiple
-    # )
     model_choice = _ChoiceBlock(choices=MODEL_FILTER_CHOICES)
 
     class Meta:
@@ -122,13 +113,6 @@ class ModelMultipleChoiceBlock(BaseQuestionBlock):
         label = 'Model-Multiple-Choice'
         label_format = '{name} ({model_choice})'
 
-    def get_context(self, value, parent_context=None):
-        context = super().get_context(value, parent_context=parent_context)
-        # for input_data in value['input_data']:
-        #     raise Exception(input_data)
-        from isi_mip.climatemodels.models import InputData
-        context['options'] = [{'label': input_data.name, 'id': input_data.pk} for input_data in InputData.objects.filter(pk__in=value['choices'])]
-        return context
 
 MODEL_CHOICES = [
     ('spatial_aggregation', 'Spatial Aggregation')

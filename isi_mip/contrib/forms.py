@@ -57,7 +57,6 @@ class FieldsetFormMixin(object):
 		If `fieldset` attribute is not defined we return the field normally. Otherwise we return the field as `FieldsetBoundField`
 		with fieldset attached to it. It the later case the field has to be defined in `fieldset` attribute.
 		"""
-		
 		field = super(FieldsetFormMixin, self).__getitem__(name)
 		if not hasattr(self, 'fieldset'):
 			return field

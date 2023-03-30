@@ -181,7 +181,7 @@ class Command(BaseCommand):
                     fieldset = {}
                     generic_fields = []
                     for field in group.fields.all():
-                        form_field = TextField(name=field.identifier, verbose_name=field.name, help_text=field.help_text, blank=True)
+                        form_field = TextField(name=field.unique_identifier, verbose_name=field.name, help_text=field.help_text, blank=True)
                         block = self.generate_stream_field(form_field)
                         generic_fields.append(block)
                     fieldset = {

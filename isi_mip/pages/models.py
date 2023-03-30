@@ -469,10 +469,6 @@ class ImpactModelsPage(RoutablePageWithDefault):
     def edit_attachment(self, request, id=None):
         return impact_model_edit(self, request, id, STEP_ATTACHMENT)
     
-    @route(r'edit/updated/(?P<id>[0-9]*)/$')
-    def edit_updated(self, request, id=None):
-        return impact_model_edit_updated(request, self, id, STEP_ATTACHMENT)
-
     @route(r'duplicate/(?P<impact_model_id>[0-9]*)/(?P<simulation_round_id>[0-9]*)/$')
     def duplicate(self, request, impact_model_id=None, simulation_round_id=None):
         return duplicate_impact_model(self, request, impact_model_id, simulation_round_id)
