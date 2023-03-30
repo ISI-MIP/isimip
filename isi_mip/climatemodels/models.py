@@ -511,9 +511,7 @@ class ImpactModel(models.Model):
                  self.main_reference_paper.entry_with_link() if self.main_reference_paper else None),
                 (vname('other_references'), other_references),
             ]),
-            self.technicalinformation.values_to_tuples(),
-            self.inputdatainformation.values_to_tuples(),
-        ] + self.otherinformation.values_to_tuples()
+        ]
 
     def can_confirm_data(self):
         return hasattr(self, 'confirmation') and not self.confirmation.is_confirmed

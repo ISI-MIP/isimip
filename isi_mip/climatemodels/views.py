@@ -79,8 +79,7 @@ def impact_model_details(page, request, id):
 
     model_simulation_rounds = []
     for im in base_model.impact_model.filter(public=True):
-        im_values = im.impact_model_information.values_to_tuples()
-        # im_values = im.values_to_tuples() + im.fk_sector.values_to_tuples()
+        im_values = im.values_to_tuples() + im.impact_model_information.values_to_tuples()
         if hasattr(im, 'attachment'):
             im_values += im.attachment.values_to_tuples()
         model_details = []
