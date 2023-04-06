@@ -40,6 +40,10 @@ LOGGING = {
         },
     },
     "handlers": {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+        },
         "console": {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
@@ -53,13 +57,12 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
+        'django.security.DisallowedHost': {
+            'handlers': ['null'],
+            'propagate': False,
+        },
         # Errors logged by the SDK itself
         "sentry_sdk": {"level": "ERROR", "handlers": ["console"], "propagate": False},
-        "django.security.DisallowedHost": {
-            "level": "ERROR",
-            "handlers": ["console"],
-            "propagate": False,
-        },
     },
 }
 
