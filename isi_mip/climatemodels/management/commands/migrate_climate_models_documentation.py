@@ -15,14 +15,14 @@ from isi_mip.choiceorotherfield.models import ChoiceOrOtherField
 from isi_mip.climatemodels.impact_model_blocks import (
     IMPACT_MODEL_QUESTION_BLOCKS, ModelSingleChoiceFieldBlock)
 from isi_mip.climatemodels.models import (
-    Agriculture, AgroEconomicModelling, Biodiversity, Biomes, BiomesForests,
+    Agriculture, AgroEconomicModelling, Biodiversity, Biomes, BiomesForests, DataType,
     CoastalInfrastructure, ComputableGeneralEquilibriumModelling, Energy, Fire,
     Forests, Health, ImpactModelQuestion, InputDataInformation,
     MarineEcosystemsGlobal, MarineEcosystemsRegional, OtherInformation,
     Permafrost, Sector, SectorInformationGroup, TechnicalInformation,
     WaterGlobal, WaterRegional)
 from isi_mip.pages.models import HomePage
-from isi_mip.climatemodels.management.commands._model_field_definitions import MODEL_FIELD_DEFINITION
+from isi_mip.climatemodels.management.commands._model_field_definitions import MODEL_FIELD_DEFINITION, MODEL_FIELD_DATA_TYPE_MAPPING
 
 logger = logging.getLogger(__name__)
 
@@ -84,12 +84,25 @@ class Command(BaseCommand):
                 'type': 'model_single_choice',
                 'value': value
             }
+        elif field.name == 'climate_variables':
+            return {
+                'type': 'climate_variable_choice',
+                'value': value
+            }
+        elif field.name == 'model_output':
+            return {
+                'type': 'biodiversity_model_output_choice',
+                'value': value
+            }
         elif field.__class__ == ManyToManyField:
+            data_type_name = MODEL_FIELD_DATA_TYPE_MAPPING.get(field.name)
+            print('data_type_name', data_type_name)
+            # raise Exception(data_type_name)
             value.update({
-                'model_choice': field.name,
+                'data_type': DataType.objects.get(name=data_type_name).pk,
             })
             return {
-                'type': 'model_multiple_choice',
+                'type': 'input_data_choice',
                 'value': value
             }
         elif field.__class__ == ChoiceOrOtherField:

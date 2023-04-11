@@ -20,7 +20,8 @@ from wagtail.snippets.models import register_snippet
 from isi_mip.choiceorotherfield.fields import MyTypedChoiceField
 from isi_mip.choiceorotherfield.models import ChoiceOrOtherField
 from isi_mip.climatemodels.impact_model_blocks import (
-    IMPACT_MODEL_QUESTION_BLOCKS, MODEL_FILTER_CHOICES, FieldsetBlock)
+    IMPACT_MODEL_QUESTION_BLOCKS, BiodiversityModelOutputChoiceBlock,
+    FieldsetBlock)
 from isi_mip.climatemodels.widgets import MyBooleanSelect, MyMultiSelect
 from isi_mip.sciencepaper.models import Paper
 
@@ -410,25 +411,17 @@ class ImpactModel(models.Model):
         super().save(*args, **kwargs)
         if not is_duplication and is_creation:
             # if model gets duplicated we handle related instances in the duplicate method
-            self.base_model.sector.model.objects.get_or_create(impact_model=self)
-            TechnicalInformation.objects.get_or_create(impact_model=self)
-            InputDataInformation.objects.get_or_create(impact_model=self)
-            OtherInformation.objects.get_or_create(impact_model=self)
+            ImpactModelInformation.objects.get_or_create(impact_model=self)
 
         # make all owners involved in the duplicated model
         if is_creation and self.base_model:
             for owner in self.impact_model_responsible.all():
                 owner.responsible.add(self)
         # make sure if sector changes that sector specific objects exists for the impact model
-        if not is_duplication and not hasattr(self, self.fk_sector_name):
-            self.base_model.sector.model.objects.get_or_create(impact_model=self)
 
     def duplicate(self, simulation_round):
         # save old references
-        old_technical_information = self.technicalinformation
-        old_input_data = self.inputdatainformation
-        old_other = self.otherinformation
-        old_sector = self.fk_sector
+        old_impact_model_information = self.impact_model_information
         # Impact model
         duplicate = ImpactModel(
             base_model=self.base_model,
@@ -445,37 +438,9 @@ class ImpactModel(models.Model):
         duplicate.save(is_duplication=True)
         duplicate.other_references.set(self.other_references.all())
         # Technical information
-        old_technical_information.pk = None
-        old_technical_information.impact_model = duplicate
-        old_technical_information.save()
-        # Input Data
-        old_climate_variables = old_input_data.climate_variables.filter(inputdata__simulation_round=simulation_round)
-        old_simulated_atmospheric_climate_data_sets = old_input_data.simulated_atmospheric_climate_data_sets.filter(simulation_round=simulation_round)
-        old_observed_atmospheric_climate_data_sets = old_input_data.observed_atmospheric_climate_data_sets.filter(simulation_round=simulation_round)
-        old_emissions_data_sets = old_input_data.emissions_data_sets.filter(simulation_round=simulation_round)
-        old_socio_economic_data_sets = old_input_data.socio_economic_data_sets.filter(simulation_round=simulation_round)
-        old_land_use_data_sets = old_input_data.land_use_data_sets.filter(simulation_round=simulation_round)
-        old_other_human_influences_data_sets = old_input_data.other_human_influences_data_sets.filter(simulation_round=simulation_round)
-        old_other_data_sets = old_input_data.other_data_sets.filter(simulation_round=simulation_round)
-        old_input_data.pk = None
-        old_input_data.impact_model = duplicate
-        old_input_data.save()
-        old_input_data.climate_variables.set(old_climate_variables)
-        old_input_data.simulated_atmospheric_climate_data_sets.set(old_simulated_atmospheric_climate_data_sets)
-        old_input_data.observed_atmospheric_climate_data_sets.set(old_observed_atmospheric_climate_data_sets)
-        old_input_data.emissions_data_sets.set(old_emissions_data_sets)
-        old_input_data.socio_economic_data_sets.set(old_socio_economic_data_sets)
-        old_input_data.land_use_data_sets.set(old_land_use_data_sets)
-        old_input_data.other_human_influences_data_sets.set(old_other_human_influences_data_sets)
-        old_input_data.other_data_sets.set(old_other_data_sets)
-        # OtherInformation
-        old_other.pk = None
-        old_other.impact_model = duplicate
-        old_other.save()
-        # Sector
-        old_sector.pk = None
-        old_sector.impact_model = duplicate
-        old_sector.save()
+        old_impact_model_information.pk = None
+        old_impact_model_information.impact_model = duplicate
+        old_impact_model_information.save()
         return duplicate
 
     def _get_verbose_field_name(self, field):
@@ -542,7 +507,7 @@ class ImpactModelInformation(models.Model):
                 for field in fieldset[1]['fields']:
                     verbose_name = field['verbose_name']
                     value = getattr(self, information_type).get(field['name'], None)
-                    value = information.get_field_value(field['name'], value)
+                    value = information.get_field_value(field['name'], field['field_type'], value)
                     if value:
                         if field['help_text']:
                             verbose_name = generate_helptext(field['help_text'], verbose_name)
@@ -627,13 +592,21 @@ class ImpactModelQuestion(models.Model):
                 widget=MyMultiSelect(allowcustom=True, multiselect=False), 
                 choices=choices,
                 **options)
-        elif question.block_type == 'model_multiple_choice':
-            name = dict(MODEL_FILTER_CHOICES).get(question.value['model_choice'])
-            if name == 'Climate Variables':
-                choices = [(climate_variable.pk, climate_variable.name) for climate_variable in ClimateVariable.objects.filter(inputdata__data_type__is_climate_data_type=True, inputdata__simulation_round=simulation_round).distinct()]
-            else:
-                choices = [(input_data.pk, input_data.name) for input_data in InputData.objects.filter(data_type__name=name, simulation_round=simulation_round)]
-                
+        elif question.block_type == 'biodiversity_model_output_choice':
+            choices = [(biodiversity.pk, biodiversity.name) for biodiversity in BiodiversityModelOutput.objects.all().distinct()]
+            return django.forms.MultipleChoiceField(
+                widget=MyMultiSelect(allowcustom=True, multiselect=True),
+                choices=choices,
+                **options)
+        elif question.block_type == 'climate_variable_choice':
+            choices = [(climate_variable.pk, climate_variable.name) for climate_variable in ClimateVariable.objects.filter(inputdata__data_type__is_climate_data_type=True, inputdata__simulation_round=simulation_round).distinct()]
+            return django.forms.MultipleChoiceField(
+                widget=MyMultiSelect(allowcustom=False, multiselect=True),
+                choices=choices,
+                **options)
+        elif question.block_type == 'input_data_choice':
+            data_type = question.value['data_type']
+            choices = [(input_data.pk, input_data.name) for input_data in InputData.objects.filter(data_type__pk=data_type, simulation_round=simulation_round)]
             return django.forms.MultipleChoiceField(
                 widget=MyMultiSelect(allowcustom=False, multiselect=True),
                 choices=choices,
@@ -642,12 +615,13 @@ class ImpactModelQuestion(models.Model):
             return django.forms.BooleanField(widget=MyBooleanSelect(nullable=question.value['nullable']), **options)
         raise Exception(question.block_type)
     
-    def get_field_value(self, field_name, values):
-        if field_name in [item[0] for item in MODEL_FILTER_CHOICES]:
-            if field_name == 'climate_variables':
-                return ", ".join([climate_variable.pretty() for climate_variable in ClimateVariable.objects.filter(pk__in=values)])
-            else:
-                return ", ".join([input_data.pretty() for input_data in InputData.objects.filter(pk__in=values)])
+    def get_field_value(self, field_name, field_type, values):
+        if field_type == 'input_data_choice':
+            return ", ".join([input_data.pretty() for input_data in InputData.objects.filter(pk__in=values)])
+        elif field_type == 'climate_variable_choice':
+            return ", ".join([climate_variable.pretty() for climate_variable in ClimateVariable.objects.filter(pk__in=values)])
+        elif field_type == 'biodiversity_model_output_choice':
+            return ", ".join([biodiversity.name for biodiversity in BiodiversityModelOutput.objects.filter(pk__in=values)])
         if type(values) is bool:
             return 'Yes' if values is True else 'No' if values is False else ''
         return values
@@ -688,6 +662,7 @@ class ImpactModelQuestion(models.Model):
                     'name': question.value['name'],
                     'verbose_name': question.value['question'],
                     'help_text': question.value['help_text'],
+                    'field_type': question.block_type,
                 })
             # raise Exception(formfields)
             fieldset_list.append((fieldset.value['heading'], {

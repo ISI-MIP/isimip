@@ -91,28 +91,34 @@ def get_input_data():
     return [(input_data.pk, input_data.name) for input_data in InputData.objects.all()]
 
 
-MODEL_FILTER_CHOICES = [
-    ('emissions_data_sets', 'Emissions'),
-    ('land_use_data_sets', 'Land use'),
-    ('observed_atmospheric_climate_data_sets', 'Observed atmospheric climate'),
-    ('other_data_sets', 'Other'),
-    ('other_human_influences_data_sets', 'Other human influences'),
-    ('simulated_atmospheric_climate_data_sets', 'Simulated atmospheric climate'),
-    ('socio_economic_data_sets', 'Socio-economic'),
-    ('simulated_ocean_climate_data_sets', 'Simulated ocean climate'),
-    ('observed_ocean_climate_data_sets', 'Observed ocean climate'),
-    ('climate_variables', 'Climate Variables'),
-    ('model_output', 'Biodiversity Model Output'),
-]
+def get_data_type_choices():
+    from isi_mip.climatemodels.models import DataType
+    return [(data_type.pk, data_type.name) for data_type in DataType.objects.all()]
 
-class ModelMultipleChoiceBlock(BaseQuestionBlock):
-    model_choice = _ChoiceBlock(choices=MODEL_FILTER_CHOICES)
+
+class InputDataChoiceBlock(BaseQuestionBlock):
+    data_type = _ChoiceBlock(choices=get_data_type_choices)
 
     class Meta:
         template = 'impact_model_blocks/input_data_choice_block.html'
-        label = 'Model-Multiple-Choice'
-        label_format = '{name} ({model_choice})'
+        label = 'Input-Data-Choice'
+        label_format = '{name} ({data_type})'
 
+
+class ClimateVariableChoiceBlock(BaseQuestionBlock):
+
+    class Meta:
+        template = 'impact_model_blocks/input_data_choice_block.html'
+        label = 'Climate-Variable-Choice'
+        label_format = '{name}'
+
+
+class BiodiversityModelOutputChoiceBlock(BaseQuestionBlock):
+
+    class Meta:
+        template = 'impact_model_blocks/input_data_choice_block.html'
+        label = 'Biodiversity-Model-Output-Choice'
+        label_format = '{name}'
 
 MODEL_CHOICES = [
     ('spatial_aggregation', 'Spatial Aggregation')
@@ -133,7 +139,9 @@ IMPACT_MODEL_QUESTION_BLOCKS = [
     ('textarea', TextareaQuestionBlock()),
     ('choice', SingleChoiceBlock()),
     ('multiple_choice', MultipleChoiceBlock()),
-    ('model_multiple_choice', ModelMultipleChoiceBlock()),
+    ('input_data_choice', InputDataChoiceBlock()),
+    ('climate_variable_choice', ClimateVariableChoiceBlock()),
+    ('biodiversity_model_output_choice', BiodiversityModelOutputChoiceBlock()),
     ('model_single_choice', ModelSingleChoiceFieldBlock()),
     ('true_false', TrueFalseBlock()),
 ]

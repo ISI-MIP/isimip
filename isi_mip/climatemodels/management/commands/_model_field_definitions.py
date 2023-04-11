@@ -1,3 +1,16 @@
+MODEL_FIELD_DATA_TYPE_MAPPING = {
+    'emissions_data_sets': 'Emissions',
+    'land_use_data_sets': 'Land use',
+    'observed_atmospheric_climate_data_sets': 'Observed atmospheric climate',
+    'other_data_sets': 'Other',
+    'other_human_influences_data_sets': 'Other human influences',
+    'simulated_atmospheric_climate_data_sets': 'Simulated atmospheric climate',
+    'socio_economic_data_sets': 'Socio-economic',
+    'simulated_ocean_climate_data_sets': 'Simulated ocean climate',
+    'observed_ocean_climate_data_sets': 'Observed ocean climate',
+}
+
+
 MODEL_FIELD_DEFINITION = {
     'technical_information': [{
         'heading': 'Technical Information',
