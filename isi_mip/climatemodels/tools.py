@@ -120,7 +120,7 @@ class ImpactModelToXLSX:
             }
         general.write_row(0, 0, data=all_field_titles, cell_format=bold)
 
-        for i, impact_model in enumerate(self.qs[:1]):
+        for i, impact_model in enumerate(self.qs):
             for j, field in enumerate(model_fields['BaseImpactModel']['fields']):
                 data = self.get_field_data(impact_model.base_model, field)
                 general.write(i + 1, j, str(data))
