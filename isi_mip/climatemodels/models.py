@@ -540,10 +540,13 @@ class ImpactModelInformation(models.Model):
             for fieldset in information.question_group_list:
                 values = []
                 for field in fieldset[1]['fields']:
+                    verbose_name = field['verbose_name']
                     value = getattr(self, information_type).get(field['name'], None)
                     value = information.get_field_value(field['name'], value)
                     if value:
-                        values.append((field['verbose_name'], value))
+                        if field['help_text']:
+                            verbose_name = generate_helptext(field['help_text'], verbose_name)
+                        values.append((verbose_name, value))
                 tuples.append((fieldset[0], values))
         # raise Exception(tuples)
         return tuples
@@ -683,7 +686,8 @@ class ImpactModelQuestion(models.Model):
             for question in fieldset.value['questions']:
                 fields.append({
                     'name': question.value['name'],
-                    'verbose_name': question.value['question']
+                    'verbose_name': question.value['question'],
+                    'help_text': question.value['help_text'],
                 })
             # raise Exception(formfields)
             fieldset_list.append((fieldset.value['heading'], {
