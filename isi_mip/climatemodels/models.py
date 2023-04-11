@@ -507,7 +507,7 @@ class ImpactModelInformation(models.Model):
                 for field in fieldset[1]['fields']:
                     verbose_name = field['verbose_name']
                     value = getattr(self, information_type).get(field['name'], None)
-                    value = information.get_field_value(field['name'], field['field_type'], value)
+                    value = information.get_field_value(field['field_type'], value)
                     if value:
                         if field['help_text']:
                             verbose_name = generate_helptext(field['help_text'], verbose_name)
@@ -615,15 +615,17 @@ class ImpactModelQuestion(models.Model):
             return django.forms.BooleanField(widget=MyBooleanSelect(nullable=question.value['nullable']), **options)
         raise Exception(question.block_type)
     
-    def get_field_value(self, field_name, field_type, values):
+    def get_field_value(self, field_type, values, make_pretty=True):
         if field_type == 'input_data_choice':
-            return ", ".join([input_data.pretty() for input_data in InputData.objects.filter(pk__in=values)])
+            return ", ".join([make_pretty and input_data.pretty() or str(input_data) for input_data in InputData.objects.filter(pk__in=values)])
         elif field_type == 'climate_variable_choice':
-            return ", ".join([climate_variable.pretty() for climate_variable in ClimateVariable.objects.filter(pk__in=values)])
+            return ", ".join([make_pretty and climate_variable.pretty() or str(climate_variable) for climate_variable in ClimateVariable.objects.filter(pk__in=values)])
         elif field_type == 'biodiversity_model_output_choice':
             return ", ".join([biodiversity.name for biodiversity in BiodiversityModelOutput.objects.filter(pk__in=values)])
         if type(values) is bool:
             return 'Yes' if values is True else 'No' if values is False else ''
+        if values is None:
+            return ''
         return values
 
     
@@ -638,6 +640,19 @@ class ImpactModelQuestion(models.Model):
                 formfields[clean_name] =  self.create_field(question, simulation_round, fieldset_name)
         return formfields
     
+    @property
+    def fields(self):
+        fields = []
+        for fieldset in self.questions:
+            for question in fieldset.value['questions']:
+                fields.append({
+                    'name': question.value['name'],
+                    'verbose_name': question.value['question'],
+                    'help_text': question.value['help_text'],
+                    'field_type': question.block_type,
+                })
+        return fields
+
     @property
     def fieldset(self):
         fieldset_list = []

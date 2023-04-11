@@ -96,8 +96,6 @@ class Command(BaseCommand):
             }
         elif field.__class__ == ManyToManyField:
             data_type_name = MODEL_FIELD_DATA_TYPE_MAPPING.get(field.name)
-            print('data_type_name', data_type_name)
-            # raise Exception(data_type_name)
             value.update({
                 'data_type': DataType.objects.get(name=data_type_name).pk,
             })
