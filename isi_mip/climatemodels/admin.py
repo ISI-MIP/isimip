@@ -299,6 +299,7 @@ class DataPublicationConfirmationModelAdmin(admin.ModelAdmin):
     readonly_fields = ('impact_model', 'email_text', 'is_confirmed', 'confirmed_date', 'confirmed_license', 'confirmed_by', 'confirmed_publication_date', 'confirmed_publication_date_date', 'confirm_url')
     list_filter = ('is_confirmed', 'confirmed_license')
     ordering = ('impact_model',)
+    search_fields = ('impact_model__base_model__name', 'impact_model__base_model__sector__name', 'impact_model__simulation_round__name')
 
     def get_readonly_fields(self, request, obj=None):
         if not obj:
