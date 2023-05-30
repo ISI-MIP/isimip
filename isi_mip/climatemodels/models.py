@@ -502,17 +502,18 @@ class ImpactModelInformation(models.Model):
                 information = ImpactModelQuestion.objects.filter(sector=self.impact_model.base_model.sector).first()
             else:
                 information = ImpactModelQuestion.objects.filter(information_type=information_type).first()
-            for fieldset in information.question_group_list:
-                values = []
-                for field in fieldset[1]['fields']:
-                    verbose_name = field['verbose_name']
-                    value = getattr(self, information_type).get(field['name'], None)
-                    value = information.get_field_value(field['field_type'], value)
-                    if value:
-                        if field['help_text']:
-                            verbose_name = generate_helptext(field['help_text'], verbose_name)
-                        values.append((verbose_name, value))
-                tuples.append((fieldset[0], values))
+            if information:
+                for fieldset in information.question_group_list:
+                    values = []
+                    for field in fieldset[1]['fields']:
+                        verbose_name = field['verbose_name']
+                        value = getattr(self, information_type).get(field['name'], None)
+                        value = information.get_field_value(field['field_type'], value)
+                        if value:
+                            if field['help_text']:
+                                verbose_name = generate_helptext(field['help_text'], verbose_name)
+                            values.append((verbose_name, value))
+                    tuples.append((fieldset[0], values))
         # raise Exception(tuples)
         return tuples
 
