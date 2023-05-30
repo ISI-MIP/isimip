@@ -26,7 +26,7 @@ def progress_bar(context, **kwargs):
                     count_questions += 1
                     verbose_name = field['verbose_name']
                     value = getattr(impact_model.impact_model_information, information_type).get(field['name'], None)
-                    if value is not None:
+                    if value or value == False:
                         count_answers += 1
     progress = int(count_answers / count_questions * 100)
     template = 'widgets/progress-bar.html'
