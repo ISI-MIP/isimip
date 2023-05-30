@@ -698,9 +698,7 @@ def show_participants(request, extra_context):
 @login_required
 def impact_model_edit_updated(request, page, context,  id, current_step, target_url):
     impact_model = ImpactModel.objects.get(id=id)
-    # raise Exception(request.POST)
     next_step = FORM_STEPS[current_step]["next"]
-    form = FORM_STEPS[current_step]["form"]
     subpage = {
         'title': 'Impact Model: %s (%s, %s)' % (impact_model.base_model.name, impact_model.base_model.sector.name, impact_model.simulation_round.name),
         'url': page.url + page.reverse_subpage('details', args=(impact_model.base_model.id,)),

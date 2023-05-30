@@ -19,6 +19,7 @@ from wagtail.snippets.models import register_snippet
 
 from isi_mip.choiceorotherfield.fields import MyTypedChoiceField
 from isi_mip.choiceorotherfield.models import ChoiceOrOtherField
+from isi_mip.climatemodels.fields import MyModelSingleChoiceField
 from isi_mip.climatemodels.impact_model_blocks import (
     IMPACT_MODEL_QUESTION_BLOCKS, BiodiversityModelOutputChoiceBlock,
     FieldsetBlock)
@@ -588,11 +589,7 @@ class ImpactModelQuestion(models.Model):
             options["choices"] = [(choice['label'], choice['name']) for choice in choices]
             return django.forms.MultipleChoiceField(widget=MyMultiSelect(multiselect=True), **options)
         elif question.block_type == 'model_single_choice':
-            choices = [(spatial.name, spatial.name) for spatial in SpatialAggregation.objects.all()]
-            return django.forms.ChoiceField(
-                widget=MyMultiSelect(allowcustom=True, multiselect=False), 
-                choices=choices,
-                **options)
+            return MyModelSingleChoiceField(allowcustom=True, queryset=SpatialAggregation.objects.all())
         elif question.block_type == 'biodiversity_model_output_choice':
             choices = [(biodiversity.pk, biodiversity.name) for biodiversity in BiodiversityModelOutput.objects.all().distinct()]
             return django.forms.MultipleChoiceField(
