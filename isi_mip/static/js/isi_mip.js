@@ -243,6 +243,13 @@ $(function() {
 
 				updateTable(table);
 			});
+			var getParameter = getParameterByName(selector.attr('name'));
+			if (getParameter) {
+				table.data('activepage', 1);
+				filter[ "" + colnumber ] = getParameter;
+				selector.find('option[value=' + getParameter + ']').prop('selected', true);
+				updateTable(table);
+			}
 		});
 
 		table.data('filternames', filternames);

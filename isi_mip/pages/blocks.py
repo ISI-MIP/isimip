@@ -107,6 +107,7 @@ class _IsiNumberBlock(StructBlock):
     number = CharBlock(required=False, help_text="This number overwrites the imported number (look above) if set.")
     title = CharBlock()
     text = CharBlock()
+    link = CharBlock(required=False, help_text="This is used to link the number to the outputdata page")
 
 
 class IsiNumbersBlock(StructBlock):
