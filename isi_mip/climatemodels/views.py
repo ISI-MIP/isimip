@@ -412,7 +412,13 @@ def impact_model_edit(page, request, id, current_step):
     if not impact_model.base_model.sector.has_sector_specific_values:
         # remove step for sector specific values
         steps.pop(5)
-    context = {'page': page, 'subpage': subpage, 'steps': steps, 'has_sector_specific_values': impact_model.base_model.sector.has_sector_specific_values}
+    context = {
+        'page': page, 
+        'subpage': subpage, 
+        'steps': steps, 
+        'has_sector_specific_values': impact_model.base_model.sector.has_sector_specific_values,
+        'impact_model': impact_model,
+    }
     next_parameter = request.POST.get("next")
     # define target url depending on se next param or logical next step
     if next_parameter:
