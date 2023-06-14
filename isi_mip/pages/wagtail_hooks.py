@@ -45,20 +45,12 @@ def editor_js():
 
 class DjangoAdminLinkItem:
     def render(self, request):
-        return '''<div class="wagtail-userbar__item ">
-                    <div class="wagtail-action wagtail-icon wagtail-icon-pick">
-                        <a href="/admin/" target="_parent">Djang Admin</a>
-                    </div>
-                </div>'''
+        return '<li class="w-userbar__item" role="presentation"><a href="/admin/" target="_parent" role="menuitem" class="action">Django Admin</a></li>'
 
 
 class LogOutLinkItem:
     def render(self, request):
-        return '''<div class="wagtail-userbar__item ">
-            <div class="wagtail-action wagtail-icon">
-                <a href="/auth/logout/?next=/" target="_parent">Logout</a>
-            </div>
-        </div>'''
+        return '<li class="w-userbar__item" role="presentation"><a href="/auth/logout/?next=/" target="_parent" role="menuitem" class="action">Logout</a></li>'
 
 
 @hooks.register('construct_wagtail_userbar')
