@@ -66,8 +66,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 WAGTAILSEARCH_BACKENDS = {
     'default': {
-        'BACKEND': 'wagtail.search.backends.database',
+        'BACKEND': 'wagtail.search.backends.db',
     }
 }
-
-WAGTAILADMIN_BASE_URL = 'https://127.0.0.1'

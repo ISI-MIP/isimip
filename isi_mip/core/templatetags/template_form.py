@@ -2,21 +2,17 @@ from collections import OrderedDict
 
 from django import template
 from django.forms import BaseForm
-from django.forms.widgets import (CheckboxInput, CheckboxSelectMultiple,
-                                  FileInput, Input, RadioSelect, Select,
-                                  Textarea)
+from django.forms.widgets import Select, CheckboxSelectMultiple, CheckboxInput, RadioSelect, Input, Textarea, FileInput
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
-from isi_mip.climatemodels.forms import FieldsetFormMixin
 from isi_mip.climatemodels.models import ReferencePaper
-from isi_mip.climatemodels.widgets import (MyBooleanSelect, MyMultiSelect,
-                                           RefPaperWidget)
+from isi_mip.climatemodels.widgets import MyMultiSelect, MyBooleanSelect, RefPaperWidget
 
 register = template.Library()
 
 
-class SimpleStringForm(FieldsetFormMixin, template.Node):
+class SimpleStringForm(template.Node):
     def __init__(self, fields=None):
         if fields is None:
             fields = OrderedDict()
@@ -42,21 +38,8 @@ class SimpleStringForm(FieldsetFormMixin, template.Node):
 def template_form(form, **kwargs):
     assert isinstance(form, BaseForm)
     newform = SimpleStringForm()
-    fieldsets = []
     # raise Exception([field.field.widget for field in form])
-    current_fieldset = None
-    for i, field in enumerate(form):
-        if hasattr(form, 'fieldset'):
-            if not current_fieldset:
-                current_fieldset = field.fieldset
-            if field.fieldset != current_fieldset:
-                fieldsets.append({
-                    'heading': current_fieldset['name'],
-                    'description': current_fieldset['description'], 
-                    'form': newform
-                })
-                newform = SimpleStringForm()
-                current_fieldset = field.fieldset
+    for field in form:
         value = field.value()
         if value == 'None':
             value = ''
@@ -181,13 +164,4 @@ def template_form(form, **kwargs):
 
         string = render_to_string(template, context)
         newform[field.name] = string
-    if current_fieldset:
-        fieldsets.append({
-            'heading': current_fieldset['name'],
-            'description': current_fieldset['description'],
-            'form': newform
-        })
-    if hasattr(form, 'fieldset'):
-        return fieldsets
-    else:
-        return newform
+    return newform

@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.template import Context, Template
 from django.conf import settings
 
-from wagtail.models import Site
+from wagtail.core.models import Site
 
 from isi_mip.sciencepaper.models import Author
 from .models import *

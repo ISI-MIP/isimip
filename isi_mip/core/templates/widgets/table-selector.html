@@ -3,7 +3,7 @@
 		<select data-colnumber="{{ selector.colnumber }}" class="form-control" autocomplete="off" name="{{ selector.name }}">
 			<option value="tableselectordefaultall"{% if not activeoption %} selected="true"{% endif %}>{{ selector.all_value }}</option>
 			{% for option in selector.options %}
-				<option{% if option.value == selector.activeoption %} selected="true"{% endif %} value="{{ option.value }}">{{ option.value }}</option>
+				<option{% if option.value == selector.activeoption %} selected="true"{% endif %}>{{ option.value }}</option>
 			{% endfor %}
 		</select>
 	{% endfor %}

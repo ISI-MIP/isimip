@@ -243,13 +243,6 @@ $(function() {
 
 				updateTable(table);
 			});
-			var getParameter = getParameterByName(selector.attr('name'));
-			if (getParameter) {
-				table.data('activepage', 1);
-				filter[ "" + colnumber ] = getParameter;
-				selector.find('option[value=' + getParameter + ']').prop('selected', true);
-				updateTable(table);
-			}
 		});
 
 		table.data('filternames', filternames);
@@ -318,53 +311,41 @@ $(function() {
 			sortItems();
 		});
 
-		function addCustomValue(event, input) {
-			console.log('here');
-			var value = input.val();
-			
-			// remove options that were manually entered before if this is a radio
-			var singleselect = input.hasClass('widget-select-customvalue-singleselect');
-			if (singleselect) {
-				selectfield.find('.widget-select-newcustomvalue').remove();
-			}
-			
-			// TODO: Make sure item is no duplicate
-			
-			if (value) {
-				// clone item template
-				var newitem = $(selectfield.find('.widget-options-template').html());
-				newitem
-				.addClass('widget-select-newcustomvalue')
-				.find('input')
-				.prop('checked', true)
-				.prop('value', value)
-				.parent()
-				.find('span').text(value);
-				containerChecked.append(newitem);
-				
-				sortItems();
-				
-				// reset input
-				input.val('');
-			}
-
-			// Do not submit form
-			event.preventDefault();
-			return false;
-		}
 
 
 		selectfield.find('.widget-select-customvalue').keypress(function (event) {
 			var key = event.which;
 			if(key == 13) { // the enter key code
-				var input = $(this);
-				addCustomValue(event, input);
-				
+				var value = $(this).val();
+
+				// remove options that were manually entered before if this is a radio
+				var singleselect = $(this).hasClass('widget-select-customvalue-singleselect');
+				if (singleselect) {
+					selectfield.find('.widget-select-newcustomvalue').remove();
+				}
+
+				// TODO: Make sure item is no duplicate
+
+				// clone item template
+				var newitem = $(selectfield.find('.widget-options-template').html());
+				newitem
+					.addClass('widget-select-newcustomvalue')
+					.find('input')
+					.prop('checked', true)
+					.prop('value', value)
+					.parent()
+					.find('span').text(value);
+				containerChecked.append(newitem);
+
+				sortItems();
+
+				// reset input
+				$(this).val('');
+
+				// Do not submit form
+				event.preventDefault();
+				return false;
 			}
-		});
-		selectfield.find('.widget-select-custom .input-group-btn button').click(function(event) {
-			var input = $(this).parent().prev();
-			addCustomValue(event, input);
 		});
 	});
 });

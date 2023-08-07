@@ -1,16 +1,16 @@
 from django.db import models
 from modelcluster.fields import ParentalKey
 from modelcluster.models import ClusterableModel
-from wagtail.contrib.settings.models import BaseSiteSetting
+from wagtail.contrib.settings.models import BaseSetting
 from wagtail.contrib.settings.registry import register_setting
-from wagtail.admin.panels import FieldPanel, InlinePanel, PageChooserPanel, StreamFieldPanel
-from wagtail.models import Orderable
-from wagtail import blocks
-from wagtail.fields import StreamField
+from wagtail.admin.edit_handlers import FieldPanel, InlinePanel, PageChooserPanel, StreamFieldPanel
+from wagtail.core.models import Orderable
+from wagtail.core import blocks
+from wagtail.core.fields import StreamField
 
 
 @register_setting(icon='list-ul')
-class HeaderLinks(ClusterableModel, BaseSiteSetting):
+class HeaderLinks(ClusterableModel, BaseSetting):
     panels = [
         InlinePanel('header_links', label="Link"),
     ]
@@ -52,17 +52,17 @@ class HeaderLink(Orderable, models.Model):
     menu_items = StreamField([
         ('jump_link', JumpLinkBlock()),
         ('page_link', PageLinkBlock()),
-    ], null=True, blank=True, use_json_field=True)
+    ], null=True, blank=True)
 
     panels = [
-        FieldPanel('target'),
+        PageChooserPanel('target'),
         FieldPanel('_name'),
-        FieldPanel('menu_items'),
+        StreamFieldPanel('menu_items'),
     ]
 
 
 @register_setting(icon='list-ul')
-class FooterLinks(ClusterableModel, BaseSiteSetting):
+class FooterLinks(ClusterableModel, BaseSetting):
     panels = [
         InlinePanel('footer_links', label="Link"),
     ]
@@ -77,7 +77,7 @@ class FooterLink(Orderable, models.Model):
     name = property(lambda self: self._name or self.target.title)
 
     panels = [
-        FieldPanel('target'),
+        PageChooserPanel('target'),
         FieldPanel('anchor'),
         FieldPanel('_name'),
 
@@ -85,18 +85,18 @@ class FooterLink(Orderable, models.Model):
 
 
 @register_setting(icon='mail')
-class Invitation(BaseSiteSetting):
+class Invitation(BaseSetting):
     subject = models.CharField(max_length=500, help_text='Invitation subject', default='[ISIMIP] Registration invitation for impact-model database')
     body = models.TextField()
 
 
 @register_setting(icon='mail')
-class DataPublicationRequest(BaseSiteSetting):
+class DataPublicationRequest(BaseSetting):
     subject = models.CharField(max_length=500, help_text='Data publication request subject', default="[ISIMIP] Data confirmation request")
     body = models.TextField(help_text='You can use the following tokens in the email template: {{model_contact_person}}, {{simulation_round}}, {{sector}}, {{sector_drkz_folder_name}}, {{impact_model_name}}, {{impact_model_drkz_folder_name}}, {{data_confirmation_link}}, {{custom_text}}')
 
 
 @register_setting(icon='mail')
-class DataPublicationConfirmation(BaseSiteSetting):
+class DataPublicationConfirmation(BaseSetting):
     subject = models.CharField(max_length=500, help_text='Data publication confirmation subject', default="[ISIMIP] Data confirmation")
     body = models.TextField(help_text='You can use the following tokens in the email template: {{model_contact_person}}, {{simulation_round}}, {{impact_model_name}}, {{custom_text}}, {{license}}, {{publication_by}}, {{publication_date}}')

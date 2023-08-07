@@ -6,7 +6,7 @@ from django.db import migrations
 from django.utils.text import slugify
 from modelcluster.contrib.taggit import ClusterTaggableManager
 
-from wagtail.models import Page
+from wagtail.core.models import Page
 from wagtail.images.models import Image
 
 from isi_mip.pages.models import PaperPageTag, PaperPage
