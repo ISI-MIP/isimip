@@ -1,7 +1,7 @@
 from django import template
 from django.template.loader import render_to_string
 
-from wagtail.models import Site
+from wagtail.core.models import Site
 
 from isi_mip.core.models import HeaderLinks
 register = template.Library()

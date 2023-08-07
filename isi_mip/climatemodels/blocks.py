@@ -1,7 +1,7 @@
 import math
 
 from django.utils.html import urlize
-from wagtail.blocks import StructBlock
+from wagtail.core.blocks import StructBlock
 
 from isi_mip.climatemodels.models import InputData, OutputData, BaseImpactModel, SimulationRound
 from isi_mip.contrib.blocks import IntegerBlock, RichTextBlock
@@ -147,12 +147,6 @@ class OutputDataBlock(StructBlock):
         context['id'] = 'selectorable'
         context['tableid'] = 'selectorable'
         context['searchfield'] = {'value': ''}
-        sector_options = [{'value': x} for x in outputdata.values_list('model__base_model__sector__name', flat=True).distinct().order_by('model__base_model__sector')]
-        simulation_round_options = [{'value': x} for x in outputdata.exclude(model__simulation_round__isnull=True).values_list('model__simulation_round__name', flat=True).distinct().order_by('model__simulation_round')]
-        context['selectors'] = [
-            {'colnumber': '1', 'all_value': 'All sectors', 'options': sector_options, 'name': 'sector'},
-            {'colnumber': '3', 'all_value': 'All simulation rounds', 'options': simulation_round_options, 'name': 'simulation_round'},
-        ]
         return context
 
     class Meta:

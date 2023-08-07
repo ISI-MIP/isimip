@@ -1,7 +1,5 @@
 import os
-from collections import OrderedDict
 
-import django
 from django.apps import apps
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -11,19 +9,9 @@ from django.db.models import JSONField
 from django.template.defaultfilters import filesizeformat
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
-from django_filters.fields import ChoiceField, MultipleChoiceField
-from wagtail.admin.panels import FieldPanel
-from wagtail.fields import StreamField
 from wagtail.search import index
-from wagtail.snippets.models import register_snippet
 
-from isi_mip.choiceorotherfield.fields import MyTypedChoiceField
 from isi_mip.choiceorotherfield.models import ChoiceOrOtherField
-from isi_mip.climatemodels.fields import MyModelSingleChoiceField
-from isi_mip.climatemodels.impact_model_blocks import (
-    IMPACT_MODEL_QUESTION_BLOCKS, BiodiversityModelOutputChoiceBlock,
-    FieldsetBlock)
-from isi_mip.climatemodels.widgets import MyBooleanSelect, MyMultiSelect
 from isi_mip.sciencepaper.models import Paper
 
 
@@ -103,9 +91,6 @@ class ClimateVariable(models.Model):
         if self.abbreviation:
             return '<abbr title="{0.name}">{0.abbreviation}</abbr>'.format(self)
         return self.name
-    
-    def pretty(self):
-        return self.as_span()
 
     class Meta:
         ordering = ('name',)
@@ -412,17 +397,25 @@ class ImpactModel(models.Model):
         super().save(*args, **kwargs)
         if not is_duplication and is_creation:
             # if model gets duplicated we handle related instances in the duplicate method
-            ImpactModelInformation.objects.get_or_create(impact_model=self)
+            self.base_model.sector.model.objects.get_or_create(impact_model=self)
+            TechnicalInformation.objects.get_or_create(impact_model=self)
+            InputDataInformation.objects.get_or_create(impact_model=self)
+            OtherInformation.objects.get_or_create(impact_model=self)
 
         # make all owners involved in the duplicated model
         if is_creation and self.base_model:
             for owner in self.impact_model_responsible.all():
                 owner.responsible.add(self)
         # make sure if sector changes that sector specific objects exists for the impact model
+        if not is_duplication and not hasattr(self, self.fk_sector_name):
+            self.base_model.sector.model.objects.get_or_create(impact_model=self)
 
     def duplicate(self, simulation_round):
         # save old references
-        old_impact_model_information = self.impact_model_information
+        old_technical_information = self.technicalinformation
+        old_input_data = self.inputdatainformation
+        old_other = self.otherinformation
+        old_sector = self.fk_sector
         # Impact model
         duplicate = ImpactModel(
             base_model=self.base_model,
@@ -439,9 +432,37 @@ class ImpactModel(models.Model):
         duplicate.save(is_duplication=True)
         duplicate.other_references.set(self.other_references.all())
         # Technical information
-        old_impact_model_information.pk = None
-        old_impact_model_information.impact_model = duplicate
-        old_impact_model_information.save()
+        old_technical_information.pk = None
+        old_technical_information.impact_model = duplicate
+        old_technical_information.save()
+        # Input Data
+        old_climate_variables = old_input_data.climate_variables.filter(inputdata__simulation_round=simulation_round)
+        old_simulated_atmospheric_climate_data_sets = old_input_data.simulated_atmospheric_climate_data_sets.filter(simulation_round=simulation_round)
+        old_observed_atmospheric_climate_data_sets = old_input_data.observed_atmospheric_climate_data_sets.filter(simulation_round=simulation_round)
+        old_emissions_data_sets = old_input_data.emissions_data_sets.filter(simulation_round=simulation_round)
+        old_socio_economic_data_sets = old_input_data.socio_economic_data_sets.filter(simulation_round=simulation_round)
+        old_land_use_data_sets = old_input_data.land_use_data_sets.filter(simulation_round=simulation_round)
+        old_other_human_influences_data_sets = old_input_data.other_human_influences_data_sets.filter(simulation_round=simulation_round)
+        old_other_data_sets = old_input_data.other_data_sets.filter(simulation_round=simulation_round)
+        old_input_data.pk = None
+        old_input_data.impact_model = duplicate
+        old_input_data.save()
+        old_input_data.climate_variables.set(old_climate_variables)
+        old_input_data.simulated_atmospheric_climate_data_sets.set(old_simulated_atmospheric_climate_data_sets)
+        old_input_data.observed_atmospheric_climate_data_sets.set(old_observed_atmospheric_climate_data_sets)
+        old_input_data.emissions_data_sets.set(old_emissions_data_sets)
+        old_input_data.socio_economic_data_sets.set(old_socio_economic_data_sets)
+        old_input_data.land_use_data_sets.set(old_land_use_data_sets)
+        old_input_data.other_human_influences_data_sets.set(old_other_human_influences_data_sets)
+        old_input_data.other_data_sets.set(old_other_data_sets)
+        # OtherInformation
+        old_other.pk = None
+        old_other.impact_model = duplicate
+        old_other.save()
+        # Sector
+        old_sector.pk = None
+        old_sector.impact_model = duplicate
+        old_sector.save()
         return duplicate
 
     def _get_verbose_field_name(self, field):
@@ -477,213 +498,12 @@ class ImpactModel(models.Model):
                  self.main_reference_paper.entry_with_link() if self.main_reference_paper else None),
                 (vname('other_references'), other_references),
             ]),
-        ]
+            self.technicalinformation.values_to_tuples(),
+            self.inputdatainformation.values_to_tuples(),
+        ] + self.otherinformation.values_to_tuples()
 
     def can_confirm_data(self):
         return hasattr(self, 'confirmation') and not self.confirmation.is_confirmed
-
-
-class ImpactModelInformation(models.Model):
-    impact_model = models.OneToOneField(
-        ImpactModel,
-        on_delete=models.CASCADE,
-        primary_key=True,
-        related_name='impact_model_information'
-    )
-    technical_information = JSONField(default=dict)
-    input_data_information = JSONField(default=dict)
-    other_information = JSONField(default=dict)
-    sector_specific_information = JSONField(default=dict)
-
-
-    def values_to_tuples(self):
-        tuples = []
-        for information_type, name in INFORMATION_TYPE_CHOICES:
-            if information_type == 'sector_specific_information':
-                information = ImpactModelQuestion.objects.filter(sector=self.impact_model.base_model.sector).first()
-            else:
-                information = ImpactModelQuestion.objects.filter(information_type=information_type).first()
-            if information:
-                for fieldset in information.question_group_list:
-                    values = []
-                    for field in fieldset[1]['fields']:
-                        verbose_name = field['verbose_name']
-                        value = getattr(self, information_type).get(field['name'], None)
-                        value = information.get_field_value(field['field_type'], value)
-                        if value:
-                            if field['help_text']:
-                                verbose_name = generate_helptext(field['help_text'], verbose_name)
-                            values.append((verbose_name, value))
-                    tuples.append((fieldset[0], values))
-        # raise Exception(tuples)
-        return tuples
-
-        
-
-
-INFORMATION_TYPE_CHOICES = [
-    ('technical_information', 'Resolution information'),
-    ('input_data_information', 'Input data information'),
-    ('other_information', 'Model setup Information'),
-    ('sector_specific_information', 'Sector-specific information'),
-]
-
-@register_snippet
-class ImpactModelQuestion(models.Model):
-    information_type = models.CharField(choices=INFORMATION_TYPE_CHOICES, max_length=255, blank=True, null=True)
-    sector = models.OneToOneField('Sector', blank=True, null=True, on_delete=models.PROTECT)
-    step = models.PositiveSmallIntegerField(default=0)
-    heading = models.CharField(max_length=1024)
-    description = models.TextField(blank=True, null=True)
-    questions = StreamField([('fieldset', FieldsetBlock())], blank=True, null=True, use_json_field=True)
-
-    panels = [
-        FieldPanel('information_type'),
-        FieldPanel('sector'),
-        FieldPanel('step'),
-        FieldPanel('heading'),
-        FieldPanel('description'),
-        FieldPanel('questions'),
-    ]
-
-    class Meta:
-        ordering = ['step']
-        verbose_name = 'Model Documentation'
-        constraints = [
-            models.UniqueConstraint(fields=['information_type', 'sector'], name='unique_information_type_sector')
-        ]
-
-    def __str__(self):
-        if self.sector:
-            return self.sector.name
-        if self.information_type:
-            return self.information_type
-        
-    def get_form(self, *args, **kwargs):
-        from isi_mip.climatemodels.forms import ImpactModelQuestionForm
-        kwargs['impact_model_question'] = self
-        return ImpactModelQuestionForm(*args, **kwargs)
-    
-    def get_field_options(self, question):
-        field = question.value
-        options = {"label": field['question']}
-        options["help_text"] = field['help_text']
-        options["required"] = field['required']
-        # options["initial"] = field.default_value
-        return options
-    
-    
-    def create_field(self, question, simulation_round, fieldset):
-        options = self.get_field_options(question)
-        # options['fieldset'] = fieldset
-        if question.block_type == 'textarea':
-            return django.forms.CharField(widget=django.forms.Textarea, **options)
-        elif question.block_type == 'single_line':
-            return django.forms.CharField(**options)
-        elif question.block_type == 'choice':
-            choices = question.value['choices']
-            options["choices"] = [(choice['label'], choice['name']) for choice in choices]
-            return MyTypedChoiceField(widget=MyMultiSelect(allowcustom=question.value['allow_custom'], multiselect=False), **options)
-        elif question.block_type == 'multiple_choice':
-            choices = question.value['choices']
-            options["choices"] = [(choice['label'], choice['name']) for choice in choices]
-            return django.forms.MultipleChoiceField(widget=MyMultiSelect(multiselect=True), **options)
-        elif question.block_type == 'model_single_choice':
-            return MyModelSingleChoiceField(allowcustom=True, queryset=SpatialAggregation.objects.all())
-        elif question.block_type == 'biodiversity_model_output_choice':
-            choices = [(biodiversity.pk, biodiversity.name) for biodiversity in BiodiversityModelOutput.objects.all().distinct()]
-            return django.forms.MultipleChoiceField(
-                widget=MyMultiSelect(allowcustom=True, multiselect=True),
-                choices=choices,
-                **options)
-        elif question.block_type == 'climate_variable_choice':
-            choices = [(climate_variable.pk, climate_variable.name) for climate_variable in ClimateVariable.objects.filter(inputdata__data_type__is_climate_data_type=True, inputdata__simulation_round=simulation_round).distinct()]
-            return django.forms.MultipleChoiceField(
-                widget=MyMultiSelect(allowcustom=False, multiselect=True),
-                choices=choices,
-                **options)
-        elif question.block_type == 'input_data_choice':
-            data_type = question.value['data_type']
-            choices = [(input_data.pk, input_data.name) for input_data in InputData.objects.filter(data_type__pk=data_type, simulation_round=simulation_round)]
-            return django.forms.MultipleChoiceField(
-                widget=MyMultiSelect(allowcustom=False, multiselect=True),
-                choices=choices,
-                **options)
-        elif question.block_type == 'true_false':
-            return django.forms.BooleanField(widget=MyBooleanSelect(nullable=question.value['nullable']), **options)
-        raise Exception(question.block_type)
-    
-    def get_field_value(self, field_type, values, make_pretty=True):
-        if field_type == 'input_data_choice':
-            return ", ".join([make_pretty and input_data.pretty() or str(input_data) for input_data in InputData.objects.filter(pk__in=values)])
-        elif field_type == 'climate_variable_choice':
-            return ", ".join([make_pretty and climate_variable.pretty() or str(climate_variable) for climate_variable in ClimateVariable.objects.filter(pk__in=values)])
-        elif field_type == 'biodiversity_model_output_choice':
-            return ", ".join([biodiversity.name for biodiversity in BiodiversityModelOutput.objects.filter(pk__in=values)])
-        if type(values) is bool:
-            return 'Yes' if values is True else 'No' if values is False else ''
-        if values is None:
-            return ''
-        return values
-
-    
-    def formfields(self, simulation_round):
-        formfields = OrderedDict()
-
-        for fieldset in self.questions:
-            for question in fieldset.value['questions']:
-                fieldset_name = fieldset.value['heading']
-                fieldset_description = fieldset.value['description']
-                clean_name = question.value['name']
-                formfields[clean_name] =  self.create_field(question, simulation_round, fieldset_name)
-        return formfields
-    
-    @property
-    def fields(self):
-        fields = []
-        for fieldset in self.questions:
-            for question in fieldset.value['questions']:
-                fields.append({
-                    'name': question.value['name'],
-                    'verbose_name': question.value['question'],
-                    'help_text': question.value['help_text'],
-                    'field_type': question.block_type,
-                })
-        return fields
-
-    @property
-    def fieldset(self):
-        fieldset_list = []
-        for fieldset in self.questions:
-            fields = []
-            for question in fieldset.value['questions']:
-                fields.append(question.value['name'])
-            # raise Exception(formfields)
-            fieldset_list.append((fieldset.value['heading'], {
-                'fields': fields,
-                'description': fieldset.value['description'],
-            }))
-        return fieldset_list
-
-    @property
-    def question_group_list(self):
-        fieldset_list = []
-        for fieldset in self.questions:
-            fields = []
-            for question in fieldset.value['questions']:
-                fields.append({
-                    'name': question.value['name'],
-                    'verbose_name': question.value['question'],
-                    'help_text': question.value['help_text'],
-                    'field_type': question.block_type,
-                })
-            # raise Exception(formfields)
-            fieldset_list.append((fieldset.value['heading'], {
-                'fields': fields,
-                'description': fieldset.value['description'],
-            }))
-        return fieldset_list
-
 
 
 class TechnicalInformation(models.Model):

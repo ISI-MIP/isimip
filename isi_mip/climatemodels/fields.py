@@ -31,11 +31,6 @@ class MyModelSingleChoiceField(forms.ModelChoiceField):
     def clean(self, value):
         value = self.add_new_choices(value)
         return super().clean(value)
-    
-    def to_python(self, value):
-        value = super().to_python(value)
-        if value:
-            return value.pk
 
 
 class MyModelMultipleChoiceField(forms.ModelMultipleChoiceField):

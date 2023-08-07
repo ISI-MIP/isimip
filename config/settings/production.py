@@ -94,4 +94,4 @@ ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['isimip.org'])
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 1073741824
 
-WAGTAILADMIN_BASE_URL = 'https://www.isimip.org'
+BASE_URL = 'https://www.isimip.org'

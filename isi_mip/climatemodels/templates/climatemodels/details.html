@@ -6,17 +6,15 @@
 		{% breadcrumb %}
 		{% include 'widgets/heading1.html' with text=subpage.title %}
 		{% block content %}
-		<dl class="dl-horizontal base-model">
-		{% for listitem in base_model %}
-				{% for definition in listitem.definitions %}
-					<dt>{{ definition.key|safe }}</dt>
-					<dd>{{ definition.value|safe }}</dd>
-				{% endfor %}
-		{% endfor %}
-		</dl>
-		<p class="mb-4">
-			{{ description|safe|linebreaksbr }}
-		</p>
+			{{ description | safe }}<br/><br/>
+			<dl class="dl-horizontal base-model">
+			{% for listitem in base_model %}
+					{% for definition in listitem.definitions %}
+						<dt>{{ definition.key|safe }}</dt>
+						<dd>{{ definition.value|safe }}</dd>
+					{% endfor %}
+			{% endfor %}
+			</dl>
 			<div class="widget-richtext-content">
 				<p>Information for the model {{ model_name }} is provided for the simulation rounds shown in the tabs below. Click on the appropriate tab to get the information for the simulation round you are interested in.</p>
 			</div>
