@@ -48,7 +48,7 @@
 				{% for result in model_results %}
 					<li>
 						<h4><a href="{% routablepageurl impact_model_page "details" id=result.pk %}?query={{ search_query }}">{{ result }}</a></h4>
-						{% if result.short_description %}<p>{{ result.short_description|truncatewords:60 }}</p>{% endif %}
+						{% if result.short_description %}<p>{{ result.short_description|truncatewords_html:60|safe }}</p>{% endif %}
 					</li>
 				{% empty %}
 					<p>Sorry, no impact models found.</p>
