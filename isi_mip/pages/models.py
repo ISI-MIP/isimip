@@ -328,6 +328,7 @@ class HomePage(RoutablePageWithDefault):
         context = {'page': self, 'subpage': subpage, 'headline': ''}
         # Search
         search_query = request.GET.get('query', None)
+        impact_model_page = ImpactModelsPage.objects.first()
         if search_query:
             page_results = Page.objects.live().not_type((BlogIndexPage)).search(search_query).annotate_score("score")
 
@@ -336,7 +337,7 @@ class HomePage(RoutablePageWithDefault):
 
             # Also query non-wagtail models
             s = get_search_backend()
-            model_results = s.search(search_query, BaseImpactModel.objects.filter(impact_model__public=True))
+            model_results = s.search(search_query, BaseImpactModel.objects.filter(impact_model__public=True).distinct())
 
         else:
             page_results = []
@@ -346,8 +347,9 @@ class HomePage(RoutablePageWithDefault):
             'search_query': search_query,
             'page_results': page_results,
             'model_results': model_results,
+            'impact_model_page': impact_model_page,
         })
-        # raise Exception(dir(model_results[0]))
+        # raise Exception(model_results)
         # raise Exception(search_results)
 
         # Render template

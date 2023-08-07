@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static header footer breadcrumb wagtailcore_tags %}
+{% load static header footer breadcrumb wagtailcore_tags wagtailroutablepage_tags %}
 
 {% block header %}
 	{% header %}
@@ -47,7 +47,7 @@
 			<ul class="search-results">
 				{% for result in model_results %}
 					<li>
-						<h4><a href="{% pageurl result %}?query={{ search_query }}">{{ result }}</a></h4>
+						<h4><a href="{% routablepageurl impact_model_page "details" id=result.pk %}?query={{ search_query }}">{{ result }}</a></h4>
 						{% if result.short_description %}<p>{{ result.short_description|truncatewords:60 }}</p>{% endif %}
 					</li>
 				{% empty %}
