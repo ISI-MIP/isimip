@@ -9,6 +9,7 @@ import logging
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
+from sentry_sdk.integrations.logging import ignore_logger
 
 from .common import *  # noqa
 
@@ -83,6 +84,7 @@ sentry_sdk.init(
     send_default_pii=True,
     traces_sample_rate=0.1,
 )
+ignore_logger("django.security.DisallowedHost")
 
 INVITATION_VALID_DAYS = 365
 
