@@ -30,7 +30,7 @@ CMS_APPS = [
     'wagtail.images',
     'wagtail.search',
     'wagtail.admin',
-    'wagtail.core',
+    'wagtail',
     'wagtail.contrib.settings',
     'wagtail.contrib.table_block',
     'wagtail.contrib.routable_page',
@@ -236,4 +236,13 @@ WAGTAILSEARCH_BACKENDS = {
     'default': {
         'BACKEND': 'wagtail.search.backends.database',
     }
+}
+
+WAGTAILADMIN_RICH_TEXT_EDITORS = {
+    'default': {
+        'WIDGET': 'wagtail.admin.rich_text.DraftailRichTextArea',
+        'OPTIONS': {
+            'features': ['h2', 'h3', 'h4', 'h5', 'ol', 'ul', 'hr', 'bold', 'italic', 'link', 'document-link', 'image', 'embed', 'code', 'superscript', 'subscript']
+        }
+    },
 }

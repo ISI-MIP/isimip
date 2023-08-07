@@ -1,5 +1,5 @@
 from django.utils import formats
-from wagtail.core.blocks import CharBlock, StructBlock, TextBlock, StreamBlock, PageChooserBlock, \
+from wagtail.blocks import CharBlock, StructBlock, TextBlock, StreamBlock, PageChooserBlock, \
     URLBlock, DateBlock, ListBlock, BooleanBlock
 from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.embeds.blocks import EmbedBlock
@@ -107,6 +107,7 @@ class _IsiNumberBlock(StructBlock):
     number = CharBlock(required=False, help_text="This number overwrites the imported number (look above) if set.")
     title = CharBlock()
     text = CharBlock()
+    link = CharBlock(required=False, help_text="This is used to link the number to the outputdata page")
 
 
 class IsiNumbersBlock(StructBlock):

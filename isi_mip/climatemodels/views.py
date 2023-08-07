@@ -1,12 +1,15 @@
+import json
 import math
 from collections import OrderedDict
 from datetime import datetime
 
 import requests
 from dateutil.relativedelta import relativedelta
+from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.db.models import Q
@@ -21,7 +24,7 @@ from django.utils.safestring import mark_safe
 from django.utils.text import slugify
 from easy_pdf.rendering import (make_response, render_to_pdf,
                                 render_to_pdf_response)
-from wagtail.core.models import Site
+from wagtail.models import Site
 
 from isi_mip.climatemodels.forms import (AttachmentModelForm,
                                          BaseImpactModelForm,
@@ -34,8 +37,8 @@ from isi_mip.climatemodels.forms import (AttachmentModelForm,
                                          TechnicalInformationModelForm,
                                          get_sector_form)
 from isi_mip.climatemodels.models import (Attachment, BaseImpactModel,
-                                          ImpactModel, InputData,
-                                          SimulationRound)
+                                          ImpactModel, ImpactModelQuestion,
+                                          InputData, SimulationRound)
 from isi_mip.climatemodels.tools import (ImpactModelToXLSX,
                                          ParticpantModelToXLSX)
 from isi_mip.core.models import DataPublicationConfirmation, Invitation
@@ -53,10 +56,10 @@ STEP_ATTACHMENT = 'edit_attachment'
 FORM_STEPS = OrderedDict([
     (STEP_BASE, {'form': BaseImpactModelForm, 'next': STEP_DETAIL, 'verbose_name': 'Basic'}),
     (STEP_DETAIL, {'form': ImpactModelForm, 'next': STEP_TECHNICAL_INFORMATION, 'verbose_name': 'Model reference'}),
-    (STEP_TECHNICAL_INFORMATION, {'form': TechnicalInformationModelForm, 'next': STEP_INPUT_DATA, 'verbose_name': 'Resolution'}),
-    (STEP_INPUT_DATA, {'form': InputDataInformationModelForm, 'next': STEP_OTHER, 'verbose_name': 'Input data'}),
-    (STEP_OTHER, {'form': OtherInformationModelForm, 'next': STEP_SECTOR, 'verbose_name': 'Model setup'}),
-    (STEP_SECTOR, {'form': None, 'next': STEP_ATTACHMENT, 'verbose_name': 'Sector-specific information'}),
+    (STEP_TECHNICAL_INFORMATION, {'form': TechnicalInformationModelForm, 'next': STEP_INPUT_DATA, 'verbose_name': 'Resolution', 'name': 'technical_information'}),
+    (STEP_INPUT_DATA, {'form': InputDataInformationModelForm, 'next': STEP_OTHER, 'verbose_name': 'Input data', 'name': 'input_data_information'}),
+    (STEP_OTHER, {'form': OtherInformationModelForm, 'next': STEP_SECTOR, 'verbose_name': 'Model setup', 'name': 'other_information'}),
+    (STEP_SECTOR, {'form': None, 'next': STEP_ATTACHMENT, 'verbose_name': 'Sector-specific information', 'name': 'sector_specific_information'}),
     (STEP_ATTACHMENT, {'form': AttachmentModelForm, 'next': None, 'verbose_name': 'Attachments'}),
 ])
 
@@ -76,7 +79,7 @@ def impact_model_details(page, request, id):
 
     model_simulation_rounds = []
     for im in base_model.impact_model.filter(public=True):
-        im_values = im.values_to_tuples() + im.fk_sector.values_to_tuples()
+        im_values = im.values_to_tuples() + im.impact_model_information.values_to_tuples()
         if hasattr(im, 'attachment'):
             im_values += im.attachment.values_to_tuples()
         model_details = []
@@ -398,6 +401,7 @@ def impact_model_edit(page, request, id, current_step):
         return HttpResponseRedirect('/dashboard/')
     # raise Exception(request.POST)
     next_step = FORM_STEPS[current_step]["next"]
+    # raise Exception(next_step)
     form = FORM_STEPS[current_step]["form"]
     subpage = {
         'title': 'Impact Model: %s (%s, %s)' % (impact_model.base_model.name, impact_model.base_model.sector.name, impact_model.simulation_round.name),
@@ -408,7 +412,13 @@ def impact_model_edit(page, request, id, current_step):
     if not impact_model.base_model.sector.has_sector_specific_values:
         # remove step for sector specific values
         steps.pop(5)
-    context = {'page': page, 'subpage': subpage, 'steps': steps, 'has_sector_specific_values': impact_model.base_model.sector.has_sector_specific_values}
+    context = {
+        'page': page, 
+        'subpage': subpage, 
+        'steps': steps, 
+        'has_sector_specific_values': impact_model.base_model.sector.has_sector_specific_values,
+        'impact_model': impact_model,
+    }
     next_parameter = request.POST.get("next")
     # define target url depending on se next param or logical next step
     if next_parameter:
@@ -422,21 +432,19 @@ def impact_model_edit(page, request, id, current_step):
             messages.warning(request, page.private_model_message)
     if current_step == STEP_BASE:
         return impact_model_base_edit(page, request, context, impact_model, current_step, next_step, target_url)
-    elif current_step == STEP_SECTOR:
-        return impact_model_sector_edit(page, request, context, impact_model, target_url)
+    # elif current_step == STEP_SECTOR:
+    #     return impact_model_sector_edit(page, request, context, impact_model, target_url)
     elif current_step == STEP_ATTACHMENT:
         return impact_model_attachment_edit(page, request, context, impact_model, current_step, next_step, target_url)
     else:
         if current_step == STEP_DETAIL:
             instance = impact_model
-        elif current_step == STEP_TECHNICAL_INFORMATION:
-            instance = impact_model.technicalinformation
-        elif current_step == STEP_INPUT_DATA:
-            instance = impact_model.inputdatainformation
-        elif current_step == STEP_OTHER:
-            instance = impact_model.otherinformation
-        return impact_model_detail_edit(page, request, context, form, instance, current_step, next_step, target_url)
-
+            return impact_model_detail_edit(page, request, context, form, instance, current_step, next_step, target_url)
+        # if current_step == STEP_SECTOR:
+        #     instance = impact_model
+        #     return impact_model_sector_edit(page, request, context, instance, target_url)
+        else:
+            return impact_model_edit_updated(request, page, context, impact_model.id, current_step, target_url)
 
 def impact_model_attachment_edit(page, request, context, impact_model, current_step, next_step, target_url):
     attachment, created = Attachment.objects.get_or_create(impact_model=impact_model)
@@ -484,6 +492,7 @@ def impact_model_detail_edit(page, request, context, form, instance, current_ste
                 'country': contact_person.country or '-',
             })
         context['contact_persons'] = contact_persons
+    # raise Exception('here')
     template = 'climatemodels/%s.html' % (current_step)
     return render(request, template, context)
 
@@ -680,3 +689,48 @@ def show_participants(request, extra_context):
     if extra_context is not None:
         context.update(extra_context)
     return render(request, 'climatemodels/show_participants.html', context)
+
+
+# TODO check if user can edit model
+# if not (impact_model in request.user.userprofile.responsible.all() or request.user.is_superuser):
+#         messages.info(request, 'You need to have the permissions to perform this action.')
+#         return HttpResponseRedirect('/dashboard/')
+@login_required
+def impact_model_edit_updated(request, page, context,  id, current_step, target_url):
+    impact_model = ImpactModel.objects.get(id=id)
+    next_step = FORM_STEPS[current_step]["next"]
+    subpage = {
+        'title': 'Impact Model: %s (%s, %s)' % (impact_model.base_model.name, impact_model.base_model.sector.name, impact_model.simulation_round.name),
+        'url': page.url + page.reverse_subpage('details', args=(impact_model.base_model.id,)),
+        'subpage': {'title': 'Edit %s' % FORM_STEPS[current_step]['verbose_name'], 'url': ''}
+    }
+    if current_step == STEP_SECTOR:
+        impact_model_question = ImpactModelQuestion.objects.get(sector=impact_model.base_model.sector)
+    else:
+        impact_model_question = ImpactModelQuestion.objects.get(information_type=FORM_STEPS[current_step]['name'])
+    impact_model_information = impact_model.impact_model_information
+    if request.method == 'POST':
+        form = impact_model_question.get_form(request.POST, request.FILES, simulation_round=impact_model.simulation_round)
+        if form.is_valid():
+            # impact_model.impact_model_information.technical_information = json.dumps(form.cleaned_data, cls=DjangoJSONEncoder)
+            setattr(impact_model_information, FORM_STEPS[current_step]['name'], form.cleaned_data)
+            impact_model_information.save()
+            message = "All data have been successfully saved."
+            messages.success(request, message)
+            return HttpResponseRedirect(target_url)
+        else:
+            messages.error(request, 'Your form has errors.')
+            messages.warning(request, form.errors)
+        
+    else:
+        # raise Exception(impact_model.impact_model_information.technical_information)
+        initial = getattr(impact_model_information, FORM_STEPS[current_step]['name'])
+        form = impact_model_question.get_form(initial, simulation_round=impact_model.simulation_round)
+        # raise Exception(impact_model.impact_model_information.technical_information)
+        # form = impact_model_question.get_form(simulation_round=impact_model.simulation_round)
+        # form = impact_model_question.get_form()
+    context['form'] = form
+    context['impact_model_step'] = impact_model_question
+    context['next_step'] = FORM_STEPS[next_step]["verbose_name"]
+    template = 'climatemodels/edit_updated.html'
+    return render(request, template, context)

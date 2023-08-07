@@ -7,8 +7,8 @@ import django.db.models.deletion
 import isi_mip.contrib.blocks
 import modelcluster.fields
 import wagtail.contrib.table_block.blocks
-import wagtail.core.blocks
-import wagtail.core.fields
+import wagtail.blocks
+import wagtail.fields
 import wagtail.embeds.blocks
 
 
@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
             name='PaperOverviewPage',
             fields=[
                 ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.Page')),
-                ('content', wagtail.core.fields.StreamField([('heading', isi_mip.contrib.blocks.HeadingBlock()), ('rich_text', isi_mip.contrib.blocks.RichTextBlock()), ('horizontal_ruler', wagtail.core.blocks.StreamBlock([])), ('embed', wagtail.embeds.blocks.EmbedBlock()), ('image', isi_mip.contrib.blocks.ImageBlock()), ('table', wagtail.contrib.table_block.blocks.TableBlock()), ('monospace_text', isi_mip.contrib.blocks.MonospaceTextBlock())], blank=True)),
+                ('content', wagtail.fields.StreamField([('heading', isi_mip.contrib.blocks.HeadingBlock()), ('rich_text', isi_mip.contrib.blocks.RichTextBlock()), ('horizontal_ruler', wagtail.blocks.StreamBlock([])), ('embed', wagtail.embeds.blocks.EmbedBlock()), ('image', isi_mip.contrib.blocks.ImageBlock()), ('table', wagtail.contrib.table_block.blocks.TableBlock()), ('monospace_text', isi_mip.contrib.blocks.MonospaceTextBlock())], blank=True)),
             ],
             options={
                 'abstract': False,

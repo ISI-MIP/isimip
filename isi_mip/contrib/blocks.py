@@ -4,8 +4,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import cached_property
 from django.utils.html import strip_tags
 from django.utils.text import slugify
-from wagtail.core import blocks
-from wagtail.core.blocks import FieldBlock, PageChooserBlock, CharBlock, StreamBlock, TextBlock, \
+from wagtail import blocks
+from wagtail.blocks import FieldBlock, PageChooserBlock, CharBlock, StreamBlock, TextBlock, \
     RichTextBlock as _RichTextBlock
 from wagtail.images.blocks import ImageChooserBlock
 
