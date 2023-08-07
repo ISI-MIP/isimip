@@ -1,0 +1,25 @@
+{% extends 'climatemodels/edit_base.html' %}
+{% load template_form %}
+
+{% block form_content %}
+		{% include 'widgets/heading3.html' with text=impact_model_step.heading %}
+		{% include 'widgets/richtext-content.html' with content=impact_model_step.subheading %}
+		<p>{{ impact_model_step.description }}</p>
+		{% template_form form as nf %}
+		{% for fieldset in nf %}
+			<fieldset>
+				{% if fieldset.heading %}
+				{% include 'widgets/heading3.html' with text=fieldset.heading %}
+				{% endif %}
+				{% if fieldset.description %}
+				{% include 'widgets/richtext-content.html' with content=fieldset.description %}
+				{% endif %}
+				{{ fieldset.form }}
+			</fieldset>
+		{% endfor %}
+{% endblock %}
+{% block form_action %}
+	<div class="form-actions">
+		<input type="submit" name="submit-button" value="Save and edit {{ next_step }}" class="btn btn-primary">
+	</div>
+{% endblock %}
