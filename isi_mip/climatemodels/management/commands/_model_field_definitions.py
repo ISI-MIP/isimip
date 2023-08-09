@@ -203,6 +203,75 @@ MODEL_FIELD_DEFINITION = {
             'fields': ['defining_features', 'spatial_scale', 'spatial_resolution', 'temporal_scale', 'temporal_resolution', 'taxonomic_scope', 'vertical_resolution', 'spatial_dispersal_included', 'fishbase_used_for_mass_length_conversion', 'simulated_ocean_climate_data_sets', 'observed_ocean_climate_data_sets', ],
         },
     ],
+    'water-global': [
+        {
+            'heading': 'Technological Progress',
+            'description': '',
+            'fields': ['technological_progress', ],
+        },
+        {
+            'heading': 'Soil',
+            'description': '',
+            'fields': ['soil_layers', ],
+        },
+        {
+            'heading': 'Water Use',
+            'description': '',
+            'fields': ['water_use', 'water_sectors'],
+        },
+        {
+            'heading': 'Routing',
+            'description': '',
+            'fields': ['routing', 'routing_data'],
+        },
+        {
+            'heading': 'Land Use',
+            'description': '',
+            'fields': ['land_use', ],
+        },
+        {
+            'heading': 'Dams & Reservoirs',
+            'description': '',
+            'fields': ['dams_reservoirs', ],
+        },
+        {
+            'heading': 'Calibration',
+            'description': '',
+            'fields': [ 'calibration', 'calibration_years', 'calibration_dataset', 'calibration_catchments',],
+        },
+        {
+            'heading': 'Vegetation',
+            'description': '',
+            'fields': [ 'vegetation', 'vegetation_representation', ],
+        },
+        {
+            'heading': 'Methods',
+            'description': '',
+            'fields': [ 'methods_evapotranspiration', 'methods_snowmelt',],
+        },
+    ],
+    'water-regional': [
+        {
+            'heading': 'Methods',
+            'description': '',
+            'fields': [ 'methods_evapotranspiration', 'methods_snowmelt',],
+        },
+        {
+            'heading': 'Vegetation',
+            'description': '',
+            'fields': [ 'vegetation', 'vegetation_representation', ],
+        },
+        {
+            'heading': 'Routing',
+            'description': '',
+            'fields': ['routing', 'routing_data'],
+        },
+        {
+            'heading': 'Calibration',
+            'description': '',
+            'fields': [ 'calibration', 'calibration_years', 'calibration_dataset', 'calibration_catchments',],
+        },
+    ],
     'lakes-global': [
         {
             'heading': 'Technological Progress',

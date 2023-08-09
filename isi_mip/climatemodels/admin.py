@@ -291,6 +291,11 @@ class ClimateVariableAdmin(admin.ModelAdmin):
     list_filter = ('inputdata__data_type__name',)
 
 
+class ImpactModelInformationAdmin(admin.ModelAdmin):
+    model = ImpactModelInformation
+    search_fields = ('impact_model__base_model__name', 'impact_model__base_model__sector__name', 'impact_model__simulation_round__name')
+
+
 class DataPublicationConfirmationModelAdmin(admin.ModelAdmin):
     model = DataPublicationConfirmation
     fields = ('impact_model', 'email_text', 'is_confirmed', 'confirmed_date', 'confirmed_license', 'confirmed_by', 'confirmed_publication_date', 'confirmed_publication_date_date', 'confirm_url')
@@ -359,6 +364,8 @@ admin.site.register(MarineEcosystemsRegional, HideSectorAdmin)
 admin.site.register(Biodiversity, HideSectorAdmin)
 admin.site.register(GenericSector, HideSectorAdmin)
 admin.site.register(DataPublicationConfirmation, DataPublicationConfirmationModelAdmin)
+admin.site.register(ImpactModelInformation, ImpactModelInformationAdmin)
+
 
 admin.site.register(SectorInformationGroup, SectorInformationGroupAdmin)
 

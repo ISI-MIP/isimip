@@ -68,7 +68,7 @@ class Command(BaseCommand):
                 continue
             if field.__class__ == ForeignKey:
                 field_value = getattr(model, field.name)
-                field_value = field_value and field_value.name
+                field_value = field_value and field_value.pk
             elif field.__class__ == ManyToManyField:
                 field_value = list(getattr(model, field.name).values_list('pk', flat=True))
             else:

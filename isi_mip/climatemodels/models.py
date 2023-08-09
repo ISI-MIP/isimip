@@ -495,6 +495,9 @@ class ImpactModelInformation(models.Model):
     other_information = JSONField(default=dict)
     sector_specific_information = JSONField(default=dict)
 
+    def __str__(self):
+        return "{}".format(self.impact_model)
+
 
     def values_to_tuples(self):
         tuples = []
@@ -547,7 +550,7 @@ class ImpactModelQuestion(models.Model):
     ]
 
     class Meta:
-        ordering = ['step']
+        ordering = ['information_type', 'sector', 'step']
         verbose_name = 'Model Documentation'
         constraints = [
             models.UniqueConstraint(fields=['information_type', 'sector'], name='unique_information_type_sector')
@@ -616,6 +619,8 @@ class ImpactModelQuestion(models.Model):
     def get_field_value(self, field_type, values, make_pretty=True):
         if field_type == 'input_data_choice':
             return ", ".join([make_pretty and input_data.pretty() or str(input_data) for input_data in InputData.objects.filter(pk__in=values)])
+        elif field_type == 'model_single_choice' and values:
+            return SpatialAggregation.objects.get(pk=values).name
         elif field_type == 'climate_variable_choice':
             return ", ".join([make_pretty and climate_variable.pretty() or str(climate_variable) for climate_variable in ClimateVariable.objects.filter(pk__in=values)])
         elif field_type == 'biodiversity_model_output_choice':

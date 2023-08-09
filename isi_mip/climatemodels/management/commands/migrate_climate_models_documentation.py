@@ -39,6 +39,8 @@ MODEL_LIST = (
     ('marine-ecosystems-and-fisheries-regional', MarineEcosystemsRegional),
     ('lakes-global', WaterGlobal),
     ('lakes-local', WaterRegional),
+    ('water-global', WaterGlobal),
+    ('water-regional', WaterRegional),
     ('biodiversity', Biodiversity),
     ('air-quality', Health),
     ('coastal-systems', CoastalInfrastructure),
@@ -149,7 +151,7 @@ class Command(BaseCommand):
         return stream_field
 
     def handle(self, *args, **options):
-        ImpactModelQuestion.objects.all().delete()
+        # ImpactModelQuestion.objects.all().delete()
         for model_type, model in MODEL_LIST:
             fieldsets = []
             impact_model_question = ImpactModelQuestion.objects.filter(Q(information_type=model_type) | Q(sector__slug=model_type))
