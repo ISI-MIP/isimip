@@ -617,9 +617,11 @@ class ImpactModelQuestion(models.Model):
         raise Exception(question.block_type)
     
     def get_field_value(self, field_type, values, make_pretty=True):
+        if values is None:
+            return ''
         if field_type == 'input_data_choice':
             return ", ".join([make_pretty and input_data.pretty() or str(input_data) for input_data in InputData.objects.filter(pk__in=values)])
-        elif field_type == 'model_single_choice' and values:
+        elif field_type == 'model_single_choice':
             return SpatialAggregation.objects.get(pk=values).name
         elif field_type == 'climate_variable_choice':
             return ", ".join([make_pretty and climate_variable.pretty() or str(climate_variable) for climate_variable in ClimateVariable.objects.filter(pk__in=values)])
@@ -627,8 +629,6 @@ class ImpactModelQuestion(models.Model):
             return ", ".join([biodiversity.name for biodiversity in BiodiversityModelOutput.objects.filter(pk__in=values)])
         if type(values) is bool:
             return 'Yes' if values is True else 'No' if values is False else ''
-        if values is None:
-            return ''
         return values
 
     
