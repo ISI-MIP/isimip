@@ -607,7 +607,7 @@ class ImpactModelQuestion(models.Model):
                 **options)
         elif question.block_type == 'input_data_choice':
             data_type = question.value['data_type']
-            choices = [(input_data.pk, input_data.name) for input_data in InputData.objects.filter(data_type__pk=data_type, simulation_round=simulation_round)]
+            choices = [(input_data.pk, input_data.name) for input_data in InputData.objects.filter(data_type__pk=data_type, simulation_round=simulation_round, protocol_relation=InputData.PROTOCOL_DATA)]
             return django.forms.MultipleChoiceField(
                 widget=MyMultiSelect(allowcustom=False, multiselect=True),
                 choices=choices,
