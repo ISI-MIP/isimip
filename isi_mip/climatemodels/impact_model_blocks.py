@@ -13,7 +13,7 @@ from wagtail.blocks.field_block import \
     MultipleChoiceBlock as _MultipleChoiceBlock
 from wagtail.blocks.field_block import RichTextBlock, TextBlock
 from wagtail.blocks.list_block import ListBlock
-from wagtail.core.blocks.stream_block import StreamBlock
+from wagtail.blocks.stream_block import StreamBlock
 from wagtail.coreutils import resolve_model_string
 
 
