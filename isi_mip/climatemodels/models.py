@@ -70,7 +70,7 @@ class ReferencePaper(Paper):
         journal = "{0.journal_name},{0.journal_volume},{0.journal_pages},".format(self) if self.journal_name else ''
         year = self.first_published.year if self.first_published else ''
         return "{}{}{}{}".format(author, title, journal, year)
-    
+
     def entry(self):
         author = "{} et al. ".format(self.lead_author) if self.lead_author else ''
         title = "{0.title}. ".format(self) if self.doi else self.title
@@ -103,7 +103,7 @@ class ClimateVariable(models.Model):
         if self.abbreviation:
             return '<abbr title="{0.name}">{0.abbreviation}</abbr>'.format(self)
         return self.name
-    
+
     def pretty(self):
         return self.as_span()
 
@@ -186,7 +186,7 @@ class InputData(models.Model):
     class Meta:
         verbose_name_plural = 'Input data'
         ordering = ('-created', 'name',)
-    
+
     def pretty(self):
         from isi_mip.pages.models import GettingStartedPage
         page = GettingStartedPage.objects.get(is_input_data_parent_page=True)
@@ -521,7 +521,7 @@ class ImpactModelInformation(models.Model):
         # raise Exception(tuples)
         return tuples
 
-        
+
 
 
 INFORMATION_TYPE_CHOICES = [
@@ -561,12 +561,12 @@ class ImpactModelQuestion(models.Model):
             return self.sector.name
         if self.information_type:
             return self.information_type
-        
+
     def get_form(self, *args, **kwargs):
         from isi_mip.climatemodels.forms import ImpactModelQuestionForm
         kwargs['impact_model_question'] = self
         return ImpactModelQuestionForm(*args, **kwargs)
-    
+
     def get_field_options(self, question):
         field = question.value
         options = {"label": field['question']}
@@ -574,8 +574,8 @@ class ImpactModelQuestion(models.Model):
         options["required"] = field['required']
         # options["initial"] = field.default_value
         return options
-    
-    
+
+
     def create_field(self, question, simulation_round, fieldset):
         options = self.get_field_options(question)
         # options['fieldset'] = fieldset
@@ -615,7 +615,7 @@ class ImpactModelQuestion(models.Model):
         elif question.block_type == 'true_false':
             return django.forms.BooleanField(widget=MyBooleanSelect(nullable=question.value['nullable']), **options)
         raise Exception(question.block_type)
-    
+
     def get_field_value(self, field_type, values, make_pretty=True):
         if values is None:
             return ''
@@ -631,7 +631,7 @@ class ImpactModelQuestion(models.Model):
             return 'Yes' if values is True else 'No' if values is False else ''
         return values
 
-    
+
     def formfields(self, simulation_round):
         formfields = OrderedDict()
 
@@ -642,7 +642,7 @@ class ImpactModelQuestion(models.Model):
                 clean_name = question.value['name']
                 formfields[clean_name] =  self.create_field(question, simulation_round, fieldset_name)
         return formfields
-    
+
     @property
     def fields(self):
         fields = []
@@ -1127,7 +1127,7 @@ class Biomes(BiomesForests):
     simulate_bioenergy = models.TextField(null=True, blank=True, default='', verbose_name='How do you simulate bioenergy? I.e. What PFT do you simulate on bioenergy land?')
     transition_cropland = models.TextField(null=True, blank=True, default='', verbose_name='How do you simulate the transition from cropland to bioenergy?')
     simulate_pasture = models.TextField(null=True, blank=True, default='', verbose_name='How do you simulate pasture (which PFT)?')
-    
+
     class Meta:
         verbose_name_plural = 'Biomes'
         verbose_name = 'Biomes'
@@ -1194,7 +1194,7 @@ class Biomes(BiomesForests):
 
 
 class Fire(BaseSector):
-    # Input data sets used 
+    # Input data sets used
     input_datasets_used = models.TextField(null=True, blank=True, default='', verbose_name='What input datasets are used in the fire model and what are they used for?')
     time_step_fire_model = models.TextField(null=True, blank=True, default='', verbose_name='What is the time step of the fire model?')
     time_step_exchange = models.TextField(null=True, blank=True, default='', verbose_name='What is the time step of the exchange between fire and vegetation model? e.g. are carbon pools and cover fractions updated every day?')
@@ -1749,7 +1749,7 @@ class OutputData(models.Model):
         duplicate.scenarios.set(self.scenarios.all())
         duplicate.drivers.set(self.drivers.all())
         return duplicate
-    
+
     def __str__(self):
         if self.model:
             return "%s : %s" % (self.model.base_model.sector, self.model.base_model.name)
@@ -1762,15 +1762,15 @@ def impact_model_path(instance, filename):
 
 class Attachment(models.Model):
     impact_model = models.OneToOneField(ImpactModel, on_delete=models.CASCADE)
-    attachment1 = models.FileField(null=True, blank=True, verbose_name="Attachment", upload_to=impact_model_path, validators=[FileExtensionValidator(allowed_extensions=['pdf', 'txt', 'csv'])])
+    attachment1 = models.FileField(null=True, blank=True, verbose_name="Attachment", upload_to=impact_model_path, validators=[FileExtensionValidator(allowed_extensions=['pdf', 'txt', 'csv', 'nc'])])
     attachment1_description = models.TextField(null=True, blank=True, verbose_name="Description")
-    attachment2 = models.FileField(null=True, blank=True, verbose_name="Attachment", upload_to=impact_model_path, validators=[FileExtensionValidator(allowed_extensions=['pdf', 'txt', 'csv'])])
+    attachment2 = models.FileField(null=True, blank=True, verbose_name="Attachment", upload_to=impact_model_path, validators=[FileExtensionValidator(allowed_extensions=['pdf', 'txt', 'csv', 'nc'])])
     attachment2_description = models.TextField(null=True, blank=True, verbose_name="Description")
-    attachment3 = models.FileField(null=True, blank=True, verbose_name="Attachment", upload_to=impact_model_path, validators=[FileExtensionValidator(allowed_extensions=['pdf', 'txt', 'csv'])])
+    attachment3 = models.FileField(null=True, blank=True, verbose_name="Attachment", upload_to=impact_model_path, validators=[FileExtensionValidator(allowed_extensions=['pdf', 'txt', 'csv', 'nc'])])
     attachment3_description = models.TextField(null=True, blank=True, verbose_name="Description")
-    attachment4 = models.FileField(null=True, blank=True, verbose_name="Attachment", upload_to=impact_model_path, validators=[FileExtensionValidator(allowed_extensions=['pdf', 'txt', 'csv'])])
+    attachment4 = models.FileField(null=True, blank=True, verbose_name="Attachment", upload_to=impact_model_path, validators=[FileExtensionValidator(allowed_extensions=['pdf', 'txt', 'csv', 'nc'])])
     attachment4_description = models.TextField(null=True, blank=True, verbose_name="Description")
-    attachment5 = models.FileField(null=True, blank=True, verbose_name="Attachment", upload_to=impact_model_path, validators=[FileExtensionValidator(allowed_extensions=['pdf', 'txt', 'csv'])])
+    attachment5 = models.FileField(null=True, blank=True, verbose_name="Attachment", upload_to=impact_model_path, validators=[FileExtensionValidator(allowed_extensions=['pdf', 'txt', 'csv', 'nc'])])
     attachment5_description = models.TextField(null=True, blank=True, verbose_name="Description")
 
     def _get_verbose_field_name(self, field):
@@ -1797,9 +1797,9 @@ class Attachment(models.Model):
 
 
 PUBLICATION_DATE_CHOICES = [
-    ('as_soon_as_possible', 'as soon as possible'), 
-    ('not_before_date', 'not before date'), 
-    ('one_year_after_dkrz', 'one year after submission to DKRZ at latest'), 
+    ('as_soon_as_possible', 'as soon as possible'),
+    ('not_before_date', 'not before date'),
+    ('one_year_after_dkrz', 'one year after submission to DKRZ at latest'),
     ('notify_isimip', 'the modeling group will notify the ISIMIP data team by email of the end of the emarbo period. (not later than one year after data submission)')
 ]
 

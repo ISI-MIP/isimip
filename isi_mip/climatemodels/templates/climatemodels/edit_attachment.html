@@ -4,7 +4,7 @@
 {% block form_content %}
 	<fieldset>
 		{% include 'widgets/heading3.html' with text='Attachments' %}
-		{% include 'widgets/richtext-content.html' with content='You can upload any file of type PDF, TXT or CSV.' %}
+		{% include 'widgets/richtext-content.html' with content='You can upload any file of type PDF, TXT, CSV or NC.' %}
 		{% for field in form %}
 		<div class="form-group {{ field.field.widget.input_type }}">
 			<label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}:</label>
